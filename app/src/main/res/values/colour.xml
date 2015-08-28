@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="ColorPrimaryRed">#e62117</color>
+    <color name="ColorPrimaryDarkRed">#c31c13</color>
+    <color name="tabsScrollColorRed">#8a140e</color>
+    <color name="ColorPrimaryBlue">#0BB5FF</color>
+    <color name="ColorPrimaryDarkBlue">#0198E1</color>
+    <color name="tabsScrollColorBlue">#0D4F8B</color>
+
+    <color name="backgroundPurple">#3F2466</color>
+    <color name="ColorPrimaryPurple">#654F84</color>
+    <color name="ColorPrimaryDarkPurple">#523975</color>
+    <color name="tabsScrollColorPurple">#3F2466</color>
+
+    <color name="lightGray">#bbbbbb</color>
+
+    <color name="apptheme_color">#81408c</color>
+
+    <color name="lightPurpleButton">#e1d2f3</color>
+    <color name="pressedPurpleButton">#ba9dda</color>
+    <color name="focusedPurpleButton">#d6c3ed</color>
+    <color name="textColor">#250054</color>
+
+    <color name="lightPurpleBackground">#E9E4ED</color>
+
+    <color name="swipeRefresh1">#482C6F</color>
+    <color name="swipeRefresh2">#AD78D9</color>
+    <color name="swipeRefresh3">#DCADF4</color>
+    <color name="swipeRefresh4">#AD78D9</color>
+
+
+</resources>

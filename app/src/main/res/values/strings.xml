@@ -1,0 +1,139 @@
+<resources>
+    <string name="app_name">RunMate</string>
+    <string name="subtitle">A social network for runners</string>
+    <string name="content_description_background">RunMate Background Image</string>
+
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="password_hint">Password</string>
+    <string name="username_hint">Username</string>
+    <string name="login_button_label">SIGN IN</string>
+    <string name="sign_up_text">Don\'t have an account? Sign up...</string>
+    <string name="content_desc_button_divider">Button divider</string>
+
+    <string name="title_section1">My Profile</string>
+    <string name="title_section2">Runs</string>
+    <string name="title_section3">Friends</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="email_hint">Email</string>
+    <string name="sign_up_button_label">SIGN UP</string>
+    <string name="cancel_sign_up_button_label">CANCEL</string>
+
+    <string name="sign_up_error_message">Please make sure you enter a username, password, and email address</string>
+    <string name="sign_up_error_title">Sorry, there was a problem</string>
+    <string name="error_title">Sorry about this...</string>
+
+    <string name="login_error_message">Please make sure you enter a username and password</string>
+    <string name="login_error_title">Sorry, there was a problem</string>
+
+    <string name="menu_logout_label">Logout</string>
+    <string name="menu_edit_friends_label">Edit Friends</string>
+    <string name="menu_add_friend_label">Add Friends</string>
+    <string name="action_search">Search</string>
+
+    <string name="progress_bar">Progress Bar</string>
+
+    <string name="empty_inbox_label">No new parseUsers</string>
+    <string name="empty_friends_label">No fiends yet... Add some to begin</string>
+    <string name="title_activity_edit_friends">Edit Friends</string>
+    <string name="title_activity_maps_activity_manual_polyline">Manual Polyline</string>
+    <string name="title_activity_maps_activity_directions_polyline">Directions Polyline</string>
+    <string name="plot_route_label">Plot run</string>
+
+    <string name="menu_camera_label">Camera</string>
+    <string name="str_btn_send">Send Route</string>
+    <string name="str_btn_accept">Accept</string>
+    <string name="str_btn_decline">Decline</string>
+    <string name="str_btn_animate">Animate Route</string>
+
+    <string-array name="camera_choices">
+        <item>Take Picture</item>
+        <item>Take Video</item>
+        <item>Choose Picture</item>
+        <item>Choose Video</item>
+    </string-array>
+
+    <string-array name="plot_route_choices">
+        <item>Manual Plot</item>
+        <item>Directions Assisted Plot</item>
+        <item>Track Run via GPS</item>
+    </string-array>
+
+    <string name="error_external_storage">There was a problem accessing your device\'s external storage</string>
+    <string name="general_error">Sorry, there was an error</string>
+    <string name="video_file_size_warning">The selected video must be less than 10MB</string>
+    <string name="error_opening_file">There was a problem with the selected file</string>
+    <string name="error_file_size_too_large">The selected file is too large. Please select a new file</string>
+    <string name="error_selecting_recipient_message">There was an error with the recipient selected. Please try again</string>
+    <string name="error_selecting_recipient_title">We\'re sorry</string>
+    <string name="error_sending_message">There was an error sending your message. Please try again</string>
+    <string name="error_sending_title">We\'re sorry</string>
+    <string name="error_declining_route_message">There was an error declining the route. Please try again</string>
+    <string name="error_declining_route_title">We\'re sorry</string>
+    <string name="success_decline_route">Route successfully deleted</string>
+    <string name="title_activity_recipients">Choose Recipients</string>
+
+    <string name="empty_recipients_list_string">Choose some friends first...</string>
+
+    <string name="menu_send_label">Send</string>
+    <string name="success_message">Message sent</string>
+    <string name="title_activity_view_image">RunMate</string>
+    <string name="title_activity_maps_activity_directions_multiple">MapDirectionsMultiple</string>
+
+    <string name="route_creation_error_message">Please ensure you have at least 2 points selected</string>
+    <string name="route_creation_error_title">Tap the map</string>
+    <string name="route_undo_error_message">No more parseUsers to undo</string>
+    <string name="route_undo_error_title">Steady on...</string>
+    <string name="title_activity_route_recipients">RouteRecipientsActivity</string>
+    <string name="success_route">Route sent</string>
+    <string name="error_sending_route_message">There was an error sending your route. Please try again</string>
+    <string name="title_activity_maps_activity_display_route">Map</string>
+    <string name="title_activity_inbox_route_fragment">InboxRouteFragment</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="distance_count">0 km</string>
+    <string name="str_btn_undo">Undo</string>
+    <string name="str_btn_complete_loop">Complete Loop</string>
+    <string name="title_activity_maps_activity_track_run">Map</string>
+
+    <string name="start_updates">Start Run</string>
+    <string name="stop_updates">Stop Run</string>
+    <string name="latitude_label">Lat</string>
+    <string name="longitude_label">Lng</string>
+    <string name="last_update_time_label">Last Update</string>
+    <string name="location_updated_message">New location detected</string>
+
+    <string name="nav_item_home">Home</string>
+    <string name="nav_item_my_runs">My Runs</string>
+    <string name="nav_item_my_profile">My Profile</string>
+    <string name="nav_item_settings">Settings</string>
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_home</item>
+        <item>@string/nav_item_my_runs</item>
+        <item>@string/nav_item_my_profile</item>
+        <item>@string/nav_item_settings</item>
+    </string-array>
+
+    <string name="title_home">Home</string>
+    <string name="title_my_runs">My Runs</string>
+    <string name="title_my_profile">Profile</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
+
+    <string name="content_desc_message_icon">Message icon</string>
+    <string name="content_desc_user_avatar">User avatar</string>
+    <string name="content_desc_user_checkmark">User checked</string>
+
+    <string name="push_notification_message">New RunMate route from %s</string>
+
+
+
+</resources>
