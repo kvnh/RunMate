@@ -27,8 +27,9 @@ public final class ParseConstants {
     public static final String KEY_CREATED_AT = "createdAt";
     public static final String TYPE_IMAGE = "image";
     public static final String TYPE_VIDEO = "video";
-    public static final String KEY_LATLNGPOINTS = "latLngPoints";
-    public static final String KEY_LATLNGBOUNDARYPOINTS = "latLngBoundaryPoints";
+    public static final String KEY_LATLNG_POINTS = "latLngPoints";
+    public static final String KEY_LATLNG_BOUNDARY_POINTS = "latLngBoundaryPoints";
     public static final String KEY_USER_ID = "userId";
+    public static final String KEY_ROUTE_DISTANCE = "routeDistance";
 
 }

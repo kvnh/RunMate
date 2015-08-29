@@ -65,6 +65,7 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
             holder.iconImageView = (ImageView) convertView.findViewById(R.id.messageIcon);
             holder.nameLabel = (TextView) convertView.findViewById(R.id.senderLabel);
             holder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
+            holder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
             convertView.setTag(holder);
         } else {
             // then it already exists and we can reuse the components - they are already there in memory - we just need to change the data
@@ -98,6 +99,11 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
         holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
 
+
+        double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
+        // holder.distanceLabel.setText(String.valueOf(distance));
+        holder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));
+
         return convertView;
     }
 
@@ -110,10 +116,12 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // The time the message was sent
         TextView timeLabel;
 
+        TextView distanceLabel;
+
     }
 
     // method to refill the list with ParseObject data if it is not null
-    public void refill(List<ParseObject> messages){
+    public void refill(List<ParseObject> messages) {
         // clear the current data
         mRoutes.clear();
         // add all the new ones

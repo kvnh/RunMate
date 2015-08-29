@@ -100,6 +100,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         mButtonCompleteLoop.setOnClickListener(this);
     }
 
+
     @Override
     public void onMapClick(LatLng latLng) {
         // Plot tapped point on map
@@ -154,8 +155,11 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", mRoute.getMarkerPoints());
 
-            // Add the min and max lat and long points to the route object
+            // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", mRoute.getLatLngBounds());
+
+            // Add the total distance of the route to the intent object
+            createRouteIntent.putExtra("routeDistance", mRoute.getTotalDistance());
 
             // Start RouteRecipientsActivity in order to choose recipients
             startActivity(createRouteIntent);

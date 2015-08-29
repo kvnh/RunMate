@@ -54,8 +54,9 @@ public class RouteRecipientsActivity extends Activity {
     // member variable to represent the array of LatLng values plotted my the user and passed into this activity via the intent that started it
     protected ArrayList<LatLng> markerPoints;
 
-
     protected LatLngBounds latLngBounds;
+
+    protected double mRouteDistance;
 
     // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
     // Values are those points clicked on the map
@@ -96,6 +97,10 @@ public class RouteRecipientsActivity extends Activity {
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
 
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
+
+        // mRouteDistance = getIntent().getParcelableExtra("routeDistance");
+        mRouteDistance = getIntent().getDoubleExtra("routeDistance", mRouteDistance);
+
     }
 
     // get a list of all your friends - this code is copied from the onResume() method in the FriendsFragment with some additions
@@ -233,10 +238,10 @@ public class RouteRecipientsActivity extends Activity {
         ParseObject route = new ParseObject(ParseConstants.CLASS_ROUTES);
 
         // add the LatLng points from the plotted map to the ParseObject route
-        route.addAll(ParseConstants.KEY_LATLNGPOINTS, (convertLatLngToParseGeoPointArray(markerPoints)));
+        route.addAll(ParseConstants.KEY_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(markerPoints)));
 
         // add the max and min lat and long points from the plotted map to the ParseObject route
-        route.addAll(ParseConstants.KEY_LATLNGBOUNDARYPOINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
+        route.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
 
         // now that we have an object, we can start adding data, using the key-value pairs...
         // first, get a String representation of the ID
@@ -246,6 +251,9 @@ public class RouteRecipientsActivity extends Activity {
         // put the recipient ID's
         // get the selected friends from the list through the helper method getRecipientIds()
         route.put(ParseConstants.KEY_RECIPIENT_IDS, getRecipientIds());
+
+
+        route.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
 
         // return a successful route
         return route;
