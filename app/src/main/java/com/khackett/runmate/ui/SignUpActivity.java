@@ -248,10 +248,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * Canels the signup activity and returns the user to the login screen
+     * Cancels the SignUpActivity and returns the user to the login screen
      */
     public void cancelSignUp() {
-        // Finish the sign up activity and return to the previous activity
+        // Finish the SignUpActivity and return to the previous activity
         finish();
     }
 

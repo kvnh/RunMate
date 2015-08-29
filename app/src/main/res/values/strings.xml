@@ -31,6 +31,7 @@
     <string name="sign_up_button_label">SIGN UP</string>
     <string name="cancel_sign_up_button_label">CANCEL</string>
     <string name="reset_password_button_label">SUBMIT</string>
+    <string name="cancel_reset_password_button_label">CANCEL</string>
     <string name="enter_email_text">Enter your email to reset your password</string>
 
     <string name="sign_up_error_title">Sorry, there was a problem</string>

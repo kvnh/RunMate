@@ -3,7 +3,7 @@ package com.khackett.runmate.ui;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -12,20 +12,19 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.khackett.runmate.R;
-import com.khackett.runmate.RunMateApplication;
-import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 
 /**
- * Class to log a registered user into RunMate
+ * Class to reset a users RunMate password.
  */
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Member variables that correspond to items in the layout.
     protected EditText mEmail;
     protected Button mResetPasswordButton;
+    protected Button mCancelResetPasswordButton;
 
     // Declare the context of the activity.
     protected Context mContext;
@@ -38,9 +37,11 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         // Set each member variable for the ui components
         mEmail = (EditText) findViewById(R.id.emailField);
         mResetPasswordButton = (Button) findViewById(R.id.resetPasswordButton);
+        mCancelResetPasswordButton = (Button) findViewById(R.id.cancelResetPasswordButton);
 
         // Register buttons with the listener
         mResetPasswordButton.setOnClickListener(this);
+        mCancelResetPasswordButton.setOnClickListener(this);
 
         // Initialise the Context to the LoginActivity.
         mContext = ForgotPasswordActivity.this;
@@ -53,17 +54,14 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
      */
     @Override
     public void onClick(View v) {
-        // Switch statement to select which action to take depending on button/text pressed
+        // Switch statement to select which action to take depending on button/text pressed.
         switch (v.getId()) {
             case R.id.resetPasswordButton:
                 resetPassword();
                 break;
-//            case R.id.loginButton:
-//                loginInUser();
-//                break;
-//            case R.id.signUpText:
-//                signUpUser();
-//                break;
+            case R.id.cancelResetPasswordButton:
+                cancelResetPassword();
+                break;
             default:
                 System.out.println("Problem with input");
         }
@@ -85,7 +83,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         // Ensure that the email field is not blank.
         if (email.isEmpty()) {
             // Alert user to fill in all of the fields.
-            showDialog(R.string.forgot_password_error_title, R.string.forgot_password_error_message);
+            showErrorDialog(R.string.forgot_password_error_title, R.string.forgot_password_error_message);
         } else {
 
             // Set up a dialog progress indicator box.
@@ -101,10 +99,24 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     progressDialog.dismiss();
 
                     if (e == null) {
-                        // An email was successfully sent with reset instructions - alert the user
-                        showDialog(R.string.reset_password_success_title, R.string.reset_password_success_message);
-                        // Finish ForgotPasswordActivity and return to the previous activity
-                        finish();
+                        // An email was successfully sent with reset instructions - alert the user.
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
+                        // Set the message title and text for the dialog
+                        // Chain the methods together as they are all referencing the builder object.
+                        builder.setMessage(R.string.reset_password_success_message)
+                                .setTitle(R.string.reset_password_success_title)
+                                        // Button to dismiss the dialog.
+                                        // Set the listener so that user has to interact with dialog to dismiss it.
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // Finish ForgotPasswordActivity and return to the previous activity.
+                                        finish();
+                                    }
+                                });
+                        // Create a dialog from the builder object and show it.
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
                     } else {
                         // There is an exception - alert the user.
                         AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
@@ -122,60 +134,34 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
     }
 
     /**
-     * Switches to the SignUpActivity
-     */
-    public void signUpUser() {
-        // Create a new intent for the SignUpActivity and start.
-        Intent intent = new Intent(this, SignUpActivity.class);
-        startActivity(intent);
-    }
-
-
-    /**
-     * Checks for empty fields in the log in activity.
-     *
-     * @param username the users username
-     * @param password the users password
-     * @return true if any of the text fields are empty; false if they all contain a String value
-     */
-    public boolean checkForEmptyFields(String username, String password) {
-
-        // Declare variables for text field checks
-        String usernameCheck, passwordCheck;
-
-        // Initialise variables
-        usernameCheck = username;
-        passwordCheck = password;
-
-        // Check if any of the arguments are empty String values
-        if (usernameCheck.isEmpty() || passwordCheck.isEmpty()) {
-            // If so, return a value of true
-            return true;
-        }
-        // If not, return a value of false
-        return false;
-    }
-
-    /**
      * Error dialog to display to the user if the credentials they entered are not valid
      *
      * @param title   the title of the dialog
      * @param message the message in the dialog
      */
-    public void showDialog(int title, int message) {
+    public void showErrorDialog(int title, int message) {
         // Alert user of relevant error - Use a dialog so user interaction is required.
         // Use Builder to build and configure the alert
         AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
         // Set the message title and text for the dialog
-        // Chain the methods together as they are all referencing the builder object
+        // Chain the methods together as they are all referencing the builder object.
         builder.setMessage(message).setTitle(title)
                 // Button to dismiss the dialog.
                 // Set the listener to null - only want to dismiss the dialog when the button is tapped.
-                // ok is from android resources
+                // ok is from android resources.
                 .setPositiveButton(android.R.string.ok, null);
-        // Create a dialog from the builder object and show it
+        // Create a dialog from the builder object and show it.
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+
+    /**
+     * Cancels the ForgotPasswordActivity and returns the user to the login screen
+     */
+    public void cancelResetPassword() {
+        // Finish the ForgotPasswordActivity and return to the previous activity.
+        finish();
     }
 
     @Override
