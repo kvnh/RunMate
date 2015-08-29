@@ -54,7 +54,8 @@
         </activity>
         <activity
             android:name=".MapsActivityManualPolyline"
-            android:label="@string/title_activity_maps_activity_manual_polyline">
+            android:label="@string/title_activity_maps_activity_manual_polyline"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity"/>
@@ -92,7 +93,8 @@
         </activity>
         <activity
             android:name=".MapsActivityDirectionsMultiple"
-            android:label="@string/title_activity_maps_activity_directions_multiple">
+            android:label="@string/title_activity_maps_activity_directions_multiple"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity"/>

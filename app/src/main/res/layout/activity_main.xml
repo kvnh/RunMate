@@ -35,11 +35,11 @@
             android:background="@color/ColorPrimaryPurple"
             android:elevation="2dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tool_bar"
-            android:layout_marginTop="@dimen/TextDimTop"/>
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/tool_bar"-->
+            <!--android:layout_marginTop="@dimen/TextDimTop"/>-->
 
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
