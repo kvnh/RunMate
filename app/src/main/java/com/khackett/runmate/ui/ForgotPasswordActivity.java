@@ -10,25 +10,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.RunMateApplication;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 
 /**
  * Class to log a registered user into RunMate
  */
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Member variables that correspond to items in the layout.
-    protected EditText mUserName;
-    protected EditText mPassword;
-    protected Button mLoginButton;
-    protected TextView mSignUpTextView;
-    protected TextView mForgotPasswordTextView;
+    protected EditText mEmail;
+    protected Button mResetPasswordButton;
 
     // Declare the context of the activity.
     protected Context mContext;
@@ -36,22 +33,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_forgot_password);
 
         // Set each member variable for the ui components
-        mUserName = (EditText) findViewById(R.id.usernameField);
-        mPassword = (EditText) findViewById(R.id.passwordField);
-        mLoginButton = (Button) findViewById(R.id.loginButton);
-        mSignUpTextView = (TextView) findViewById(R.id.signUpText);
-        mForgotPasswordTextView = (TextView) findViewById(R.id.forgotPasswordText);
+        mEmail = (EditText) findViewById(R.id.emailField);
+        mResetPasswordButton = (Button) findViewById(R.id.resetPasswordButton);
 
         // Register buttons with the listener
-        mLoginButton.setOnClickListener(this);
-        mSignUpTextView.setOnClickListener(this);
-        mForgotPasswordTextView.setOnClickListener(this);
+        mResetPasswordButton.setOnClickListener(this);
 
         // Initialise the Context to the LoginActivity.
-        mContext = LoginActivity.this;
+        mContext = ForgotPasswordActivity.this;
     }
 
     /**
@@ -63,77 +55,61 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         // Switch statement to select which action to take depending on button/text pressed
         switch (v.getId()) {
-            case R.id.loginButton:
-                loginInUser();
+            case R.id.resetPasswordButton:
+                resetPassword();
                 break;
-            case R.id.signUpText:
-                signUpUser();
-                break;
-            case R.id.forgotPasswordText:
-                forgotPassword();
-                break;
+//            case R.id.loginButton:
+//                loginInUser();
+//                break;
+//            case R.id.signUpText:
+//                signUpUser();
+//                break;
             default:
                 System.out.println("Problem with input");
         }
     }
 
-    /**
-     * Method to log a user into RunMate.
-     */
-    public void loginInUser() {
-        // When the user taps the log in button, check the values for validation on the client side
-        // If they are ok, send them to Parse backend.  If not, display a message to the user
 
-        // Get values from the edit text fields.
+    /**
+     * Method to reset the users password
+     */
+    public void resetPassword() {
+        // Get value from the edit text field.
         // Add the toString() method, as the return type in getText() is Editable.
         // - special type of String value that needs to be converted to a regular String.
-        String username = mUserName.getText().toString();
-        String password = mPassword.getText().toString();
+        String email = mEmail.getText().toString();
 
-        // Trim whitespaces from these values in case the user accidentally hits a space.
-        username = username.trim();
-        password = password.trim();
+        // Trim whitespaces in case the user accidentally hits a space.
+        email = email.trim();
 
-        // Ensure that none of the fields are blank.
-
-        if (checkForEmptyFields(username, password)) {
+        // Ensure that the email field is not blank.
+        if (email.isEmpty()) {
             // Alert user to fill in all of the fields.
-            showErrorDialog(R.string.login_error_title, R.string.login_error_message);
+            showDialog(R.string.forgot_password_error_title, R.string.forgot_password_error_message);
         } else {
 
-            // Credentials pass client side validation. Validate in backend.
-
             // Set up a dialog progress indicator box.
-            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-            progressDialog.setTitle(R.string.log_in_progress_dialog_title);
-            progressDialog.setMessage(mContext.getString(R.string.log_in_progress_dialog_message));
+            final ProgressDialog progressDialog = new ProgressDialog(ForgotPasswordActivity.this);
+            progressDialog.setTitle(R.string.forgot_password_progress_dialog_title);
+            progressDialog.setMessage(mContext.getString(R.string.forgot_password_progress_dialog_message));
             progressDialog.show();
 
-            // Attempt to log user in using background thread
-            ParseUser.logInInBackground(username, password, new LogInCallback() {
-                @Override
-                public void done(ParseUser parseUser, ParseException e) {
-
+            // Credentials pass client side validation. Validate in backend.
+            ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
+                public void done(ParseException e) {
                     // Dismiss progress dialog once connection with backend has been made.
                     progressDialog.dismiss();
 
-                    // done() method returns a ParseUser object.
                     if (e == null) {
-                        // If login is successful and no ParseException, log user into RunMate
-
-                        // Update the Parse Installation object with the users ID to be used for push notifications.
-                        RunMateApplication.updateParseInstallationObject(parseUser);
-
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-
+                        // An email was successfully sent with reset instructions - alert the user
+                        showDialog(R.string.reset_password_success_title, R.string.reset_password_success_message);
+                        // Finish ForgotPasswordActivity and return to the previous activity
+                        finish();
                     } else {
                         // There is an exception - alert the user.
-                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
                         builder.setMessage(e.getMessage())
-                                .setTitle(R.string.login_error_title)
+                                .setTitle(R.string.forgot_password_error_title)
                                 .setPositiveButton(android.R.string.ok, null);
                         AlertDialog dialog = builder.create();
                         dialog.show();
@@ -141,6 +117,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         }
+
+
     }
 
     /**
@@ -149,15 +127,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void signUpUser() {
         // Create a new intent for the SignUpActivity and start.
         Intent intent = new Intent(this, SignUpActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Switches to the ForgotPasswordActivity
-     */
-    public void forgotPassword() {
-        // Create a new intent for the ForgotPasswordActivity and start.
-        Intent intent = new Intent(this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
 
@@ -193,10 +162,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * @param title   the title of the dialog
      * @param message the message in the dialog
      */
-    public void showErrorDialog(int title, int message) {
+    public void showDialog(int title, int message) {
         // Alert user of relevant error - Use a dialog so user interaction is required.
         // Use Builder to build and configure the alert
-        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
         // Set the message title and text for the dialog
         // Chain the methods together as they are all referencing the builder object
         builder.setMessage(message).setTitle(title)
