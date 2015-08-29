@@ -103,9 +103,11 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
     // class that contains the data that is going to be displayed in the custom layout for each item
     private static class ViewHolder {
-        // we have 2 pieces of data - a text view and an image view
+        // The image to be displayed
         ImageView iconImageView;
+        // The users name
         TextView nameLabel;
+        // The time the message was sent
         TextView timeLabel;
 
     }

@@ -25,17 +25,28 @@
         style="@style/AuthenticationFieldContainer">
 
         <EditText
-            android:id="@+id/usernameField"
+            android:id="@+id/fullNameField"
             style="@style/AuthenticationEditText"
-            android:hint="@string/username_hint">
+            android:hint="@string/full_name_hint">
 
             <requestFocus/>
         </EditText>
 
         <EditText
+            android:id="@+id/usernameField"
+            style="@style/AuthenticationEditText"
+            android:hint="@string/username_hint"/>
+
+        <EditText
             android:id="@+id/passwordField"
             style="@style/AuthenticationEditText"
             android:hint="@string/password_hint"
+            android:inputType="textPassword"/>
+
+        <EditText
+            android:id="@+id/passwordConfirmField"
+            style="@style/AuthenticationEditText"
+            android:hint="@string/confirm_password_hint"
             android:inputType="textPassword"/>
 
         <EditText

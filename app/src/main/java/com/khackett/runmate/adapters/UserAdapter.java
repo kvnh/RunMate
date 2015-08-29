@@ -20,9 +20,9 @@ import com.squareup.picasso.Picasso;
 import java.util.Date;
 import java.util.List;
 
-// need to create a custom list view adapter - very similar to the way it is done in fragments
-// our adapter has 2 parts: we need to define a custom layout that will be used for each item in the list;
-// then we need to create a custom class that adapts one message of our parse objects into the layout
+// Create a custom list view adapter - similar to the way it is done in fragments.
+// The adapter has two parts: a custom layout that will be used for each item in the list;
+// And a custom class that adapts one message of the parse object into the layout.
 
 /**
  * Custom adapter that uses the message_item.xml layout file
@@ -124,7 +124,6 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         ImageView userImageView;
         ImageView checkUserImageView;
         TextView nameLabel;
-
 
     }
 

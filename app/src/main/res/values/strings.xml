@@ -18,12 +18,16 @@
 
     <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="email_hint">Email</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="full_name_hint">Name</string>
     <string name="sign_up_button_label">SIGN UP</string>
     <string name="cancel_sign_up_button_label">CANCEL</string>
 
-    <string name="sign_up_error_message">Please make sure you enter a username, password, and email address</string>
+    <string name="sign_up_error_message">Please make sure all of the fields are filled</string>
     <string name="sign_up_error_title">Sorry, there was a problem</string>
     <string name="error_title">Sorry about this...</string>
+    <string name="confirm_password_error_title">Sorry, there was a problem</string>
+    <string name="confirm_password_error_message">Please ensure your confirmation password is matching</string>
 
     <string name="login_error_message">Please make sure you enter a username and password</string>
     <string name="login_error_title">Sorry, there was a problem</string>
