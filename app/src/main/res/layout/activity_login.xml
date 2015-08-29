@@ -52,8 +52,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/loginButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:text="@string/sign_up_text"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
 </RelativeLayout>
