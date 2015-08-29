@@ -3,16 +3,15 @@
     <string name="subtitle">A social network for runners</string>
     <string name="content_description_background">RunMate Background Image</string>
 
+    <string name="login_error_message">Please make sure you enter a username and password</string>
+    <string name="login_error_title">Sorry, there was a problem</string>
+
     <string name="title_activity_login">LoginActivity</string>
     <string name="password_hint">Password</string>
     <string name="username_hint">Username</string>
     <string name="login_button_label">SIGN IN</string>
     <string name="sign_up_text">Don\'t have an account? Sign up here...</string>
     <string name="content_desc_button_divider">Button divider</string>
-
-    <string name="title_section1">My Profile</string>
-    <string name="title_section2">Runs</string>
-    <string name="title_section3">Friends</string>
 
     <string name="action_settings">Settings</string>
 
@@ -23,19 +22,24 @@
     <string name="sign_up_button_label">SIGN UP</string>
     <string name="cancel_sign_up_button_label">CANCEL</string>
 
-    <string name="sign_up_error_message">Please make sure all of the fields are filled</string>
     <string name="sign_up_error_title">Sorry, there was a problem</string>
+    <string name="sign_up_error_message">Please make sure all of the fields are filled</string>
     <string name="error_title">Sorry about this...</string>
     <string name="confirm_password_error_title">Sorry, there was a problem</string>
     <string name="confirm_password_error_message">Please ensure your confirmation password is matching</string>
-
-    <string name="login_error_message">Please make sure you enter a username and password</string>
-    <string name="login_error_title">Sorry, there was a problem</string>
+    <string name="sign_up_progress_dialog_title">Please wait</string>
+    <string name="sign_up_progress_dialog_message">Signing you up to RunMate</string>
+    <string name="log_in_progress_dialog_title">Please wait</string>
+    <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
 
     <string name="menu_logout_label">Logout</string>
     <string name="menu_edit_friends_label">Edit Friends</string>
     <string name="menu_add_friend_label">Add Friends</string>
     <string name="action_search">Search</string>
+
+    <string name="title_section1">My Profile</string>
+    <string name="title_section2">Runs</string>
+    <string name="title_section3">Friends</string>
 
     <string name="progress_bar">Progress Bar</string>
 
@@ -137,7 +141,6 @@
     <string name="content_desc_user_checkmark">User checked</string>
 
     <string name="push_notification_message">New RunMate route from %s</string>
-
 
 
 </resources>

@@ -2,6 +2,7 @@ package com.khackett.runmate.ui;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +18,11 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 /**
- * Class to sign up a new user to the backend in Parse.
+ * Class to sign up a new user to RunMate.
  */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // member variables that correspond to items in the layout
+    // Member variables that correspond to items in the layout.
     protected EditText mUserName;
     protected EditText mPassword;
     protected EditText mPasswordConfirm;
@@ -30,14 +31,15 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     protected Button mSignUpButton;
     protected Button mCancelSignUpButton;
 
-//    protected ProgressBar mProgressBar;
+    // Declare the context of the activity.
+    protected Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        // set each member variable for the ui components
+        // Set each member variable for the ui components
         mUserName = (EditText) findViewById(R.id.usernameField);
         mPassword = (EditText) findViewById(R.id.passwordField);
         mPasswordConfirm = (EditText) findViewById(R.id.passwordConfirmField);
@@ -49,6 +51,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         // Register buttons with the listener
         mSignUpButton.setOnClickListener(this);
         mCancelSignUpButton.setOnClickListener(this);
+
+        // Initialise the Context to the SignUpActivity.
+        mContext = SignUpActivity.this;
     }
 
     /**
@@ -58,6 +63,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      */
     @Override
     public void onClick(View v) {
+        // Switch statement to select which action to take depending on button pressed
         switch (v.getId()) {
             case R.id.signUpButton:
                 signUpUser();
@@ -71,13 +77,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * Sign up a user using the credentials entered.
+     * Signs up a user using the credentials entered.
      * Validation checks for empty fields and a non-duplicate confirmation password.
+     * Check values of text fields locally when the user taps the sign up button.
+     * If OK, send the values to the backend to check validation credentials.
+     * If not, display an instruction message to the user.
      */
     public void signUpUser() {
-        // Check values of text fields locally when the user taps the sign up button.
-        // If OK, send the values to the backend to check validation credentials
-        // If not, display an instruction message to the user
 
         // Get values from the edit text fields.
         // Add the toString() method, as the return type in getText() is Editable.
@@ -104,9 +110,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             showErrorDialog(R.string.confirm_password_error_title, R.string.confirm_password_error_message);
         } else {
 
-//                    // set progress bar to visible
-//                    // setProgressBarIndeterminateVisibility(true);
-//                    mProgressBar.setVisibility(View.VISIBLE);
+            // Credentials pass client side validation. Validate in backend.
+
+            // Set up a dialog progress indicator box
+            final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this);
+            progressDialog.setTitle(R.string.sign_up_progress_dialog_title);
+            progressDialog.setMessage(mContext.getString(R.string.sign_up_progress_dialog_message));
+            progressDialog.show();
 
             // Create a new user.
             // First create a new ParseUser object and add each of the information fields to it
@@ -116,19 +126,19 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             newUser.setPassword(password);
             newUser.setEmail(email);
 
-            // Use ParseUser class signup method to sign user up in a background processing thread.
+            // Use ParseUser signUpInBackground() method to sign user up in a background processing thread, separate from main thread.
             // Use a callback method when it is complete - SignUpCallback()
             newUser.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
 
-//                            // Once contact has been made with Parse, (before the error is checked), set progress indicator visibility to false.
-//                            // setProgressBarIndeterminateVisibility(false);
-//                            mProgressBar.setVisibility(View.INVISIBLE);
+                    // Dismiss progress dialog once connection with backend has been made
+                    progressDialog.dismiss();
 
-                    // this time the done() method has a parseUser object returned.
+                    // done() method returns a ParseUser object.
                     // If signup is successful and no ParseException, initialise newUser variable.
                     if (e == null) {
+
                         // Update the Parse Installation object with the users ID to be used for push notifications.
                         RunMateApplication.updateParseInstallationObject(ParseUser.getCurrentUser());
 
@@ -139,6 +149,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
+
                         // If ParseException, alert the user with dialog.
                         AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
                         // Set the message from the exception.
@@ -221,7 +232,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      * @param message the message in the dialog
      */
     public void showErrorDialog(int title, int message) {
-
         // Alert user of relevant error - Use a dialog so user interaction is required.
         // Use Builder to build and configure the alert
         AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
