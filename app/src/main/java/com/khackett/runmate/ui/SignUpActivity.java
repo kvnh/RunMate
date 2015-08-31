@@ -238,7 +238,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      * .{6,} at least 6 characters
      *
      * @param password
-     * @return
+     * @return true if the password passes the regex conditions; false if not.
      */
     public boolean isPasswordValid(String password) {
         // String variable to represent the regex search pattern

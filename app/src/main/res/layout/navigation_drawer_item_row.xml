@@ -10,7 +10,7 @@
     android:paddingTop="8dp">
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/nav_drawer_item_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"

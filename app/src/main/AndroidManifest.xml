@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.khackett.runmate"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.khackett.runmate"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -14,7 +13,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
-    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <uses-feature
@@ -24,6 +23,7 @@
     <permission
         android:name="com.khackett.runmate.permission.C2D_MESSure"
         android:protectionLevel="signature"/>
+
     <uses-permission android:name="com.khackett.runmate.permission.C2D_MESSAGE"/>
 
     <application
@@ -133,16 +133,14 @@
 
         <service android:name="com.parse.PushService"/>
 
-        <receiver
-            android:name="com.parse.ParseBroadcastReceiver">
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.USER_PRESENT"/>
             </intent-filter>
         </receiver>
-
         <receiver
-            android:name="com.khackett.runmate.utils.ParseReceiver"
+            android:name=".utils.ParseReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE"/>
@@ -150,7 +148,6 @@
                 <action android:name="com.parse.push.intent.OPEN"/>
             </intent-filter>
         </receiver>
-
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -165,7 +162,6 @@
         <meta-data
             android:name="com.parse.push.notification_icon"
             android:resource="@mipmap/ic_stat_rm"/>
-
     </application>
 
 </manifest>

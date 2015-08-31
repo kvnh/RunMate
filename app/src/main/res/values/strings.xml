@@ -130,7 +130,7 @@
     <string name="location_updated_message">New location detected</string>
 
     <string name="nav_item_home">Home</string>
-    <string name="nav_item_my_runs">Run History</string>
+    <string name="nav_item_run_history">Run History</string>
     <string name="nav_item_my_profile">My Profile</string>
     <string name="nav_item_settings">Settings</string>
     <string name="nav_item_help">Help</string>
@@ -138,7 +138,7 @@
     <!-- navigation drawer item labels  -->
     <string-array name="nav_drawer_labels">
         <item>@string/nav_item_home</item>
-        <item>@string/nav_item_my_runs</item>
+        <item>@string/nav_item_run_history</item>
         <item>@string/nav_item_my_profile</item>
         <item>@string/nav_item_settings</item>
         <item>@string/nav_item_help</item>
@@ -157,6 +157,9 @@
     <string name="content_desc_user_checkmark">User checked</string>
 
     <string name="push_notification_message">New RunMate route from %s</string>
+    <string name="title_activity_squad_fragment">SquadFragment</string>
+
+    <string name="hello_world">Hello world!</string>
 
 
 </resources>

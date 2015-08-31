@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_item_inbox"
+        android:icon="@mipmap/ic_tab_inbox"
+        android:title="Inbox"/>
+
+    <item
+        android:id="@+id/nav_item_sent"
+        android:icon="@mipmap/ic_tab_inbox"
+        android:title="Run History"/>
+
+    <item
+        android:id="@+id/nav_item_draft"
+        android:icon="@mipmap/ic_tab_inbox"
+        android:title="My Profile"/>
+
+
+    <item android:title="Others">
+        <menu>
+            <item
+                android:icon="@mipmap/ic_action_play_over_video"
+                android:title="Spam"/>
+            <item
+                android:icon="@mipmap/ic_action_play_over_video"
+                android:title="Bin"/>
+        </menu>
+    </item>
+
+    <group android:id="@+id/group_settings_id">
+
+        <item
+            android:icon="@mipmap/ic_action_play_over_video"
+            android:title="Settings"/>
+        <item
+            android:icon="@mipmap/ic_action_play_over_video"
+            android:title="Help"/>
+    </group>
+
+</menu>
