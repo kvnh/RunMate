@@ -23,11 +23,11 @@ import com.parse.SignUpCallback;
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Member variables that correspond to items in the layout.
+    protected EditText mFullName;
     protected EditText mUserName;
+    protected EditText mEmail;
     protected EditText mPassword;
     protected EditText mPasswordConfirm;
-    protected EditText mEmail;
-    protected EditText mFullName;
     protected Button mSignUpButton;
     protected Button mCancelSignUpButton;
 
@@ -40,11 +40,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_up);
 
         // Set each member variable for the ui components
+        mFullName = (EditText) findViewById(R.id.fullNameField);
         mUserName = (EditText) findViewById(R.id.usernameField);
+        mEmail = (EditText) findViewById(R.id.emailField);
         mPassword = (EditText) findViewById(R.id.passwordField);
         mPasswordConfirm = (EditText) findViewById(R.id.passwordConfirmField);
-        mEmail = (EditText) findViewById(R.id.emailField);
-        mFullName = (EditText) findViewById(R.id.fullNameField);
         mSignUpButton = (Button) findViewById(R.id.signUpButton);
         mCancelSignUpButton = (Button) findViewById(R.id.cancelSignUpButton);
 
@@ -90,16 +90,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         // - special type of String value that needs to be converted to a regular String.
         String fullName = mFullName.getText().toString();
         String username = mUserName.getText().toString();
+        String email = mEmail.getText().toString();
         String password = mPassword.getText().toString();
         String passwordConfirm = mPasswordConfirm.getText().toString();
-        String email = mEmail.getText().toString();
 
         // Trim whitespaces from these values in case the user accidentally hits a space
         fullName = fullName.trim();
         username = username.trim();
+        email = email.trim();
         password = password.trim();
         passwordConfirm = passwordConfirm.trim();
-        email = email.trim();
 
         // Ensure that none of the values are blank
         if (checkForEmptyFields(fullName, username, password, passwordConfirm, email)) {
@@ -108,6 +108,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         } else if (!isPasswordMatching(password, passwordConfirm)) {
             // Alert user to enter matching passwords
             showErrorDialog(R.string.confirm_password_error_title, R.string.confirm_password_error_message);
+        } else if (!isPasswordValid(password)) {
+            // Alert user to enter a valid password
+            showErrorDialog(R.string.password_validation_error_title, R.string.password_validation_error_message);
         } else {
 
             // Credentials pass client side validation. Validate in backend.
@@ -123,8 +126,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             ParseUser newUser = new ParseUser();
             newUser.put("fullName", fullName);
             newUser.setUsername(username);
-            newUser.setPassword(password);
             newUser.setEmail(email);
+            newUser.setPassword(password);
 
             // Use ParseUser signUpInBackground() method to sign user up in a background processing thread, separate from main thread.
             // Use a callback method when it is complete - SignUpCallback()
@@ -175,24 +178,25 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      * @param email           the users email
      * @return true if any of the text fields are empty; false if they all contain a String value
      */
-    public boolean checkForEmptyFields(String fullName, String username, String password, String passwordConfirm, String email) {
+    public boolean checkForEmptyFields(String fullName, String username, String email, String password, String passwordConfirm) {
 
         // Declare variables for text field checks
-        String fullNameCheck, usernameCheck, passwordCheck, passwordConfirmCheck, emailCheck;
+        String fullNameCheck, usernameCheck, emailCheck, passwordCheck, passwordConfirmCheck;
 
         // Initialise variables
         fullNameCheck = fullName;
         usernameCheck = username;
+        emailCheck = email;
         passwordCheck = password;
         passwordConfirmCheck = passwordConfirm;
-        emailCheck = email;
 
         // Check if any of the arguments are empty String values
         if (fullNameCheck.isEmpty() ||
                 usernameCheck.isEmpty() ||
+                emailCheck.isEmpty() ||
                 passwordCheck.isEmpty() ||
-                passwordConfirmCheck.isEmpty() ||
-                emailCheck.isEmpty()) {
+                passwordConfirmCheck.isEmpty()
+                ) {
             // If so, return a value of true
             return true;
         }
@@ -224,6 +228,28 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         return false;
     }
 
+    /**
+     * Method to check for password validation client side
+     * Conditions:
+     * (?=.*[A-Z]) an upper case letter must occur at least once
+     * (?=.*[a-z]) a lower case letter must occur at least once
+     * (?=.*[0-9]) a digit must occur at least once
+     * (?=\\S+$) no whitespace allowed in the entire string
+     * .{6,} at least 6 characters
+     *
+     * @param password
+     * @return
+     */
+    public boolean isPasswordValid(String password) {
+        // String variable to represent the regex search pattern
+        String pattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{6,}";
+        if (password.matches(pattern)) {
+            // If the password meets the conditions of the regex, return true.
+            return true;
+        }
+        // Otherwise return false.
+        return false;
+    }
 
     /**
      * Error dialog to display to the user if the credentials they entered are not valid

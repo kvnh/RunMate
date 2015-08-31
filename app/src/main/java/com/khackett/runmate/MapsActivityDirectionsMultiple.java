@@ -43,7 +43,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    List<Polyline> polylines;
+    private List<Polyline> polylines;
 
     // Member variable for the UI buttons
     protected Button mButtonSend;
