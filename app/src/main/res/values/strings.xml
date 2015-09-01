@@ -51,8 +51,8 @@
     <string name="menu_add_friend_label">Add Friends</string>
     <string name="action_search">Search</string>
 
-    <string name="title_section1">My Profile</string>
-    <string name="title_section2">Runs</string>
+    <string name="title_section1">My Runs</string>
+    <string name="title_section2">Inbox</string>
     <string name="title_section3">Friends</string>
 
     <string name="progress_bar">Progress Bar</string>

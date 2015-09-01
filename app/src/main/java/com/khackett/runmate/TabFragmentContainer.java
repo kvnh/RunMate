@@ -4,47 +4,46 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khackett.runmate.ui.FriendsFragment;
-import com.khackett.runmate.ui.InboxRouteFragment;
-import com.khackett.runmate.ui.SettingsFragment;
+import com.khackett.runmate.adapters.MyFragmentPagerAdapter;
 
 /**
  * Created by KHackett on 31/08/15.
  */
 public class TabFragmentContainer extends Fragment {
 
+    // Create the FragmentPagerAdapter that will provide and manage tabs for each section.
+    public static MyFragmentPagerAdapter myFragmentPagerAdapter;
+
     public static TabLayout tabLayout;
+
+    // The ViewPager is a layout widget in which each child view is a separate tab in the layout.
+    // It will host the section contents.
     public static ViewPager viewPager;
-    public static int int_items = 3;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        /**
-         *Inflate tab_layout and setup Views.
-         */
-        View x = inflater.inflate(R.layout.tab_layout_fragment_container, null);
-        tabLayout = (TabLayout) x.findViewById(R.id.tabs);
-        viewPager = (ViewPager) x.findViewById(R.id.viewpager);
+        // Inflate tab_layout_fragment_container view and setup views for the TabLayout and ViewPager items.
+        View view = inflater.inflate(R.layout.tab_layout_fragment_container, null);
 
-        /**
-         *Set an Apater for the View Pager
-         */
-        viewPager.setAdapter(new MyAdapter(getChildFragmentManager()));
+        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
 
-        /**
-         * Now , this is a workaround ,
-         * The setupWithViewPager dose't works without the runnable .
-         * Maybe a Support Library Bug .
-         */
+        // Set up the ViewPager with the sections adapter.
+        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
+
+        // Instantiate the adapter that will return a fragment for each of the three sections of the main activity
+        myFragmentPagerAdapter = new MyFragmentPagerAdapter(getActivity(), getChildFragmentManager());
+
+        // Set up the adapter for the ViewPager
+        viewPager.setAdapter(myFragmentPagerAdapter);
+
+        // Runnable() method required to implement setupWithViewPager() method
         tabLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -52,57 +51,9 @@ public class TabFragmentContainer extends Fragment {
             }
         });
 
-        return x;
-
+        // Return the created View
+        return view;
     }
 
-    class MyAdapter extends FragmentPagerAdapter {
-
-        /**
-         * default constructor that accepts a FragmentManager parameter to add/remove fragments
-         *
-         * @param fragmentManager
-         */
-        public MyAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
-
-        /**
-         * Return fragment with respect to Position .
-         */
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return new SettingsFragment();
-                case 1:
-                    return new InboxRouteFragment();
-                case 2:
-                    return new FriendsFragment();
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return int_items;
-        }
-
-        /**
-         * This method returns the title of the tab according to the position.
-         */
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "My Runs";
-                case 1:
-                    return "Inbox";
-                case 2:
-                    return "Friends";
-            }
-            return null;
-        }
-    }
 
 }

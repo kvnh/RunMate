@@ -62,7 +62,7 @@ public class InboxRouteFragment extends ListFragment {
         super.onResume();
 
         // Retrieve the routes from the Parse backend
-        retrieveRoutes();
+        // retrieveRoutes();
 
         // set the progress bar here
         // getActivity().setProgressBarIndeterminateVisibility(true);

@@ -38,8 +38,7 @@ public class FriendsFragment extends Fragment {
     protected GridView mGridView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // the 1st parameter is the layout id that is used for this fragment,
         // the 2nd is the container where the fragment will be displayed (this will be the ViewPager from main activity),
         // the 3rd parameter should be false whenever we add a fragment to an activity in code, which is what we are going to do
@@ -48,10 +47,10 @@ public class FriendsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.user_grid, container, false);
 
         // Set the GridView fragment
-        mGridView = (GridView)rootView.findViewById(R.id.friendsGrid);
+        mGridView = (GridView) rootView.findViewById(R.id.friendsGrid);
 
         // Check that there are friends to display - if not, display a message
-        TextView emptyFriendsList = (TextView)rootView.findViewById(android.R.id.empty);
+        TextView emptyFriendsList = (TextView) rootView.findViewById(android.R.id.empty);
         // Attach this as the empty text view for the GridView
         mGridView.setEmptyView(emptyFriendsList);
 
@@ -110,14 +109,14 @@ public class FriendsFragment extends Fragment {
                     }
 
                     // Get the adapter associated with the GridView and check to see if it is null
-                    if(mGridView.getAdapter() == null) {
+                    if (mGridView.getAdapter() == null) {
                         // Use the custom UserAdapter to display the users in the GridView
                         UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
                         // Call setAdapter for this activity to set the items in the GridView
                         mGridView.setAdapter(adapter);
                     } else {
                         // GridView is not available - refill with the list of friends
-                        ((UserAdapter)mGridView.getAdapter()).refill(mFriends);
+                        ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
                     }
 
                 } else {

@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,10 +31,25 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
+    public static final String TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Check to see if a user is logged in before the intent is started.
+        // If getCurrentUser() returns a parse user, which is cached on the device by the Parse SDK,
+        // then a user is logged in as a ParseUser and they will be stored in the currentUser variable.
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        if (currentUser == null) {
+            // If not user returned, user is not logged in - take them to the login page
+            navigateToLogin();
+        } else {
+            // User is already logged in - add a log statement to look at the current user.
+            Log.i(TAG, currentUser.getUsername());
+        }
 
         // Initialise the DrawerLayout and NavigationView views.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -62,15 +79,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up the Toolbar.
         setupToolbar();
-
     }
 
+
     public void setupToolbar() {
-        // Setup the ActionBarDrawerToggle functionality for the Toolbar
+        // Attaching the toolbar layout to the toolbar object.
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Setting toolbar as the ActionBar with setSupportActionBar() call.
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        // Setup the ActionBarDrawerToggle functionality for the Toolbar
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
                 toolbar,
@@ -83,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items to the action bar if present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -151,28 +170,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // define and set listener for the array list dialogs in camera and plot_route
-    protected DialogInterface.OnClickListener mDialogListenerPlotRoute =
-            new DialogInterface.OnClickListener() {
-                @Override
-                // which tells us the index of the value that was tapped on in the dialog list
-                public void onClick(DialogInterface dialog, int which) {
-                    // create a switch statement to look at the switch statement
-                    switch (which) {
-                        case 0: // Choose Map option 1: polylines
-                            Intent intent1 = new Intent(MainActivity.this, MapsActivityManualPolyline.class);
-                            startActivity(intent1);
-                            break;
-                        case 1: // Choose Map option 2: directions(multiple)
-                            Intent intent2 = new Intent(MainActivity.this, MapsActivityDirectionsMultiple.class);
-                            startActivity(intent2);
-                            break;
-                        case 2: // Choose Map option 3: track run via GPS
-                            Intent intent3 = new Intent(MainActivity.this, MapsActivityTrackRun.class);
-                            startActivity(intent3);
-                            break;
-                    }
-                }
-            };
+    protected DialogInterface.OnClickListener mDialogListenerPlotRoute = new DialogInterface.OnClickListener() {
+        @Override
+        // which tells us the index of the value that was tapped on in the dialog list
+        public void onClick(DialogInterface dialog, int which) {
+            // create a switch statement to look at the switch statement
+            switch (which) {
+                case 0: // Choose Map option 1: polylines
+                    Intent intent1 = new Intent(MainActivity.this, MapsActivityManualPolyline.class);
+                    startActivity(intent1);
+                    break;
+                case 1: // Choose Map option 2: directions(multiple)
+                    Intent intent2 = new Intent(MainActivity.this, MapsActivityDirectionsMultiple.class);
+                    startActivity(intent2);
+                    break;
+                case 2: // Choose Map option 3: track run via GPS
+                    Intent intent3 = new Intent(MainActivity.this, MapsActivityTrackRun.class);
+                    startActivity(intent3);
+                    break;
+            }
+        }
+    };
 
 //
 //    public static final int TAKE_PHOTO_REQUEST = 0;
@@ -319,88 +337,6 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                }
 //            };
-//
-//
-//
-//    /**
-//     * The {@link android.support.v4.view.PagerAdapter} that will provide
-//     * fragments for each of the sections. We use a
-//     * {@link FragmentPagerAdapter} derivative, which will keep every
-//     * loaded fragment in memory. If this becomes too memory intensive, it
-//     * may be best to switch to a
-//     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-//     */
-//    SectionsPagerAdapter mSectionsPagerAdapter;
-//
-//    /**
-//     * The {@link ViewPager} that will host the section contents.
-//     */
-//    ViewPager mViewPager;
-//    // The ViewPager is a layout widget in which each child view is a separate page (a separate tab) in the layout.
-//
-//    SlidingTabLayout tabs;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//        setContentView(R.layout.activity_main);
-//
-//        // Attaching the toolbar layout to the toolbar object
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        // Setting toolbar as the ActionBar with setSupportActionBar() call
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//
-//        navDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer_fragment);
-//        navDrawerFragment.setUp(R.id.navigation_drawer_fragment, (DrawerLayout) findViewById(R.id.drawerLayout), toolbar);
-//        navDrawerFragment.setDrawerListener(this);
-//
-//        // display the first navigation drawer view on app launch
-//        // displayView(0);
-//
-//        // check to see if anyone is logged in before we start this intent
-//        // if getCurrentUser() class method returns a parse user
-//        // (which is automatically cached for us on the device behind the scenes by the Parse SDK),
-//        // then we know that somebody is logged in as a parse user as they will be stored in the currentUser variable
-//        ParseUser currentUser = ParseUser.getCurrentUser();
-//
-//        if (currentUser == null) {
-//            // user is not logged in - take them to the login page
-//            navigateToLogin();
-//
-//        } else {
-//            // user is already logged in - add a log statement to look at the current user
-//            Log.i(TAG, currentUser.getUsername());
-//        }
-//
-//        // Create the adapter that will return a fragment for each of the three
-//        // primary sections of the activity.
-//        mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-//
-//        // Set up the ViewPager with the sections adapter.
-//        mViewPager = (ViewPager) findViewById(R.id.pager);
-//        // the adapter is being set as the adapter for our ViewPager
-//        mViewPager.setAdapter(mSectionsPagerAdapter);
-//
-//
-//        // Assigning the Sliding Tab Layout View
-//        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-//        // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
-//        tabs.setDistributeEvenly(true);
-//
-//        // Setting Custom Color for the Scroll bar indicator of the Tab View
-//        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-//            @Override
-//            public int getIndicatorColor(int position) {
-//                return getResources().getColor(R.color.tabsScrollColorPurple);
-//            }
-//        });
-//
-//        // Setting the ViewPager For the SlidingTabsLayout
-//        tabs.setViewPager(mViewPager);
-//
-//    }
 //
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
