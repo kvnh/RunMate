@@ -88,16 +88,6 @@
                 android:value=".ui.MainActivity"/>
         </activity>
         <activity
-            android:name=".ui.RecipientsActivity"
-            android:label="@string/title_activity_recipients"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/ActionBarTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
-        </activity>
-        <activity
             android:name=".MapsActivityDirectionsMultiple"
             android:label="@string/title_activity_maps_activity_directions_multiple"
             android:screenOrientation="portrait">

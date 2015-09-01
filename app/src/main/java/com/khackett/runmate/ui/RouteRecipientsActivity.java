@@ -339,7 +339,7 @@ public class RouteRecipientsActivity extends Activity {
     protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // Change the visibility of the send button (set in menu_recipients.xml) whenever a friend is selected
+            // Change the visibility of the send button (set in menu_route_recipients.xml) whenever a friend is selected
             // Create the menu in onCreateOptionsMenu
             // Check the number of items that are checked on the grid view
             if (mGridView.getCheckedItemCount() > 0) {
