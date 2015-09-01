@@ -65,13 +65,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 mDrawerLayout.closeDrawers();
-                if (menuItem.getItemId() == R.id.nav_item_inbox) {
+                if (menuItem.getItemId() == R.id.navItemHome) {
                     FragmentTransaction tabFragmentContainer = mFragmentManager.beginTransaction();
                     tabFragmentContainer.replace(R.id.containerView, new TabFragmentContainer()).commit();
                 }
-                if (menuItem.getItemId() == R.id.nav_item_sent) {
+                if (menuItem.getItemId() == R.id.navItemSettings) {
                     FragmentTransaction settingsFragment = mFragmentManager.beginTransaction();
                     settingsFragment.replace(R.id.containerView, new SettingsFragment()).commit();
+                }
+
+                if (menuItem.getItemId() == R.id.navItemHelp) {
+                    FragmentTransaction settingsFragment = mFragmentManager.beginTransaction();
+                    settingsFragment.replace(R.id.containerView, new InstructionsFragment()).commit();
                 }
                 return false;
             }
@@ -80,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         // Set up the Toolbar.
         setupToolbar();
     }
-
 
     public void setupToolbar() {
         // Attaching the toolbar layout to the toolbar object.

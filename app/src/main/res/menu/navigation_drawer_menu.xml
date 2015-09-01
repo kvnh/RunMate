@@ -2,40 +2,43 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_item_inbox"
+        android:id="@+id/navItemHome"
         android:icon="@mipmap/ic_tab_inbox"
-        android:title="Inbox"/>
+        android:title="@string/nav_item_home"/>
 
     <item
-        android:id="@+id/nav_item_sent"
+        android:id="@+id/navItemRunHistory"
         android:icon="@mipmap/ic_tab_inbox"
-        android:title="Run History"/>
+        android:title="@string/nav_item_run_history"/>
 
     <item
-        android:id="@+id/nav_item_draft"
+        android:id="@+id/navItemMyProfile"
         android:icon="@mipmap/ic_tab_inbox"
-        android:title="My Profile"/>
+        android:title="@string/nav_item_my_profile"/>
 
 
     <item android:title="Others">
         <menu>
             <item
+                android:id="@+id/navItemHelp"
                 android:icon="@mipmap/ic_action_play_over_video"
-                android:title="Spam"/>
+                android:title="@string/nav_item_help"/>
             <item
+                android:id="@+id/navItemSettings"
                 android:icon="@mipmap/ic_action_play_over_video"
-                android:title="Bin"/>
+                android:title="@string/nav_item_settings"/>
         </menu>
     </item>
 
-    <group android:id="@+id/group_settings_id">
+    <!--<group-->
+    <!--android:id="@+id/group_settings_id">-->
 
-        <item
-            android:icon="@mipmap/ic_action_play_over_video"
-            android:title="Settings"/>
-        <item
-            android:icon="@mipmap/ic_action_play_over_video"
-            android:title="Help"/>
-    </group>
+    <!--<item-->
+    <!--android:icon="@mipmap/ic_action_play_over_video"-->
+    <!--android:title="Settings"/>-->
+    <!--<item-->
+    <!--android:icon="@mipmap/ic_action_play_over_video"-->
+    <!--android:title="Help"/>-->
+    <!--</group>-->
 
 </menu>
