@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
-import  org.apache.commons.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,13 +24,15 @@ public class FileHelper {
         byte[] fileBytes = null;
         InputStream inStream = null;
         ByteArrayOutputStream outStream = null;
-
-        if (uri.getScheme().equals("content")) {
+        Log.d(TAG, "in the getByteArrayFromFile() method");
+        Log.d(TAG, "in the getByteArrayFromFile() method - uri = " + uri);
+        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
             try {
+                Log.d(TAG, "entering try to set inputstream");
                 inStream = context.getContentResolver().openInputStream(uri);
                 outStream = new ByteArrayOutputStream();
 
-                byte[] bytesFromFile = new byte[1024*1024]; // buffer size (1 MB)
+                byte[] bytesFromFile = new byte[1024 * 1024]; // buffer size (1 MB)
                 int bytesRead = inStream.read(bytesFromFile);
                 while (bytesRead != -1) {
                     outStream.write(bytesFromFile, 0, bytesRead);
@@ -38,25 +40,20 @@ public class FileHelper {
                 }
 
                 fileBytes = outStream.toByteArray();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
-            }
-            finally {
+            } finally {
                 try {
                     inStream.close();
                     outStream.close();
-                }
-                catch (IOException e) { /*( Intentionally blank */ }
+                } catch (IOException e) { /*( Intentionally blank */ }
             }
-        }
-        else {
+        } else {
             try {
                 File file = new File(uri.getPath());
                 FileInputStream fileInput = new FileInputStream(file);
                 fileBytes = IOUtils.toByteArray(fileInput);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }
         }
@@ -72,11 +69,9 @@ public class FileHelper {
         byte[] reducedData = outputStream.toByteArray();
         try {
             outputStream.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // Intentionally blank
         }
-
         return reducedData;
     }
 
@@ -85,8 +80,7 @@ public class FileHelper {
 
         if (fileType.equals(ParseConstants.TYPE_IMAGE)) {
             fileName += "png";
-        }
-        else {
+        } else {
             // For video, we want to get the actual file extension
             if (uri.getScheme().equals("content")) {
                 // do it using the mime type
@@ -94,8 +88,7 @@ public class FileHelper {
                 int slashIndex = mimeType.indexOf("/");
                 String fileExtension = mimeType.substring(slashIndex + 1);
                 fileName += fileExtension;
-            }
-            else {
+            } else {
                 fileName = uri.getLastPathSegment();
             }
         }

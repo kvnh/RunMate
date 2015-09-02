@@ -10,12 +10,12 @@
         android:title="@string/menu_logout_label"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_action"
-        android:orderInCategory="100"
-        android:title="@string/action_search"
-        app:showAsAction="always"/>
+    <!--<item-->
+        <!--android:id="@+id/action_search"-->
+        <!--android:icon="@drawable/ic_search_action"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="@string/action_search"-->
+        <!--app:showAsAction="always"/>-->
 
     <item
         android:id="@+id/action_add_friends"

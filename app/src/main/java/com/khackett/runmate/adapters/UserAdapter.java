@@ -1,7 +1,7 @@
 package com.khackett.runmate.adapters;
 
 import android.content.Context;
-import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +12,10 @@ import android.widget.TextView;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.MD5Util;
-import com.khackett.runmate.utils.ParseConstants;
-import com.parse.ParseObject;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
-import java.util.Date;
 import java.util.List;
 
 // Create a custom list view adapter - similar to the way it is done in fragments.
@@ -29,6 +27,8 @@ import java.util.List;
  * Created by KHackett on 31/07/15.
  */
 public class UserAdapter extends ArrayAdapter<ParseUser> {
+
+    public static final String TAG = UserAdapter.class.getSimpleName();
 
     protected Context mContext;
     protected List<ParseUser> mParseUsers;
@@ -81,21 +81,20 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         // get the parse object that corresponds to position, because getView() is going to be called for each position in the list
         ParseUser user = mParseUsers.get(position);
 
-        // Get the email address of the user
-        String userEmail = user.getEmail().toLowerCase();
+        ParseFile image = (ParseFile) user.getParseFile("profilePic");
         // Email will be an empty String if the user didn't supply an email address
-        if (userEmail.equals("")) {
-            // If email address is empty, set the default avatar
+        if (image == null) {
+            // If image file is empty, set the default avatar
+            Log.d(TAG, "No profile picture for: " + user.getUsername());
             holder.userImageView.setImageResource(R.mipmap.avatar_empty);
         } else {
-            // Set the Gravatar
-            String hash = MD5Util.md5Hex(userEmail);
-            String gravatarUrl = "http://www.gravatar.com/avatar/" + hash + "?s=204&d=404";
+
             Picasso.with(mContext)
                     // Load the URL
-                    .load(gravatarUrl)
+                    .load(image.getUrl())
                             // if a 404 code is returned, use the placeholder image
                     .placeholder(R.mipmap.avatar_empty)
+                    .resize(250, 250)
                             // Load into user image view
                     .into(holder.userImageView);
         }
@@ -120,11 +119,10 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
     // class that contains the data that we are adapting and that is
     // going to be displayed in the custom layout for each item
     private static class ViewHolder {
-        // we have 3 pieces of data - a text view, an image view and a check for the image view
+        // There are 3 pieces of data - a text view, an image view and a check for the image view
         ImageView userImageView;
         ImageView checkUserImageView;
         TextView nameLabel;
-
     }
 
     // method to refill the list with ParseObject data if it is not null

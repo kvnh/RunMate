@@ -168,4 +168,9 @@
         \nLong click anywhere on the map to clear it.
         \nPress the send button and select all of your friends you wish to include in the run.</string>
 
+    <string name="my_profile_title">My Profile</string>
+
+    <string name="take_picture_button_label">Take your picture</string>
+    <string name="pick_from_gallery_button_label">Choose from gallery</string>
+
 </resources>
