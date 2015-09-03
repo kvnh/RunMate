@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/navItemHome"
-        android:icon="@mipmap/ic_tab_inbox"
+        android:icon="@mipmap/ic_inbox_black_24dp"
         android:title="@string/nav_item_home"/>
 
     <item
         android:id="@+id/navItemRunHistory"
-        android:icon="@mipmap/ic_tab_inbox"
+        android:icon="@mipmap/ic_history_black_24dp"
         android:title="@string/nav_item_run_history"/>
 
     <item
         android:id="@+id/navItemMyProfile"
-        android:icon="@mipmap/ic_tab_inbox"
+        android:icon="@mipmap/ic_person_outline_black_24dp"
         android:title="@string/nav_item_my_profile"/>
 
 
@@ -21,11 +21,11 @@
         <menu>
             <item
                 android:id="@+id/navItemHelp"
-                android:icon="@mipmap/ic_action_play_over_video"
+                android:icon="@mipmap/ic_help_outline_black_24dp"
                 android:title="@string/nav_item_help"/>
             <item
                 android:id="@+id/navItemSettings"
-                android:icon="@mipmap/ic_action_play_over_video"
+                android:icon="@mipmap/ic_settings_black_24dp"
                 android:title="@string/nav_item_settings"/>
         </menu>
     </item>
@@ -43,7 +43,7 @@
         android:id="@+id/groupExtras">
         <item
             android:id="@+id/navItemLogOut"
-            android:icon="@mipmap/ic_action_play_over_video"
+            android:icon="@mipmap/ic_exit_to_app_black_24dp"
             android:title="@string/nav_item_log_out"/>
     </group>
 
