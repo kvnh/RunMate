@@ -202,7 +202,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         builder.setMessage(message).setTitle(title)
                 // Button to dismiss the dialog.
                 // Set the listener to null - only want to dismiss the dialog when the button is tapped.
-                // ok is from android resources
+                // (ok is from android resources)
                 .setPositiveButton(android.R.string.ok, null);
         // Create a dialog from the builder object and show it
         AlertDialog dialog = builder.create();

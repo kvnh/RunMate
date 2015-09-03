@@ -228,10 +228,14 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
 
             } else if (requestCode == TAKE_PHOTO_REQUEST) {
 
+//                mMediaUri = (Uri)data.getData();
+//                Log.d(TAG, "mMediaUri after data.getData(): " + mMediaUri);
+
                 bitmapPicture = (Bitmap) data.getExtras().get("data");
                 Log.d(TAG, "bitmapPicture picture: " + bitmapPicture);
 
                 saveImageToParse(TAKE_PHOTO_REQUEST);
+                updateProfilePic();
             }
         } else if (resultCode != Activity.RESULT_CANCELED) {
             Log.d(TAG, "Problem getting the picture from gallery");

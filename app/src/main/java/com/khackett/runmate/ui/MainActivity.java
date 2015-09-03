@@ -83,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction myProfileFragment = mFragmentManager.beginTransaction();
                     myProfileFragment.replace(R.id.containerView, new MyProfileFragment()).commit();
                 }
+                if (menuItem.getItemId() == R.id.navItemLogOut) {
+                    // User has tapped on the log out option
+                    ParseUser.logOut();
+                    navigateToLogin();
+                }
                 return false;
             }
         });
@@ -124,11 +129,6 @@ public class MainActivity extends AppCompatActivity {
         int itemId = item.getItemId();
 
         switch (itemId) {
-            case R.id.action_logout:
-                // the user has tapped on the log out option
-                ParseUser.logOut();
-                navigateToLogin();
-                break;
             case R.id.action_add_friends:
                 // create and start and new intent
                 Intent intent = new Intent(this, EditFriendsActivity.class);

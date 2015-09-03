@@ -17,7 +17,7 @@
         android:title="@string/nav_item_my_profile"/>
 
 
-    <item android:title="Others">
+    <item android:title="Extras">
         <menu>
             <item
                 android:id="@+id/navItemHelp"
@@ -30,15 +30,21 @@
         </menu>
     </item>
 
-    <!--<group-->
-    <!--android:id="@+id/group_settings_id">-->
+    <!--<item android:title="">-->
+    <!--<menu>-->
+    <!--<item-->
+    <!--android:id="@+id/navItemLogOut"-->
+    <!--android:icon="@mipmap/ic_action_play_over_video"-->
+    <!--android:title="@string/nav_item_log_out"/>-->
+    <!--</menu>-->
+    <!--</item>-->
 
-    <!--<item-->
-    <!--android:icon="@mipmap/ic_action_play_over_video"-->
-    <!--android:title="Settings"/>-->
-    <!--<item-->
-    <!--android:icon="@mipmap/ic_action_play_over_video"-->
-    <!--android:title="Help"/>-->
-    <!--</group>-->
+    <group
+        android:id="@+id/groupExtras">
+        <item
+            android:id="@+id/navItemLogOut"
+            android:icon="@mipmap/ic_action_play_over_video"
+            android:title="@string/nav_item_log_out"/>
+    </group>
 
 </menu>
