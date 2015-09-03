@@ -252,7 +252,6 @@ public class RouteRecipientsActivity extends Activity {
         // get the selected friends from the list through the helper method getRecipientIds()
         route.put(ParseConstants.KEY_RECIPIENT_IDS, getRecipientIds());
 
-
         route.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
 
         // return a successful route

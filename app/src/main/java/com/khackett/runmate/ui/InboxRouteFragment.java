@@ -26,12 +26,18 @@ import java.util.List;
 
 public class InboxRouteFragment extends ListFragment {
 
-    private GoogleMap mMap;
+    // private GoogleMap mMap;
 
     protected SwipeRefreshLayout mSwipeRefreshLayout;
 
     // member variable to store the list of routes received by the user
     protected List<ParseObject> mRoutes;
+
+    private int MY_STATUS_CODE = 1111;
+
+    // Default constructor for InboxRouteFragment
+    public InboxRouteFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,7 +68,7 @@ public class InboxRouteFragment extends ListFragment {
         super.onResume();
 
         // Retrieve the routes from the Parse backend
-        // retrieveRoutes();
+        retrieveRoutes();
 
         // set the progress bar here
         // getActivity().setProgressBarIndeterminateVisibility(true);
@@ -180,12 +186,10 @@ public class InboxRouteFragment extends ListFragment {
         // (URI's and URL's can often be used interchangeably)
         // Uri fileUri = Uri.parse(file.getUrl());
 
-
         JSONArray parseList = route.getJSONArray("latLngPoints");
         JSONArray parseListBounds = route.getJSONArray("latLngBoundaryPoints");
         String objectId = route.getObjectId();
         // JSONArray ids = route.getJSONArray(ParseConstants.KEY_RECIPIENT_IDS);
-
 
         // start a map activity to display the route
         Intent intent = new Intent(getActivity(), MapsActivityDisplayRoute.class);
@@ -194,7 +198,16 @@ public class InboxRouteFragment extends ListFragment {
         intent.putExtra("myObjectId", objectId);
 
         // Start the MapsActivityDisplayRoute activity
-        startActivity(intent);
+        startActivityForResult(intent, MY_STATUS_CODE);
+        // startActivity(intent);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MY_STATUS_CODE) {
+            //Refresh the fragment here
+            retrieveRoutes();
+        }
     }
 
     private void retrieveRoutes() {

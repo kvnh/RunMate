@@ -20,6 +20,7 @@ public final class ParseConstants {
     public static final String KEY_FRIENDS_RELATION = "friendsRelation";
     // define all of the keys for sending and storing a message
     public static final String KEY_RECIPIENT_IDS = "recipientIds";
+    public static final String KEY_ACCEPTED_RECIPIENT_IDS = "acceptedRecipientIds";
     public static final String KEY_SENDER_IDS = "senderId";
     public static final String KEY_SENDER_NAME = "senderName";
     public static final String KEY_FILE = "file";

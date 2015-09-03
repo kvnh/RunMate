@@ -99,7 +99,6 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
         holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
 
-
         double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
         // holder.distanceLabel.setText(String.valueOf(distance));
         holder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));

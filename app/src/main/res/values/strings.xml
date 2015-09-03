@@ -89,11 +89,14 @@
     <string name="error_file_size_too_large">The selected file is too large. Please select a new file</string>
     <string name="error_selecting_recipient_message">There was an error with the recipient selected. Please try again</string>
     <string name="error_selecting_recipient_title">We\'re sorry</string>
-    <string name="error_sending_message">There was an error sending your message. Please try again</string>
     <string name="error_sending_title">We\'re sorry</string>
-    <string name="error_declining_route_message">There was an error declining the route. Please try again</string>
+    <string name="error_sending_message">There was an error sending your message. Please try again</string>
     <string name="error_declining_route_title">We\'re sorry</string>
+    <string name="error_declining_route_message">There was an error accepting the route. Please try again</string>
+    <string name="error_accepting_route_title">We\'re sorry</string>
+    <string name="error_accepting_route_message">There was an error declining the route. Please try again</string>
     <string name="success_decline_route">Route successfully deleted</string>
+    <string name="success_accept_route">Route added to My Runs</string>
     <string name="title_activity_recipients">Choose Recipients</string>
 
     <string name="empty_recipients_list_string">Choose some friends first...</string>

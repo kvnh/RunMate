@@ -182,7 +182,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_accept:
-                // do something
+                acceptRoute();
                 break;
             case R.id.btn_decline:
                 declineRoute();
@@ -193,6 +193,31 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             default:
                 System.out.println("Problem with input");
         }
+    }
+
+    public void acceptRoute() {
+        String objectId = getIntent().getStringExtra("myObjectId");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
+
+        query.getInBackground(objectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    acceptUserRoute(object);
+                } else {
+                    // there is an error - notify the user
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDisplayRoute.this);
+                    builder.setMessage(R.string.error_accepting_route_message)
+                            .setTitle(R.string.error_accepting_route_title)
+                            .setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
+
+        // Send the user back to the main activity right after the message is deleted.
+        // Use finish() to close the current activity, returning to the main activity
+        finish();
     }
 
     public void declineRoute() {
@@ -219,12 +244,36 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         finish();
     }
 
+    public void acceptUserRoute(ParseObject object) {
+        ParseObject route = object;
+        // Add the current user to the accepted list
+        ArrayList<String> acceptedRecipientIds = new ArrayList<String>();
+        acceptedRecipientIds.add(ParseUser.getCurrentUser().getObjectId());
+        route.put(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, acceptedRecipientIds);
+
+        List<String> ids = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
+        if (ids.size() == 1) {
+            // Last recipient - delete the route object
+            route.deleteInBackground();
+        } else {
+            // Remove the recipient and save.
+            ids.remove(ParseUser.getCurrentUser().getObjectId());
+
+            ArrayList<String> idsToRemove = new ArrayList<String>();
+            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+
+            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
+            route.saveInBackground();
+        }
+        Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_accept_route, Toast.LENGTH_LONG).show();
+    }
+
     public void deleteUserRoute(ParseObject object) {
         ParseObject route = object;
         List<String> ids = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
 
         if (ids.size() == 1) {
-            // last recipient - delete the whole thing!
+            // last recipient - delete the route object
             route.deleteInBackground();
         } else {
             // remove the recipient and save
