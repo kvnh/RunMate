@@ -45,7 +45,7 @@
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>
     <string name="password_validation_error_message">Your password should be at least 6 characters long, contain at least 1 lower case letter, one upper case letter and at least 1 digit</string>
-    
+
     <string name="menu_edit_friends_label">Edit Friends</string>
     <string name="menu_add_friend_label">Add Friends</string>
     <string name="action_search">Search</string>
@@ -175,5 +175,11 @@
 
     <string name="take_picture_button_label">Take your picture</string>
     <string name="pick_from_gallery_button_label">Choose from gallery</string>
+    <string name="title_activity_add_route_details">Add some details to your route</string>
+
+    <string name="route_name_hint">Name your route</string>
+    <string name="proposed_date_button_label">Choose a date</string>
+    <string name="proposed_time_button_label">Choose a time</string>
+    <string name="choose_friends_button_label">Choose some friends...</string>
 
 </resources>

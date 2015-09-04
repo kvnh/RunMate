@@ -22,7 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.model.Route;
-import com.khackett.runmate.ui.RouteRecipientsActivity;
+import com.khackett.runmate.ui.AddRouteDetailsActivity;
 import com.khackett.runmate.utils.DirectionsJSONParser;
 
 import org.json.JSONArray;
@@ -100,7 +100,6 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         mButtonCompleteLoop.setOnClickListener(this);
     }
 
-
     @Override
     public void onMapClick(LatLng latLng) {
         // Plot tapped point on map
@@ -151,7 +150,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             // alert user to add more points
         } else {
             // Declare intent to capture a route
-            Intent createRouteIntent = new Intent(MapsActivityDirectionsMultiple.this, RouteRecipientsActivity.class);
+            Intent createRouteIntent = new Intent(MapsActivityDirectionsMultiple.this, AddRouteDetailsActivity.class);
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", mRoute.getMarkerPoints());
 

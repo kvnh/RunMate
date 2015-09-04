@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.khackett.runmate"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.khackett.runmate" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="true"/>
+        android:required="true" />
 
     <permission
         android:name="com.khackett.runmate.permission.C2D_MESSure"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.khackett.runmate.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.khackett.runmate.permission.C2D_MESSAGE" />
 
     <application
         android:name=".RunMateApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/MaterialTheme">
+        android:theme="@style/MaterialTheme" >
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+            android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_maps_key"/>
+            android:value="@string/google_maps_key" />
 
         <!-- android:theme="@style/AppTheme" -->
         <activity
@@ -45,113 +45,122 @@
             android:label="@string/app_name"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme">
+            android:theme="@style/MaterialTheme" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MapsActivityManualPolyline"
             android:label="@string/title_activity_maps_activity_manual_polyline"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.SignUpActivity"
             android:label="@string/title_activity_sign_up"
             android:parentActivityName=".ui.LoginActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
             android:parentActivityName=".ui.LoginActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.EditFriendsActivity"
             android:label="@string/title_activity_edit_friends"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme">
+            android:theme="@style/MaterialTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
             android:name=".MapsActivityDirectionsMultiple"
             android:label="@string/title_activity_maps_activity_directions_multiple"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
             android:name=".ui.RouteRecipientsActivity"
             android:label="@string/title_activity_route_recipients"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.MyAppTheme">
+            android:theme="@style/Theme.MyAppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
             android:name=".MapsActivityDisplayRoute"
-            android:label="@string/title_activity_maps_activity_display_route">
+            android:label="@string/title_activity_maps_activity_display_route" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
             android:name=".MapsActivityTrackRun"
             android:label="@string/title_activity_maps_activity_track_run"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.MainActivity" />
         </activity>
 
-        <service android:name="com.parse.PushService"/>
+        <service android:name="com.parse.PushService" />
 
-        <receiver android:name="com.parse.ParseBroadcastReceiver">
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".utils.ParseReceiver"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
-                <action android:name="com.parse.push.intent.RECEIVE"/>
-                <action android:name="com.parse.push.intent.DELETE"/>
-                <action android:name="com.parse.push.intent.OPEN"/>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <category android:name="com.khackett.runmate"/>
+                <category android:name="com.khackett.runmate" />
             </intent-filter>
         </receiver>
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@mipmap/ic_stat_rm"/>
+            android:resource="@mipmap/ic_stat_rm" />
+
+        <activity
+            android:name=".ui.AddRouteDetailsActivity"
+            android:label="@string/title_activity_add_route_details"
+            android:parentActivityName=".MapsActivityDirectionsMultiple" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.khackett.runmate.MapsActivityDirectionsMultiple" />
+        </activity>
     </application>
 
 </manifest>
