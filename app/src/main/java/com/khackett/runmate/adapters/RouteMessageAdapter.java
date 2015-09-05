@@ -2,6 +2,7 @@ package com.khackett.runmate.adapters;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,10 @@ import android.widget.TextView;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.ParseConstants;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +29,8 @@ import java.util.List;
  * Created by KHackett on 31/07/15.
  */
 public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
+
+    public static final String TAG = RouteMessageAdapter.class.getSimpleName();
 
     protected Context mContext;
     protected List<ParseObject> mRoutes;
@@ -62,8 +68,9 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
             // initialise holder as a new ViewHolder - and initialise the image view and text view inside it
             holder = new ViewHolder();
             // findViewById() is an activity method, but we can call it from the convert view
-            holder.iconImageView = (ImageView) convertView.findViewById(R.id.messageIcon);
+            holder.profilePicView = (ImageView) convertView.findViewById(R.id.profilePic);
             holder.nameLabel = (TextView) convertView.findViewById(R.id.senderLabel);
+            holder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
             holder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
             holder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
             convertView.setTag(holder);
@@ -89,15 +96,33 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // Use newly created String Date in the Text View
         holder.timeLabel.setText(stringDate);
 
-//        // change the icon based on the route type
-//        if (route.getString(ParseConstants.KEY_FILE_TYPE).equals(ParseConstants.TYPE_IMAGE)) {
-//            holder.userImageView.setImageResource(R.mipmap.ic_action_picture);
+
+        holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
+//        // ParseFile image = (ParseFile) ParseUser.getCurrentUser().getParseFile("profilePic");
+//        ParseFile image = (ParseFile) ParseUser.getQuery();
+//
+//        if (image == null) {
+//            // If image file is empty, set the default avatar
+//            Log.d(TAG, "No profile picture for: " + ParseUser.getCurrentUser().getUsername());
+//            holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
 //        } else {
-//            holder.userImageView.setImageResource(R.mipmap.ic_action_play_over_video);
+//
+//            holder.profilePicView.setImageResource(
+//                    Picasso.with(getActivity())
+//                            // Load the URL
+//                            .load(image.getUrl())
+//                                    // if a 404 code is returned, use the placeholder image
+//                            .placeholder(R.mipmap.avatar_empty)
+//                                    // Load into user image view
+//                            .into(profilePicView)
+//            );
 //        }
-        holder.iconImageView.setImageResource(R.mipmap.ic_action_picture);
+//
+//        // holder.profilePicView.setImageResource(R.mipmap.ic_action_picture);
 
         holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
+
+        holder.routeNameLabel.setText(route.getString(ParseConstants.KEY_ROUTE_NAME));
 
         double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
         // holder.distanceLabel.setText(String.valueOf(distance));
@@ -109,9 +134,10 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
     // class that contains the data that is going to be displayed in the custom layout for each item
     private static class ViewHolder {
         // The image to be displayed
-        ImageView iconImageView;
+        ImageView profilePicView;
         // The users name
         TextView nameLabel;
+        TextView routeNameLabel;
         // The time the message was sent
         TextView timeLabel;
 

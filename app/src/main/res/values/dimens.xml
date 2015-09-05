@@ -20,7 +20,11 @@
     <dimen name="inbox_horizontal_margin">8dp</dimen>
     <dimen name="inbox_vertical_margin">8dp</dimen>
 
+    <dimen name="profile_pic_horizontal_margin">4dp</dimen>
+    <dimen name="profile_pic_vertical_margin">4dp</dimen>
+
     <dimen name="message_vertical_padding">8dp</dimen>
+    <dimen name="route_name_vertical_padding">2dp</dimen>
 
     <dimen name="message_time_text">12sp</dimen>
 

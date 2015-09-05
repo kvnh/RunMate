@@ -15,52 +15,65 @@
         android:background="@android:color/white">
 
         <ImageView
-            android:id="@+id/messageIcon"
+            android:id="@+id/profilePic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:contentDescription="@string/content_desc_message_icon"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
+            android:paddingRight="@dimen/profile_pic_horizontal_margin"
             android:src="@mipmap/ic_action_picture"/>
 
         <TextView
             android:id="@+id/distanceLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/messageIcon"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textColor="@color/lightGray"
+            android:paddingRight="@dimen/profile_pic_horizontal_margin"
             android:text="@string/distance_count"
+            android:textColor="@color/lightGray"
             android:textSize="20sp"/>
 
         <TextView
             android:id="@+id/senderLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:layout_toRightOf="@id/profilePic"
+            android:layout_toStartOf="@+id/distanceLabel"
+            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
             android:paddingTop="@dimen/message_vertical_padding"
             android:text="Test Name Layout"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="16sp"
-            android:layout_toStartOf="@+id/distanceLabel"/>
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/routeNameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/senderLabel"
+            android:layout_toRightOf="@id/profilePic"
+            android:layout_toStartOf="@+id/distanceLabel"
+            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
+            android:paddingTop="@dimen/route_name_vertical_padding"
+            android:text="Test Route Name Layout"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/timeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/senderLabel"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:layout_below="@id/routeNameLabel"
+            android:layout_toRightOf="@id/profilePic"
+            android:layout_toStartOf="@+id/distanceLabel"
+            android:paddingBottom="@dimen/message_vertical_padding"
+            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
             android:text="TextView"
             android:textColor="@color/lightGray"
-            android:textSize="@dimen/message_time_text"
-            android:paddingBottom="@dimen/message_vertical_padding"
-            android:layout_toStartOf="@+id/distanceLabel"/>
+            android:textSize="@dimen/message_time_text"/>
 
     </RelativeLayout>
 
