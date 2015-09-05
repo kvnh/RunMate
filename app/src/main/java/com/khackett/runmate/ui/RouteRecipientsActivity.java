@@ -34,6 +34,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class RouteRecipientsActivity extends Activity {
@@ -69,6 +70,10 @@ public class RouteRecipientsActivity extends Activity {
     // member variable for the GridView
     protected GridView mGridView;
 
+    protected String mRouteName;
+
+    protected Calendar mProposedDateTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,13 +98,21 @@ public class RouteRecipientsActivity extends Activity {
         // Attach this as the empty text view for the GridView
         mGridView.setEmptyView(emptyFriendsList);
 
-        // get the array of LatLng points passed in from the map intent
+        // get the array of LatLng points from the passed in intent
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
 
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
 
         // mRouteDistance = getIntent().getParcelableExtra("routeDistance");
         mRouteDistance = getIntent().getDoubleExtra("routeDistance", mRouteDistance);
+
+        // Get the name of the route from the passed in intent
+        mRouteName = getIntent().getStringExtra("routeName");
+
+        // Get the proposed date and time from the passed in intent
+        mProposedDateTime = (Calendar) getIntent().getSerializableExtra("proposedTime");
+        Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is: " + mProposedDateTime);
+        Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is (getTime()): " + mProposedDateTime.getTime());
 
     }
 
@@ -253,6 +266,10 @@ public class RouteRecipientsActivity extends Activity {
         route.put(ParseConstants.KEY_RECIPIENT_IDS, getRecipientIds());
 
         route.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
+
+        route.put(ParseConstants.KEY_ROUTE_NAME, mRouteName);
+
+        route.put(ParseConstants.KEY_ROUTE_PROPOSED_TIME, mProposedDateTime.getTime());
 
         // return a successful route
         return route;

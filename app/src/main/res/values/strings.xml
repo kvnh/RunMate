@@ -45,6 +45,11 @@
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>
     <string name="password_validation_error_message">Your password should be at least 6 characters long, contain at least 1 lower case letter, one upper case letter and at least 1 digit</string>
+    <string name="send_route_error_title">Sorry, there was a problem</string>
+    <string name="send_route_error_message">Please make sure all of the fields are filled</string>
+    <string name="send_route_time_error_title">Sorry, there was a problem</string>
+    <string name="send_route_time_error_message">Please make sure the proposed time is greater than the current</string>
+
 
     <string name="menu_edit_friends_label">Edit Friends</string>
     <string name="menu_add_friend_label">Add Friends</string>
