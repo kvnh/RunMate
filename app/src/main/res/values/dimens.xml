@@ -32,4 +32,7 @@
     <dimen name="user_item_padding">4dp</dimen>
     <dimen name="user_grid_spacing">8dp</dimen>
 
+    <dimen name="maps_activity_tool_bar">50dp</dimen>
+    <dimen name="maps_activity_tool_bar_icon_padding">10dp</dimen>
+
 </resources>
