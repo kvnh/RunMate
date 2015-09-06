@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -46,9 +47,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     private List<Polyline> polylines;
 
     // Member variable for the UI buttons
-    protected Button mButtonSend;
-    protected Button mButtonUndo;
-    protected Button mButtonCompleteLoop;
+    protected ImageButton mButtonSend;
+    protected ImageButton mButtonUndo;
+    protected ImageButton mButtonCompleteLoop;
     protected TextView mDistanceCount;
 
     private Route mRoute;
@@ -89,9 +90,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         }
 
         // Set up member variables for each UI component
-        mButtonSend = (Button) findViewById(R.id.btn_send);
-        mButtonUndo = (Button) findViewById(R.id.btn_undo);
-        mButtonCompleteLoop = (Button) findViewById(R.id.btn_complete_loop);
+        mButtonSend = (ImageButton) findViewById(R.id.btn_send);
+        mButtonUndo = (ImageButton) findViewById(R.id.btn_undo);
+        mButtonCompleteLoop = (ImageButton) findViewById(R.id.btn_complete_loop);
         mDistanceCount = (TextView) findViewById(R.id.distanceCount);
 
         // Register buttons with the listener

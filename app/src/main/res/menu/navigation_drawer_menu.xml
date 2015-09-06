@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/navItemHome"
-        android:icon="@mipmap/ic_inbox_black_24dp"
+        android:icon="@mipmap/ic_home_black_24dp"
         android:title="@string/nav_item_home"/>
 
     <item

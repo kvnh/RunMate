@@ -12,6 +12,12 @@
         android:layout_height="match_parent"
         tools:context=".InstructionsFragment$PlaceholderFragment">
 
+        <ImageView
+            android:id="@+id/backgroundImage"
+            style="@style/AuthenticationBackgroundImage"
+            android:background="@mipmap/background_fill"
+            android:contentDescription="@string/content_description_background"/>
+
         <TextView
             android:id="@+id/instructionsTitle"
             android:layout_width="fill_parent"
@@ -19,6 +25,7 @@
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
             android:text="@string/instructions_title"
+            android:textColor="#ffffff"
             android:textSize="45dp"
             android:textStyle="bold"/>
 
@@ -30,6 +37,7 @@
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
             android:text="@string/instructions_sub_title"
+            android:textColor="#ffffff"
             android:textSize="25dp"
             android:textStyle="bold"/>
 
@@ -40,9 +48,12 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/instructionsSubTitle"
             android:layout_gravity="start"
+            android:layout_marginLeft="@dimen/message_vertical_padding"
+            android:layout_marginRight="@dimen/message_vertical_padding"
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
             android:text="@string/instructions_instructions"
+            android:textColor="#ffffff"
             android:textSize="16dp"/>
 
     </RelativeLayout>

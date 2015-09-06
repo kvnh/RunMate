@@ -3,7 +3,7 @@
     <string name="subtitle">A social network for runners</string>
     <string name="content_description_background">RunMate Background Image</string>
 
-    <string name="login_error_message">Please make sure you enter a username and password</string>
+    <string name="login_error_message">Please enter a username and password</string>
     <string name="login_error_title">Sorry, there was a problem</string>
 
     <string name="title_activity_login">LoginActivity</string>
@@ -35,20 +35,20 @@
     <string name="enter_email_text">Enter your email to reset your password</string>
 
     <string name="sign_up_error_title">Sorry, there was a problem</string>
-    <string name="sign_up_error_message">Please make sure all of the fields are filled</string>
+    <string name="sign_up_error_message">Please make sure all of the fields are completed</string>
     <string name="error_title">Sorry about this...</string>
     <string name="confirm_password_error_title">Sorry, there was a problem</string>
-    <string name="confirm_password_error_message">Please ensure your confirmation password is matching</string>
+    <string name="confirm_password_error_message">Please ensure your password and confirmation password are matching</string>
     <string name="sign_up_progress_dialog_title">Please wait</string>
     <string name="sign_up_progress_dialog_message">Signing you up to RunMate</string>
     <string name="log_in_progress_dialog_title">Please wait</string>
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>
-    <string name="password_validation_error_message">Your password should be at least 6 characters long, contain at least 1 lower case letter, one upper case letter and at least 1 digit</string>
+    <string name="password_validation_error_message">Your password should be at least 6 characters, contain at least 1 lower case letter, one upper case letter and at least 1 digit</string>
     <string name="send_route_error_title">Sorry, there was a problem</string>
-    <string name="send_route_error_message">Please make sure all of the fields are filled</string>
-    <string name="send_route_time_error_title">Sorry, there was a problem</string>
-    <string name="send_route_time_error_message">Please make sure the proposed time is greater than the current</string>
+    <string name="send_route_error_message">Please make sure all of the fields are completed</string>
+    <string name="send_route_time_error_title">Check your watch...</string>
+    <string name="send_route_time_error_message">Choose a time that is greater than the present</string>
 
 
     <string name="menu_edit_friends_label">Edit Friends</string>
@@ -172,9 +172,12 @@
     <string name="instructions_title">Using RunMate:</string>
     <string name="instructions_sub_title">Plotting a Route</string>
     <string name="instructions_instructions">Tap on the map to select the starting point,
-        then tap on each subsequent point to create an entire route.
+        \nthen tap on each subsequent point to create an entire route.
         \nLong click anywhere on the map to clear it.
-        \nPress the send button and select all of your friends you wish to include in the run.</string>
+        \nYou also can undo a previous plotted point at any time by selecting the undo button.
+        \nUse the Complete Loop button to return the route to the starting point.
+        \nThen simply press the send button and select all of your friends you wish to include in your run.
+    </string>
 
     <string name="my_profile_title">My Profile</string>
 
