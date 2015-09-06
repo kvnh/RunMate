@@ -2,6 +2,8 @@ package com.khackett.runmate.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,6 +39,9 @@ public class EditFriendsActivity extends Activity {
     // Create a variable for the GridView
     protected GridView mGridView;
 
+    // Declare the context of the activity.
+    protected Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,52 +70,60 @@ public class EditFriendsActivity extends Activity {
         TextView emptyFriendsList = (TextView) findViewById(android.R.id.empty);
         // Attach this as the empty text view for the GridView
         mGridView.setEmptyView(emptyFriendsList);
+
+        // Initialise the Context to the EditFriendsActivity.
+        mContext = EditFriendsActivity.this;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // get the current user using the getCurrentUser() method
+        // Get the current user using the getCurrentUser() method
         mCurrentUser = ParseUser.getCurrentUser();
-        // for the relation, from this user we want to call a method called getRelation()
+        // For the relation, from this user, call the getRelation() method
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
-        // set progress bar to visible
-        // setProgressBarIndeterminateVisibility(true);
+        // Set up a dialog progress indicator box
+        final ProgressDialog progressDialog = new ProgressDialog(EditFriendsActivity.this);
+        progressDialog.setTitle(R.string.edit_friends_progress_dialog_title);
+        progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
+        progressDialog.show();
 
-        // the query is going to return a list of ParseUser objects
+        // ParseQuery class used to fetch ParseObjects.
+        // The query will return a list of ParseUser objects.
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        // sort the results of the query in ascending order by username (using the "username" key)
+        // Sort the results of the query in ascending order by username.
         query.orderByAscending(ParseConstants.KEY_USERNAME);
-        // set limits for our queries to 1000 users
+        // Set query limits to 1000 users.
         query.setLimit(1000);
-        // execute the query
+        // Execute the query.
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
 
-                // set progress bar to invisible
-                // setProgressBarIndeterminateVisibility(false);
+                // Dismiss progress dialog once result returned from backend
+                progressDialog.dismiss();
 
                 if (e == null) {
-                    // successful query - we have users to display
+                    // Successful query - display ParseUsers
                     mUsers = users;
-                    // create an array of strings to store the usernames and set the size equal to that of the list returned
+                    // Create an array of strings to store the usernames
+                    // and set the size equal to that of the list returned.
                     String[] usernames = new String[mUsers.size()];
-                    // enhanced for loop to go through the list of parse users and extract the usernames
+                    // Enhanced for loop to go through the list of ParseUsers and extract usernames
                     int i = 0;
                     for (ParseUser user : mUsers) {
                         usernames[i] = user.getUsername();
                         i++;
                     }
 
-                    // Use the custom user adapter
+                    // Use the custom UserAdapter
                     // Get the adapter associated with the GridView and check to see if it is null
                     if (mGridView.getAdapter() == null) {
-                        // Use the custom UserAdapter to display the users in the GridView
+                        // Use the custom UserAdapter to display the users in the GridView.
                         UserAdapter adapter = new UserAdapter(EditFriendsActivity.this, mUsers);
-                        // Call setAdapter for this activity to set the items in the GridView
+                        // Call setAdapter for this activity to set the items in the GridView.
                         mGridView.setAdapter(adapter);
                     } else {
                         // GridView is not available - refill with the list of friends
@@ -120,12 +133,10 @@ public class EditFriendsActivity extends Activity {
                     addFriendCheckMarks();
 
                 } else {
-                    // there was an error - log the message
+                    // There was an error - log the message.
                     Log.e(TAG, e.getMessage());
-                    // display an alert to the user
-                    // if there is a parse exception then...
+                    // Display an alert to the user.
                     AlertDialog.Builder builder = new AlertDialog.Builder(EditFriendsActivity.this);
-                    // set the message from the exception
                     builder.setMessage(e.getMessage())
                             .setTitle(R.string.error_title)
                             .setPositiveButton(android.R.string.ok, null);
@@ -135,22 +146,6 @@ public class EditFriendsActivity extends Activity {
             }
         });
     }
-
-    //    /**
-//     * Set up the {@link android.app.ActionBar}.
-//     */
-//    private void setupActionBar() {
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//    }
-
-
-//    // can remove this as there is no need for the options menu on this screen
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_edit_friends, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -164,7 +159,6 @@ public class EditFriendsActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private void addFriendCheckMarks() {
         // the first thing we need is a list of the users friends

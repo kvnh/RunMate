@@ -83,13 +83,15 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         // Ensure that the email field is not blank.
         if (email.isEmpty()) {
             // Alert user to fill in all of the fields.
-            showErrorDialog(R.string.forgot_password_error_title, R.string.forgot_password_error_message);
+            showErrorDialog(R.string.forgot_password_error_title,
+                    R.string.forgot_password_error_message);
         } else {
 
             // Set up a dialog progress indicator box.
             final ProgressDialog progressDialog = new ProgressDialog(ForgotPasswordActivity.this);
             progressDialog.setTitle(R.string.forgot_password_progress_dialog_title);
-            progressDialog.setMessage(mContext.getString(R.string.forgot_password_progress_dialog_message));
+            progressDialog.setMessage(mContext.getString
+                    (R.string.forgot_password_progress_dialog_message));
             progressDialog.show();
 
             // Credentials pass client side validation. Validate in backend.
@@ -100,16 +102,18 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
                     if (e == null) {
                         // An email was successfully sent with reset instructions - alert the user.
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.
+                                Builder(ForgotPasswordActivity.this);
                         // Set the message title and text for the dialog
                         // Chain the methods together as they are all referencing the builder object.
                         builder.setMessage(R.string.reset_password_success_message)
                                 .setTitle(R.string.reset_password_success_title)
                                         // Button to dismiss the dialog.
-                                        // Set the listener so that user has to interact with dialog to dismiss it.
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                        // Set a listener so user has to interact with dialog to dismiss it.
+                                .setPositiveButton(android.R.string.ok,
+                                        new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // Finish ForgotPasswordActivity and return to the previous activity.
+                                        // Finish ForgotPasswordActivity and return to previous activity.
                                         finish();
                                     }
                                 });
@@ -119,7 +123,8 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
                     } else {
                         // There is an exception - alert the user.
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.
+                                Builder(ForgotPasswordActivity.this);
                         builder.setMessage(e.getMessage())
                                 .setTitle(R.string.forgot_password_error_title)
                                 .setPositiveButton(android.R.string.ok, null);
@@ -129,8 +134,6 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                 }
             });
         }
-
-
     }
 
     /**

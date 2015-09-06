@@ -44,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
         ParseUser currentUser = ParseUser.getCurrentUser();
 
         if (currentUser == null) {
-            // If not user returned, user is not logged in - take them to the login page
+            // If no user returned, user is not logged in - take them to the login page
             navigateToLogin();
         } else {
-            // User is already logged in - add a log statement to look at the current user.
+            // User is already logged in - output a log statement displaying their name.
             Log.i(TAG, currentUser.getUsername());
         }
 
@@ -148,11 +148,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * method to show the login screen
+     * Method to show the login screen
      */
     private void navigateToLogin() {
-        // all activities are started through intents so create a new intent object
-        // it takes 2 parameters - first is the context (this is the current system context within
+        // All activities are started through intents so create a new intent object
+        // It requires two parameters - first is the context (this is the current system context within
         // which the app is operating; so whenever we are working inside an activity, that is our context (activity is actually a subclass of context).
         // ... the 2nd pramter is the class of the activity that we want to start
         Intent intent = new Intent(this, LoginActivity.class);

@@ -41,6 +41,9 @@
     <string name="confirm_password_error_message">Please ensure your password and confirmation password are matching</string>
     <string name="sign_up_progress_dialog_title">Please wait</string>
     <string name="sign_up_progress_dialog_message">Signing you up to RunMate</string>
+
+    <string name="edit_friends_progress_dialog_title">Please wait</string>
+    <string name="edit_friends_progress_dialog_message">Updating your friends list</string>
     <string name="log_in_progress_dialog_title">Please wait</string>
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>

@@ -107,10 +107,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             showErrorDialog(R.string.sign_up_error_title, R.string.sign_up_error_message);
         } else if (!isPasswordMatching(password, passwordConfirm)) {
             // Alert user to enter matching passwords
-            showErrorDialog(R.string.confirm_password_error_title, R.string.confirm_password_error_message);
+            showErrorDialog(R.string.confirm_password_error_title,
+                    R.string.confirm_password_error_message);
         } else if (!isPasswordValid(password)) {
             // Alert user to enter a valid password
-            showErrorDialog(R.string.password_validation_error_title, R.string.password_validation_error_message);
+            showErrorDialog(R.string.password_validation_error_title,
+                    R.string.password_validation_error_message);
         } else {
 
             // Credentials pass client side validation. Validate in backend.
@@ -121,8 +123,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             progressDialog.setMessage(mContext.getString(R.string.sign_up_progress_dialog_message));
             progressDialog.show();
 
-            // Create a new user.
-            // First create a new ParseUser object and add each of the information fields to it
+            // Create a ParseUser object and add each of the information fields to it
             ParseUser newUser = new ParseUser();
             newUser.put("fullName", fullName);
             newUser.setUsername(username);
