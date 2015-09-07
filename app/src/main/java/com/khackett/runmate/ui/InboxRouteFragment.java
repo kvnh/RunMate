@@ -263,20 +263,16 @@ public class InboxRouteFragment extends ListFragment {
                         // cast it to RouteMessageAdapter
                         ((RouteMessageAdapter) getListView().getAdapter()).refill(mRoutes);
                     }
-
                 }
-
             }
         });
     }
-
 
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
             // when list is swiped down to refresh, retrieve the routes from the Parse backend
             retrieveRoutes();
-
         }
     };
 }

@@ -2,6 +2,8 @@ package com.khackett.runmate.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -74,6 +76,9 @@ public class RouteRecipientsActivity extends Activity {
 
     protected Calendar mProposedDateTime;
 
+    // Declare the context of the activity.
+    protected Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +119,9 @@ public class RouteRecipientsActivity extends Activity {
         Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is: " + mProposedDateTime);
         Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is (getTime()): " + mProposedDateTime.getTime());
 
+        // Initialise the Context to the EditFriendsActivity.
+        mContext = RouteRecipientsActivity.this;
+
     }
 
     // get a list of all your friends - this code is copied from the onResume() method in the FriendsFragment with some additions
@@ -126,11 +134,11 @@ public class RouteRecipientsActivity extends Activity {
         // for the relation, from this user we want to call a method called getRelation()
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
-        // start the progress indicator before we run our query
-        // use the getActivity() to get a reference to the activity in which the fragment is running (as setProgressBarIndeterminateVisibility() is an Activity method)
-        // note: Window provided Progress Bars are now deprecated with Toolbar.
-        // see: http://stackoverflow.com/questions/27788195/setprogressbarindeterminatevisibilitytrue-not-working
-        // getActivity().setProgressBarIndeterminateVisibility(true);
+        // Set up a dialog progress indicator box - start it before the query to backend is run
+        final ProgressDialog progressDialog = new ProgressDialog(RouteRecipientsActivity.this);
+        progressDialog.setTitle(R.string.edit_friends_progress_dialog_title);
+        progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
+        progressDialog.show();
 
         // the first thing we need is a list of the users friends...
         // we have the friend relation, but this doesn't give us a list of users to work with
@@ -144,8 +152,9 @@ public class RouteRecipientsActivity extends Activity {
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
-
-                // getActivity().setProgressBarIndeterminateVisibility(false);
+                
+                // Dismiss progress dialog once result returned from backend
+                progressDialog.dismiss();
 
                 // include an if statement to check the exception
                 if (e == null) {
