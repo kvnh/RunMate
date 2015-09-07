@@ -12,10 +12,11 @@ import android.widget.TextView;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.ParseConstants;
-import com.parse.ParseFile;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 import java.util.List;
@@ -96,6 +97,21 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // Use newly created String Date in the Text View
         holder.timeLabel.setText(stringDate);
 
+        // ParseUser parseUser = ParseUser.getQuery("senderID");
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("senderId", route.getString(ParseConstants.KEY_SENDER_IDS));
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    // The query was successful.
+                    Log.d(TAG, "Checking sender ID: " + objects.toString());
+
+                } else {
+                    // Something went wrong.
+                }
+            }
+        });
 
         holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
 //        // ParseFile image = (ParseFile) ParseUser.getCurrentUser().getParseFile("profilePic");

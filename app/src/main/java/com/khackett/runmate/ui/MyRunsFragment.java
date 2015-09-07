@@ -1,7 +1,10 @@
 package com.khackett.runmate.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -58,21 +61,22 @@ public class MyRunsFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
+//        // Initialise the Context to the EditFriendsActivity.
+//        mContext = RouteRecipientsActivity.this;
+
         // Return the View object - this is the view of the whole fragment
         return rootView;
     }
 
-    protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            // When list is swiped down to refresh, retrieve the users runs from the Parse backend
-            retrieveAcceptedRoutes();
-        }
-    };
-
     @Override
     public void onResume() {
         super.onResume();
+
+//        // Set up a dialog progress indicator box - start it before the query to backend is run
+//        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+//        progressDialog.setTitle(R.string.edit_friends_progress_dialog_title);
+//        progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
+//        progressDialog.show();
 
         // Retrieve the accepted routes from the Parse backend
         retrieveAcceptedRoutes();
@@ -116,10 +120,10 @@ public class MyRunsFragment extends ListFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == MY_STATUS_CODE) {
-            //Refresh the fragment here
-            retrieveAcceptedRoutes();
-        }
+//        if (requestCode == MY_STATUS_CODE) {
+//            //Refresh the fragment here
+//            retrieveAcceptedRoutes();
+//        }
     }
 
     private void retrieveAcceptedRoutes() {
@@ -168,6 +172,9 @@ public class MyRunsFragment extends ListFragment {
                         // the above adapter code is now replaced with the following line
                         RouteMessageAdapter adapter = new RouteMessageAdapter(getListView().getContext(), mAcceptedRoutes);
 
+                        // Force a refresh of the list once data has changed
+                        adapter.notifyDataSetChanged();
+
                         // need to call setListAdapter for this activity.  This method is specifically from the ListActivity class
                         setListAdapter(adapter);
                     } else {
@@ -181,5 +188,13 @@ public class MyRunsFragment extends ListFragment {
             }
         });
     }
+
+    protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            // When list is swiped down to refresh, retrieve the users runs from the Parse backend
+            retrieveAcceptedRoutes();
+        }
+    };
 
 }

@@ -40,7 +40,8 @@ public class InboxRouteFragment extends ListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         // the 1st parameter is the layout id that is used for this fragment,
         // the 2nd is the container where the fragment will be displayed (this will be the ViewPager from main activity),
@@ -255,6 +256,9 @@ public class InboxRouteFragment extends ListFragment {
                     if (getListView().getAdapter() == null) {
                         // the above adapter code is now replaced with the following line
                         RouteMessageAdapter adapter = new RouteMessageAdapter(getListView().getContext(), mRoutes);
+
+                        // Force a refresh of the list once data has changed
+                        adapter.notifyDataSetChanged();
 
                         // need to call setListAdapter for this activity.  This method is specifically from the ListActivity class
                         setListAdapter(adapter);
