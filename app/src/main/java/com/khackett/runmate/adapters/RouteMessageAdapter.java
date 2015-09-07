@@ -13,10 +13,13 @@ import android.widget.TextView;
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.ParseConstants;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 import java.util.List;
@@ -55,7 +58,7 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // the more efficient we are in this method, the better our list view will perform
         // - this affects things like scrolling or tapping on items
         // a common pattern that help with this is the ViewHolder PATTERN!!!
-        ViewHolder holder; // we need to create this ViewHolder class
+        final ViewHolder holder; // we need to create this ViewHolder class
 
         // when doing a custom list adapter, the convention is to create a private static class that we can reference - see below
 
@@ -97,44 +100,43 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // Use newly created String Date in the Text View
         holder.timeLabel.setText(stringDate);
 
-        // ParseUser parseUser = ParseUser.getQuery("senderID");
-
+        ParseFile image = null;
+        // Get the objectId of the route sender
+        String senderId = route.getString(ParseConstants.KEY_SENDER_IDS);
+        // Query Parse to get the matching user in the User table
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("senderId", route.getString(ParseConstants.KEY_SENDER_IDS));
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> objects, ParseException e) {
+        query.whereEqualTo("objectId", senderId);
+        query.getFirstInBackground(new GetCallback<ParseUser>() {
+            public void done(ParseUser user, ParseException e) {
                 if (e == null) {
-                    // The query was successful.
-                    Log.d(TAG, "Checking sender ID: " + objects.toString());
+                    // If no exception
+                    Log.d(TAG, "Checking sender name: " + user.get("username").toString());
+                    ParseFile image = (ParseFile) user.getParseFile("profilePic");
+
+                    if (image == null) {
+                        Log.d(TAG, "No matching image for this user");
+                        // Assign the empty avatar image
+                        holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
+                    } else {
+                        Log.d(TAG, "Getting the users profile from Parse");
+                        // Assign the users profile image
+                        Picasso.with(mContext)
+                                // Load the URL
+                                .load(image.getUrl())
+                                        // if a 404 code is returned, use the placeholder image
+                                .placeholder(R.mipmap.avatar_empty)
+                                .resize(200, 200)
+                                        // Load into user image view
+                                .into(holder.profilePicView);
+                    }
+
 
                 } else {
-                    // Something went wrong.
+                    Log.d(TAG, "Error returned from the Parse backend");
                 }
             }
         });
 
-        holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
-//        // ParseFile image = (ParseFile) ParseUser.getCurrentUser().getParseFile("profilePic");
-//        ParseFile image = (ParseFile) ParseUser.getQuery();
-//
-//        if (image == null) {
-//            // If image file is empty, set the default avatar
-//            Log.d(TAG, "No profile picture for: " + ParseUser.getCurrentUser().getUsername());
-//            holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
-//        } else {
-//
-//            holder.profilePicView.setImageResource(
-//                    Picasso.with(getActivity())
-//                            // Load the URL
-//                            .load(image.getUrl())
-//                                    // if a 404 code is returned, use the placeholder image
-//                            .placeholder(R.mipmap.avatar_empty)
-//                                    // Load into user image view
-//                            .into(profilePicView)
-//            );
-//        }
-//
-//        // holder.profilePicView.setImageResource(R.mipmap.ic_action_picture);
 
         holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
 
