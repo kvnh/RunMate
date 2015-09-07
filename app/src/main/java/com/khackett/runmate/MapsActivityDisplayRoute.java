@@ -66,6 +66,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     // member variable to represent an array of ParseGeoPoint values, retrieved from the parse cloud
     protected ArrayList<ParseGeoPoint> parseList;
 
+    // All returned LatLng points from the Directions API - used for animation
+    protected ArrayList<LatLng> allLatLng;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +77,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         markerPoints = new ArrayList<LatLng>();
         // latLngBoundsPoints = new ArrayList<LatLng>();
         // mLatLngBounds = new LatLngBounds();
+
+        // Instantiate allLatLng ArrayList
+        allLatLng = new ArrayList<LatLng>();
 
         // Getting reference to SupportMapFragment of the activity_maps
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -313,15 +319,18 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     public void animateRoute() {
         LatLng SYDNEY = new LatLng(-33.88, 151.21);
         LatLng MOUNTAIN_VIEW = new LatLng(-34.4, 152.1);
+        LatLng Belfast_1 = new LatLng(54.5846461, -5.9304789);
+        LatLng Belfast2 = new LatLng(54.5854979, -5.9229902);
+
         // Move the camera instantly to Sydney with a zoom of 15.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SYDNEY, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast_1, 15));
         // Zoom in, animating the camera.
         // mMap.animateCamera(CameraUpdateFactory.zoomIn());
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
         mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 30000, null);
         // Construct a CameraPosition focusing on Mountain View and animate the camera to that position.
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(MOUNTAIN_VIEW)      // Sets the center of the map to Mountain View
+                .target(Belfast2)      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
                 .tilt(30)                   // Sets the tilt of the camera to 30 degrees
@@ -491,6 +500,12 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
                     points.add(position);
                 }
+
+                for (LatLng point : points) {
+                    Log.i(TAG, "Enhanced for loop with each section LatLng point: " + point.toString());
+                    allLatLng.add(point);
+                }
+                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLng.toString());
 
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);

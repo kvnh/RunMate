@@ -42,6 +42,8 @@ import java.util.List;
 
 public class MapsActivityDirectionsMultiple extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
 
+    public static final String TAG = MapsActivityDirectionsMultiple.class.getSimpleName();
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     private List<Polyline> polylines;
@@ -54,6 +56,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     private Route mRoute;
 
+    protected ArrayList<LatLng> allLatLng;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -64,6 +68,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         polylines = new ArrayList<Polyline>();
 
         mRoute = new Route();
+
+        // Instantiate allLatLng ArrayList
+        allLatLng = new ArrayList<LatLng>();
 
         // Getting reference to SupportMapFragment of the activity_maps
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -411,6 +418,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             for (int i = 0; i < result.size(); i++) {
                 lineOptions = new PolylineOptions();
                 sectionLatLng = new ArrayList<LatLng>();
+
                 // Fetching i-th route
                 List<HashMap<String, String>> path = result.get(i);
                 // Fetching all the points in i-th route
@@ -429,6 +437,16 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 }
 
                 mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
+
+                for (LatLng enhancedPoint : sectionLatLng) {
+                    Log.i(TAG, "Enhanced for loop with each section LatLng point: " + enhancedPoint.toString());
+                    allLatLng.add(enhancedPoint);
+                }
+                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLng.toString());
+
+                for (LatLng point : mRoute.getMinMaxLatLngArrayList()) {
+                    Log.i(TAG, "Enhanced for loop with all LatLng points using the get method: " + point.toString());
+                }
 
                 // Add Polyline to list and draw on map
                 polylines.add(mMap.addPolyline(lineOptions));
