@@ -2,9 +2,7 @@ package com.khackett.runmate;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -47,7 +45,7 @@ import java.util.List;
 
 public class MapsActivityDisplayRoute extends FragmentActivity implements View.OnClickListener {
 
-    private static final String TAG = "MapsActivityDisplayRoute";
+    public static final String TAG = MapsActivityDisplayRoute.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -315,27 +313,127 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 60));
     }
 
+    private static final int ANIMATION_SPEED = 1000;
+
+    int currentPoint;
 
     public void animateRoute() {
-        LatLng SYDNEY = new LatLng(-33.88, 151.21);
-        LatLng MOUNTAIN_VIEW = new LatLng(-34.4, 152.1);
-        LatLng Belfast_1 = new LatLng(54.5846461, -5.9304789);
-        LatLng Belfast2 = new LatLng(54.5854979, -5.9229902);
 
-        // Move the camera instantly to Sydney with a zoom of 15.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast_1, 15));
-        // Zoom in, animating the camera.
-        // mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 30000, null);
-        // Construct a CameraPosition focusing on Mountain View and animate the camera to that position.
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(Belfast2)      // Sets the center of the map to Mountain View
-                .zoom(17)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 30000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom + 0.5f), 1000, MyCancelableCallback);
+
+        currentPoint = 0 - 1;
+
+//        // Set up camera to begin
+//        // Define where it should be pointed
+//        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                .target(new LatLng(0, 0))
+//                .bearing(45)
+//                .tilt(90)
+//                .zoom(mMap.getCameraPosition().zoom)
+//                .build();
+
+
+//        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+//                ANIMATE_SPEEED_TURN,
+//                new GoogleMap.CancelableCallback() {
+//
+//                    @Override
+//                    public void onFinish() {
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                    }
+//                }
+//        );
+
+//        LatLng SYDNEY = new LatLng(-33.88, 151.21);
+//        LatLng MOUNTAIN_VIEW = new LatLng(-34.4, 152.1);
+//        LatLng Belfast_1 = new LatLng(54.5846461, -5.9304789);
+//        LatLng Belfast2 = new LatLng(54.5854979, -5.9229902);
+//
+//        // Move the camera instantly to Sydney with a zoom of 15.
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast_1, 15));
+//        // Zoom in, animating the camera.
+//        // mMap.animateCamera(CameraUpdateFactory.zoomIn());
+//        // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 30000, null);
+//        // Construct a CameraPosition focusing on Mountain View and animate the camera to that position.
+//        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                .target(Belfast2)      // Sets the center of the map to Mountain View
+//                .zoom(17)                   // Sets the zoom
+//                .bearing(90)                // Sets the orientation of the camera to east
+//                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+//                .build();                   // Creates a CameraPosition from the builder
+//        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 30000, null);
+    }
+
+
+    GoogleMap.CancelableCallback MyCancelableCallback = new GoogleMap.CancelableCallback() {
+
+        @Override
+        public void onCancel() {
+            Log.i(TAG, "onCancel() action");
+        }
+
+        @Override
+        public void onFinish() {
+
+            if (++currentPoint < allLatLng.size()) {
+                float targetBearing;
+
+                if (mMap.getCameraPosition().target == allLatLng.get(currentPoint)) {
+                    targetBearing = bearingBetweenLatLngs(allLatLng.get(currentPoint - 2), allLatLng.get(currentPoint - 1));
+                } else {
+                    targetBearing = bearingBetweenLatLngs(mMap.getCameraPosition().target, allLatLng.get(currentPoint));
+                }
+                // LatLng targetLatLng = markers.get(currentPoint).getPosition();
+                LatLng targetLatLng = allLatLng.get(currentPoint);
+
+                Log.i(TAG, (currentPoint + 1) + " of " + allLatLng.size() + " - bearing: " + targetBearing + " - " + targetLatLng);
+
+                // efine where the camera should be pointed at
+                CameraPosition cameraPosition =
+                        new CameraPosition.Builder()
+                                .target(targetLatLng)
+                                .tilt(currentPoint < allLatLng.size() - 1 ? 90 : 0)
+                                .bearing(targetBearing)
+                                        // .bearing(300)
+                                .zoom(mMap.getCameraPosition().zoom)
+                                .build();
+
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000,
+                        currentPoint == allLatLng.size() - 1 ? FinalCancelableCallback : MyCancelableCallback);
+
+//						googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            }
+        }
+    };
+
+    GoogleMap.CancelableCallback FinalCancelableCallback = new GoogleMap.CancelableCallback() {
+        @Override
+        public void onFinish() {
+            // GoogleMapUtis.fixZoomForMarkers(mMap, markers);
+        }
+
+        @Override
+        public void onCancel() {
+
+        }
+    };
+
+    private Location convertLatLngToLocation(LatLng latLng) {
+        Location location = new Location("someLoc");
+        location.setLatitude(latLng.latitude);
+        location.setLongitude(latLng.longitude);
+        return location;
+    }
+
+    private float bearingBetweenLatLngs(LatLng start, LatLng end) {
+        Location startLocation = convertLatLngToLocation(start);
+        Location endLocation = convertLatLngToLocation(end);
+        return startLocation.bearingTo(endLocation);
     }
 
 
@@ -503,7 +601,15 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
                 for (LatLng point : points) {
                     Log.i(TAG, "Enhanced for loop with each section LatLng point: " + point.toString());
-                    allLatLng.add(point);
+                    if (allLatLng.size() == 0) {
+                        Log.i(TAG, "Adding first point: " + point.toString());
+                        allLatLng.add(point);
+                    } else if (!point.toString().equals(allLatLng.get(allLatLng.size() - 1).toString())) {
+                        Log.i(TAG, "Adding non repeating points: " + point.longitude + " " + point.latitude);
+                        allLatLng.add(point);
+                    } else {
+                        // not adding point
+                    }
                 }
                 Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLng.toString());
 
