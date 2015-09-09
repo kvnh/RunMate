@@ -8,43 +8,42 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/maps_activity_tool_bar"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:background="@color/backgroundPurple"
         android:orientation="horizontal">
 
 
         <Button
             android:id="@+id/btn_decline"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:layout_weight="1"
-            android:background="#40ffffff"
+            android:background="#07000000"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/str_btn_decline"
-            android:textColor="#0A0AFF"/>
+            android:textColor="#FFF"/>
 
         <Button
             android:id="@+id/btn_accept"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#40ffffff"
+            android:background="#07000000"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/str_btn_accept"
-            android:textColor="#0A0AFF"/>
+            android:textColor="#FFF"/>
 
         <Button
             android:id="@+id/btn_animate"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#40ffffff"
+            android:background="#07000000"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/str_btn_animate"
-            android:textColor="#0A0AFF"/>
+            android:textColor="#FFF"/>
 
     </LinearLayout>
 

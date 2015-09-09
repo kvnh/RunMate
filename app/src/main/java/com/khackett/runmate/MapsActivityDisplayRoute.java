@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -24,7 +25,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.utils.DirectionsJSONParser;
 import com.khackett.runmate.utils.ParseConstants;
@@ -106,6 +106,8 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
             // set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
+
+            // mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
         }
 
@@ -202,7 +204,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                 animateRoute();
                 break;
             default:
-                System.out.println("Problem with input");
+                Log.i(TAG, "Problem with input");
         }
     }
 
@@ -320,7 +322,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 60));
     }
 
-
     /**
      * Method to add start and finish markers to the route.
      */
@@ -343,98 +344,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
                     .showInfoWindow();
         }
-    }
-
-    private static final int CAMERA_SPEED = 1000;   // Set the speed of the camera between points to 1 second
-
-    private static int currentLatLngCheck;
-
-    private float cameraZoomLevel;
-
-    public void animateRoute() {
-
-        cameraZoomLevel = 0.1f;
-
-        // Set the currentLatLngCheck to the first index of the array.
-        currentLatLngCheck = -1;
-
-        // Zoom the camera in the
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom + cameraZoomLevel),
-                CAMERA_SPEED,
-                cancelableCallback);
-
-        animator.startAnimation(false);
-    }
-
-    GoogleMap.CancelableCallback cancelableCallback = new GoogleMap.CancelableCallback() {
-
-        @Override
-        public void onCancel() {
-            Log.i(TAG, "onCancel() action");
-        }
-
-        @Override
-        public void onFinish() {
-
-            if (++currentLatLngCheck < allNonDuplicateLatLng.size()) {
-                float targetBearing;
-                targetBearing = bearingBetweenLatLngPoints(mMap.getCameraPosition().target, allNonDuplicateLatLng.get(currentLatLngCheck));
-
-                LatLng targetLatLng = allNonDuplicateLatLng.get(currentLatLngCheck);
-
-                Log.i(TAG, (currentLatLngCheck + 1) + " of " + allNonDuplicateLatLng.size() + " - bearing: " + targetBearing + " / " + targetLatLng);
-
-                // Set up a camera position and define where it should be pointed at.
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(targetLatLng)                   // Set where the camera should go.
-                        .tilt(currentLatLngCheck < allNonDuplicateLatLng.size() - 1 ? 90 : 0) // Set the tilt of the camera.
-                        .bearing(targetBearing)                 // Set the camera orientation angle.
-                        .zoom(mMap.getCameraPosition().zoom)    // Set the zoom value.
-                        .build();                               // Create a CameraPosition from the builder.
-
-                // Pass the CameraPosition to the Google Map animateCamera() method.
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                        CAMERA_SPEED,
-                        // Repeat process if there are still points in allNonDuplicateLatLng array
-                        // to animate through
-                        currentLatLngCheck == allNonDuplicateLatLng.size() - 1 ?
-                                finalCancelableCallback : cancelableCallback);
-            }
-        }
-    };
-
-    GoogleMap.CancelableCallback finalCancelableCallback = new GoogleMap.CancelableCallback() {
-        // onFinish() called after the animation has finished
-        @Override
-        public void onFinish() {
-            // Zoom out to view route once the camera finishes animating.
-            zoomToViewRoute();
-        }
-
-        // onCancel() called whenever the animation has stopped.
-        @Override
-        public void onCancel() {
-
-        }
-    };
-
-    /**
-     * Method to
-     *
-     * @param latLng
-     * @return
-     */
-    private Location convertLatLngToLocation(LatLng latLng) {
-        Location location = new Location("someLocation");
-        location.setLatitude(latLng.latitude);
-        location.setLongitude(latLng.longitude);
-        return location;
-    }
-
-    public float bearingBetweenLatLngPoints(LatLng start, LatLng end) {
-        Location startLocation = convertLatLngToLocation(start);
-        Location endLocation = convertLatLngToLocation(end);
-        return startLocation.bearingTo(endLocation);
     }
 
 
@@ -625,23 +534,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         }
     }
 
-
-//    /**
-//     * method to convert an array of ParseGeoPoint elements to an array of LatLng elements
-//     *
-//     * @param parseList
-//     * @return
-//     */
-//    protected ArrayList convertParseGeoPointToLatLngArray(ArrayList<ParseGeoPoint> parseList) {
-//        markerPoints = new ArrayList<LatLng>();
-//        for (ParseGeoPoint item : parseList) {
-//            LatLng latLngPoint = new LatLng(item.getLatitude(), item.getLongitude());
-//            markerPoints.add(latLngPoint);
-//        }
-//        return markerPoints;
-//    }
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -677,8 +569,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
@@ -686,94 +577,86 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
+    public void animateRoute() {
+        // Keep the screen on while the user is animating the route
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        animator.startAnimation();
+    }
 
     private Animator animator = new Animator();
     private final Handler mHandler = new Handler();
 
+    private float cameraZoomLevel = 0.1f;
+
     public class Animator implements Runnable {
 
-        private static final int ANIMATE_SPEEED = 1500;
-        private static final int ANIMATE_SPEEED_TURN = 1000;
-        private static final int BEARING_OFFSET = 20;
+        // Set the speed of the camera between points to 1.5 second
+        private static final int CAMERA_SPEED = 1500;
+        private static final int CAMERA_SPEED_TURN = 1000;
 
+        // Linear interpolator to define the rate of change of animation.
         private final Interpolator interpolator = new LinearInterpolator();
 
-        int currentIndex = 0;
+        // Set the currentLatLngCheck to the first index of the array.
+        private int currentLatLngIndex = 0;
 
-        float tilt = 90;
+        private float tilt = 90;
 
-        long start = SystemClock.uptimeMillis();
+        private long startTime = SystemClock.uptimeMillis();
 
-        LatLng endLatLng = null;
-        LatLng beginLatLng = null;
-
-        boolean showPolyline = false;
+        private LatLng beginLatLng = null;
+        private LatLng endLatLng = null;
 
         private Marker trackingMarker;
 
-        public void startAnimation(boolean showPolyLine) {
+        public void startAnimation() {
             if (allNonDuplicateLatLng.size() > 2) {
-                animator.initialize(showPolyLine);
+                animator.initialize();
             }
-        }
-
-        public void stopAnimation() {
-            animator.stop();
         }
 
         public void reset() {
-            // resetMarkers();
-            start = SystemClock.uptimeMillis();
-            currentIndex = 0;
+            startTime = SystemClock.uptimeMillis();
+            currentLatLngIndex = 0;
             endLatLng = getEndLatLng();
             beginLatLng = getBeginLatLng();
-
         }
 
-        public void stop() {
-            trackingMarker.remove();
-            mHandler.removeCallbacks(animator);
-        }
-
-        public void initialize(boolean showPolyLine) {
+        /**
+         * Method to set the initial position of the camera based on the first and second LatLng points
+         */
+        public void initialize() {
             reset();
-            this.showPolyline = showPolyLine;
 
-            // highLightMarker(0);
+            LatLng firstPoint = allNonDuplicateLatLng.get(0);
+            LatLng secondPoint = allNonDuplicateLatLng.get(1);
 
-            if (showPolyLine) {
-                polyLine = initializePolyLine();
-            }
-
-            // We first need to put the camera in the correct position for the first run (we need 2 markers for this).....
-            LatLng markerPos = allNonDuplicateLatLng.get(0);
-            LatLng secondPos = allNonDuplicateLatLng.get(1);
-
-            setupCameraPositionForMovement(markerPos, secondPos);
+            setupCameraPositionForMovement(firstPoint, secondPoint);
         }
 
-        private void setupCameraPositionForMovement(LatLng markerPos, LatLng secondPos) {
+        private void setupCameraPositionForMovement(LatLng firstPoint, LatLng secondPoint) {
 
-            float bearing = bearingBetweenLatLngPoints(markerPos, secondPos);
+            float cameraBearingStart = bearingBetweenLatLngPoints(firstPoint, secondPoint);
 
             trackingMarker = mMap.addMarker(new MarkerOptions()
-                    .position(markerPos)
+                    .position(firstPoint)
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_directions_run_black_24dp)));
 
+            // Set up camera position for the start point.
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(markerPos)
-                    .bearing(bearing + BEARING_OFFSET)
-                    .tilt(90)
-                    .zoom(mMap.getCameraPosition().zoom >= 16 ? mMap.getCameraPosition().zoom : 16)
-                    .build();
+                    .target(firstPoint) // Set the initial view for the camera.
+                    .tilt(tilt)
+                    .bearing(cameraBearingStart)  // Set the camera orientation angle for th first point.
+                    .zoom(mMap.getCameraPosition().zoom >= 16 ? mMap.getCameraPosition().zoom : 16) // Set the zoom value.
+                    .build();   // Create a CameraPosition from the builder.
 
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                    ANIMATE_SPEEED_TURN,
+                    CAMERA_SPEED_TURN,
                     new GoogleMap.CancelableCallback() {
 
                         @Override
                         public void onFinish() {
-                            System.out.println("finished camera");
+                            Log.i(TAG, "Camera finished");
                             animator.reset();
                             Handler handler = new Handler();
                             handler.post(animator);
@@ -781,109 +664,95 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
                         @Override
                         public void onCancel() {
-                            System.out.println("cancelling camera");
+                            Log.i(TAG, "Cancelling camera animation");
                         }
-                    }
-            );
+                    });
         }
-
-        private Polyline polyLine;
-        private PolylineOptions rectOptions = new PolylineOptions();
-
-
-        private Polyline initializePolyLine() {
-            //polyLinePoints = new ArrayList<LatLng>();
-            rectOptions.add(allNonDuplicateLatLng.get(0));
-            return mMap.addPolyline(rectOptions);
-        }
-
-        /**
-         * Add the marker to the polyline.
-         */
-        private void updatePolyLine(LatLng latLng) {
-            List<LatLng> points = polyLine.getPoints();
-            points.add(latLng);
-            polyLine.setPoints(points);
-        }
-
 
         @Override
         public void run() {
 
-            long elapsed = SystemClock.uptimeMillis() - start;
-            double t = interpolator.getInterpolation((float) elapsed / ANIMATE_SPEEED);
+            long elapsedTime = SystemClock.uptimeMillis() - startTime;
+            double timeInterpolator = interpolator.getInterpolation((float) elapsedTime / CAMERA_SPEED);
 
-            double lat = t * endLatLng.latitude + (1 - t) * beginLatLng.latitude;
-            double lng = t * endLatLng.longitude + (1 - t) * beginLatLng.longitude;
+            double lat = timeInterpolator * endLatLng.latitude + (1 - timeInterpolator) * beginLatLng.latitude;
+            double lng = timeInterpolator * endLatLng.longitude + (1 - timeInterpolator) * beginLatLng.longitude;
             LatLng newPosition = new LatLng(lat, lng);
 
             trackingMarker.setPosition(newPosition);
 
-            if (showPolyline) {
-                updatePolyLine(newPosition);
-            }
-
-            // It's not possible to move the marker + center it through a cameraposition update while another camerapostioning was already happening.
-            //navigateToPoint(newPosition,tilt,bearing,currentZoom,false);
-            //navigateToPoint(newPosition,false);
-
-            if (t < 1) {
+            if (timeInterpolator < 1) {
                 mHandler.postDelayed(this, 16);
             } else {
 
-                System.out.println("Move to next marker.... current = " + currentIndex + " and size = " + allNonDuplicateLatLng.size());
-                // imagine 5 elements -  0|1|2|3|4 currentindex must be smaller than 4
-                if (currentIndex < allNonDuplicateLatLng.size() - 2) {
+                if (currentLatLngIndex < allNonDuplicateLatLng.size() - 2) {
 
-                    currentIndex++;
+                    currentLatLngIndex++;
 
                     endLatLng = getEndLatLng();
                     beginLatLng = getBeginLatLng();
 
+                    startTime = SystemClock.uptimeMillis();
 
-                    start = SystemClock.uptimeMillis();
+                    LatLng firstPoint = getBeginLatLng();
+                    LatLng nextPoint = getEndLatLng();
 
-                    LatLng begin = getBeginLatLng();
-                    LatLng end = getEndLatLng();
+                    float cameraBearing = bearingBetweenLatLngPoints(firstPoint, nextPoint);
 
-                    float bearingL = bearingBetweenLatLngPoints(begin, end);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(nextPoint)
+                            .bearing(cameraBearing)
+                            .tilt(tilt)
+                            .zoom(mMap.getCameraPosition().zoom)
+                            .build();
 
-                    // highLightMarker(currentIndex);
+                    Log.i(TAG, (currentLatLngIndex + 1) + " of " + allNonDuplicateLatLng.size() + " - bearing: " + cameraBearing + " / " + nextPoint);
 
-                    CameraPosition cameraPosition =
-                            new CameraPosition.Builder()
-                                    .target(end) // changed this...
-                                    .bearing(bearingL + BEARING_OFFSET)
-                                    .tilt(tilt)
-                                    .zoom(mMap.getCameraPosition().zoom)
-                                    .build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                            CAMERA_SPEED_TURN,
+                            null);
 
-
-                    mMap.animateCamera(
-                            CameraUpdateFactory.newCameraPosition(cameraPosition),
-                            ANIMATE_SPEEED_TURN,
-                            null
-                    );
-
-                    start = SystemClock.uptimeMillis();
+                    startTime = SystemClock.uptimeMillis();
                     mHandler.postDelayed(animator, 16);
 
                 } else {
-                    currentIndex++;
-                    stopAnimation();
+                    currentLatLngIndex++;
+                    // Zoom out to view route once the camera finishes animating.
+                    zoomToViewRoute();
+                    // Remove the runner icon
+                    trackingMarker.remove();
+                    // Remove any callbacks to the Handler object
+                    mHandler.removeCallbacks(animator);
                 }
-
             }
         }
 
         private LatLng getEndLatLng() {
-            return allNonDuplicateLatLng.get(currentIndex + 1);
+            return allNonDuplicateLatLng.get(currentLatLngIndex + 1);
         }
 
         private LatLng getBeginLatLng() {
-            return allNonDuplicateLatLng.get(currentIndex);
+            return allNonDuplicateLatLng.get(currentLatLngIndex);
+        }
+
+        /**
+         * Method to
+         *
+         * @param latLng
+         * @return
+         */
+        private Location convertLatLngToLocation(LatLng latLng) {
+            Location location = new Location("someLocation");
+            location.setLatitude(latLng.latitude);
+            location.setLongitude(latLng.longitude);
+            return location;
+        }
+
+        private float bearingBetweenLatLngPoints(LatLng start, LatLng end) {
+            Location startLocation = convertLatLngToLocation(start);
+            Location endLocation = convertLatLngToLocation(end);
+            return startLocation.bearingTo(endLocation);
         }
 
     }
-
 }

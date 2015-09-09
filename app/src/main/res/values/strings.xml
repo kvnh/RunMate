@@ -75,7 +75,7 @@
     <string name="str_btn_send">Send Route</string>
     <string name="str_btn_accept">Accept</string>
     <string name="str_btn_decline">Decline</string>
-    <string name="str_btn_animate">Animate Route</string>
+    <string name="str_btn_animate">Animate \nRoute</string>
 
     <string-array name="camera_choices">
         <item>Take Picture</item>
