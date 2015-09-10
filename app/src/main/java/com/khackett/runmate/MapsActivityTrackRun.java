@@ -135,6 +135,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     private List<Polyline> polylines;
 
+    // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
+    protected ArrayList<LatLng> markerPoints;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -619,6 +622,5 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * This is where we can add markers or lines, add listeners or move the camera.
      */
     private void setUpMap() {
-        // mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 }

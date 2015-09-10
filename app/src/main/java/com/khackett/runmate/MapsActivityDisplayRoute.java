@@ -107,8 +107,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             // set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
 
-            // mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
         }
 
         // Set up member variables for each UI component
@@ -153,13 +151,11 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
              * for the end location, the colour of the marker is RED.
              */
             if (markerPoints.size() == 1) {
-                // place a green marker for the start position
+                // Add a green marker for the start position.
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
 
             if (markerPoints.size() >= 2) {
-//                    LatLng point1 = markerPoints.get(markerPoints.size() - 2);
-//                    LatLng point2 = markerPoints.get(markerPoints.size() - 1);
 
                 LatLng point1 = markerPoints.get(i);
                 LatLng point2 = markerPoints.get(i + 1);
@@ -372,7 +368,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Output format
         String output = "json";
 
-        // transport mode
+        // Transport mode
         String transMode = "&mode=walking";
 
         // Building the url to the web service
@@ -488,7 +484,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             ArrayList<LatLng> points = null;
             PolylineOptions lineOptions = null;
-            MarkerOptions markerOptions = new MarkerOptions();
 
             // Traversing through all the routes
             for (int i = 0; i < result.size(); i++) {

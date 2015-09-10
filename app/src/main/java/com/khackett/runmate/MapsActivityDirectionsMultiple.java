@@ -148,7 +148,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 completeLoop();
                 break;
             default:
-                System.out.println("Problem with input");
+                Log.i(TAG, "Problem with input");
         }
     }
 
@@ -193,7 +193,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             lastPoint = mRoute.getMarkerPoints().get(mRoute.getMarkerPoints().size() - 2);
 
             // Animate camera to centre on the previously touched position
-            System.out.println("Centering camera to previous position at " + lastPoint.toString());
+            Log.i(TAG, "Centering camera to previous position at " + lastPoint.toString());
             mMap.animateCamera(CameraUpdateFactory.newLatLng(lastPoint));
 
             // Remove polyline object from the map
@@ -484,20 +484,18 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             return distance;
         }
 
-        // Executes in UI thread, after the parsing process
+        // Executes in UI thread, after the parsing process.
         @Override
         protected void onPostExecute(Double distance) {
             mRoute.setTotalDistance(distance);
             double routeDistance = mRoute.getTotalDistance();
-            System.out.println("Total Distance calculated in AsyncTask in m = " + routeDistance);
+            Log.i(TAG, "Total Distance calculated in AsyncTask in m = " + routeDistance);
             mDistanceCount.setText(routeDistance / 1000 + "km");
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -508,12 +506,12 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     }
 
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
+        // Do a null check to confirm that a map not already instantiated.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
-            // Check if we were successful in obtaining the map.
+            // Check if successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
@@ -523,28 +521,5 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
-
-//    /**
-//     * set the camera to centre on the users current location
-//     */
-//    public void centreCamera() {
-//        // http://stackoverflow.com/questions/23226056/to-use-or-not-to-use-getmylocation-in-google-maps-api-v2-for-android
-//
-//        // Getting LocationManager object from System Service LOCATION_SERVICE
-//        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//        // Creating a criteria object to retrieve provider
-//        Criteria criteria = new Criteria();
-//        // Getting the name of the best provider
-//        String provider = locationManager.getBestProvider(criteria, true);
-//        // Getting Current Location From GPS
-//        Location location = locationManager.getLastKnownLocation(provider);
-//
-//        mLatitude = location.getLatitude();
-//        mLongitude = location.getLongitude();
-//        LatLng point = new LatLng(mLatitude, mLongitude);
-//
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
-//        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-//    }
 
 }

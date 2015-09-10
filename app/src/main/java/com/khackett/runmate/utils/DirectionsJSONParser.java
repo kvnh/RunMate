@@ -50,7 +50,6 @@ public class DirectionsJSONParser {
                             hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
                             hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
                             path.add(hm);
-                            // System.out.println(path.toString());
                         }
                     }
                     routes.add(path);
