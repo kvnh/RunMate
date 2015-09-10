@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.ParseConstants;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -21,6 +20,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +47,21 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         super(context, R.layout.message_item, routes);
         mContext = context;
         mRoutes = routes;
+    }
+
+    // class that contains the data that is going to be displayed in the custom layout for each item
+    private static class ViewHolder {
+        // The image to be displayed
+        ImageView profilePicView;
+        // The users name
+        TextView nameLabel;
+        TextView routeNameLabel;
+        // The time the message was sent
+        TextView timeLabel;
+        // The distance of the route
+        TextView distanceLabel;
+        // The time and date of the route
+        TextView timeAndDateLabel;
     }
 
     // in fragments, the adapter called an appropriate method to get a fragment, then it adapter it and then put in the view
@@ -77,6 +93,7 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
             holder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
             holder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
             holder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
+            holder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
             convertView.setTag(holder);
         } else {
             // then it already exists and we can reuse the components - they are already there in memory - we just need to change the data
@@ -100,7 +117,6 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         // Use newly created String Date in the Text View
         holder.timeLabel.setText(stringDate);
 
-        ParseFile image = null;
         // Get the objectId of the route sender
         String senderId = route.getString(ParseConstants.KEY_SENDER_IDS);
         // Query Parse to get the matching user in the User table
@@ -114,22 +130,19 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
                     ParseFile image = (ParseFile) user.getParseFile("profilePic");
 
                     if (image == null) {
-                        Log.d(TAG, "No matching image for this user");
                         // Assign the empty avatar image
                         holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
                     } else {
-                        Log.d(TAG, "Getting the users profile from Parse");
                         // Assign the users profile image
                         Picasso.with(mContext)
                                 // Load the URL
                                 .load(image.getUrl())
                                         // if a 404 code is returned, use the placeholder image
                                 .placeholder(R.mipmap.avatar_empty)
-                                .resize(200, 200)
+                                .resize(180, 180)
                                         // Load into user image view
                                 .into(holder.profilePicView);
                     }
-
 
                 } else {
                     Log.d(TAG, "Error returned from the Parse backend");
@@ -137,30 +150,23 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
             }
         });
 
-
         holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
 
         holder.routeNameLabel.setText(route.getString(ParseConstants.KEY_ROUTE_NAME));
+
+
+        // Create an instance of SimpleDateFormat used for formatting
+        // the string representation of date (month/day/year)
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date proposedTimeParse = route.getDate(ParseConstants.KEY_ROUTE_PROPOSED_TIME);
+        String proposedTimeString = dateFormat.format(proposedTimeParse);
+        holder.timeAndDateLabel.setText(proposedTimeString);
 
         double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
         // holder.distanceLabel.setText(String.valueOf(distance));
         holder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));
 
         return convertView;
-    }
-
-    // class that contains the data that is going to be displayed in the custom layout for each item
-    private static class ViewHolder {
-        // The image to be displayed
-        ImageView profilePicView;
-        // The users name
-        TextView nameLabel;
-        TextView routeNameLabel;
-        // The time the message was sent
-        TextView timeLabel;
-
-        TextView distanceLabel;
-
     }
 
     // method to refill the list with ParseObject data if it is not null

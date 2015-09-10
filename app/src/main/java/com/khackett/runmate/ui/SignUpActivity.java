@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.RunMateApplication;
+import com.khackett.runmate.utils.ParseConstants;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -125,7 +126,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
             // Create a ParseUser object and add each of the information fields to it
             ParseUser newUser = new ParseUser();
-            newUser.put("fullName", fullName);
+            newUser.put(ParseConstants.KEY_USER_FULL_NAME, fullName);
             newUser.setUsername(username);
             newUser.setEmail(email);
             newUser.setPassword(password);
