@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.khackett.runmate.MapsActivityDisplayRoute;
+import com.khackett.runmate.MapsActivityTrackRun;
 import com.khackett.runmate.R;
 import com.khackett.runmate.adapters.RouteMessageAdapter;
 import com.khackett.runmate.utils.ParseConstants;
@@ -74,7 +75,6 @@ public class MyRunsFragment extends ListFragment {
         retrieveAcceptedRoutes();
     }
 
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -99,8 +99,8 @@ public class MyRunsFragment extends ListFragment {
         String objectId = route.getObjectId();
         // JSONArray ids = route.getJSONArray(ParseConstants.KEY_RECIPIENT_IDS);
 
-        // start a map activity to display the route
-        Intent intent = new Intent(getActivity(), MapsActivityDisplayRoute.class);
+        // Start a map activity to display the route
+        Intent intent = new Intent(getActivity(), MapsActivityTrackRun.class);
         intent.putExtra("parseLatLngList", parseList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
         intent.putExtra("myObjectId", objectId);
