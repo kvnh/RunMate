@@ -66,7 +66,8 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public static final long UPDATE_INTERVAL = 1000 * 5;
 
     /**
-     * The fastest rate for location updates in milliseconds - updates will never be more frequent than this value.
+     * The fastest rate for location updates in milliseconds.
+     * Updates will never be more frequent than this value.
      */
     public static final long FASTEST_UPDATE_INTERVAL = 1000 * 1;
 
@@ -88,7 +89,8 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     private GoogleApiClient mGoogleApiClient;
 
     /**
-     * Used to request a quality of service for location updates and store parameters for requests to the FusedLocationProviderApi.
+     * Used to request a quality of service for location updates
+     * and store parameters for requests to the FusedLocationProviderApi.
      */
     private LocationRequest mLocationRequest;
 

@@ -21,8 +21,8 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    double mLatitude = 0;
-    double mLongitude = 0;
+    private double mLatitude = 0;
+    private double mLongitude = 0;
 
     // create an array list to contain all of the points tapped on the map.
     // These points will contain latitude and longitude points
@@ -69,41 +69,6 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         super.onResume();
         setUpMapIfNeeded();
     }
-
-//    /**
-//     * method created to get the search entry from a user and turn this into a geo location
-//     *
-//     * @param view
-//     */
-//    public void onSearch(View view) {
-//        EditText location_tf = (EditText) findViewById(R.id.TFAddress);
-//        // convert this to a String
-//        String location = location_tf.getText().toString();
-//
-//        List<Address> addressList = null;
-//
-//        if (location != null || !location.equals("")) {
-//            // create an object of geocoder class
-//            Geocoder geocoder = new Geocoder(this);
-//            try {
-//                addressList = geocoder.getFromLocationName(location, 1);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            // get the first entry from the address that was entered
-//            Address address = addressList.get(0);
-//
-//            // get the latitude and longitude of the inputted address and assign to latLng
-//            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-//
-//            // set a marker on the location the entered location
-//            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-//
-//            // centre the camera on the users current location
-//            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-//        }
-//    }
 
     /**
      * method to change the type of the map between normal view and satellite view
@@ -180,10 +145,6 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         polylineOptions = new PolylineOptions()
                 .color(Color.RED)
                 .width(5);
-
-        // these next 2 lines can be deleted
-        // polylineOptions.color(Color.RED);
-        // polylineOptions.width(5);
 
         // Adding the tapped point to the ArrayList
         arrayPoints.add(point);
