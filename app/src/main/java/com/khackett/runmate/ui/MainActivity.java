@@ -130,12 +130,12 @@ public class MainActivity extends AppCompatActivity {
 
         switch (itemId) {
             case R.id.action_add_friends:
-                // create and start and new intent
+                // Create and start a new intent to add/remove friends
                 Intent intent = new Intent(this, EditFriendsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.action_plot_route:
-                // add code for an alert dialog
+                // Open an alert dialog.
                 AlertDialog.Builder builderPlot = new AlertDialog.Builder(this);
                 // get the list the strings file
                 // code for listener will be long, so create a member variable for it and pass that in instead
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         // All activities are started through intents so create a new intent object
         // It requires two parameters - first is the context (this is the current system context within
         // which the app is operating; so whenever we are working inside an activity, that is our context (activity is actually a subclass of context).
-        // ... the 2nd pramter is the class of the activity that we want to start
+        // ... the 2nd parameter is the class of the activity that we want to start
         Intent intent = new Intent(this, LoginActivity.class);
 
         // remove the main activity from the history so that it is skipped when we go backwards with the back button fromm login activity

@@ -49,6 +49,7 @@ public class MyRunsFragment extends ListFragment {
         // the 3rd parameter should be false whenever we add a fragment to an activity in code, which is what we are going to do
         // So this line of code uses an inflater object to create a new view using the layout we provide.
         // It then attaches that view to a parent, which in this case is the ViewPager object from main activity
+
         View rootView = inflater.inflate(R.layout.fragment_my_runs, container, false);
 
         // Set SwipeRefreshLayout component
@@ -61,9 +62,6 @@ public class MyRunsFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
-//        // Initialise the Context to the EditFriendsActivity.
-//        mContext = RouteRecipientsActivity.this;
-
         // Return the View object - this is the view of the whole fragment
         return rootView;
     }
@@ -72,17 +70,11 @@ public class MyRunsFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
-//        // Set up a dialog progress indicator box - start it before the query to backend is run
-//        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-//        progressDialog.setTitle(R.string.edit_friends_progress_dialog_title);
-//        progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
-//        progressDialog.show();
-
         // Retrieve the accepted routes from the Parse backend
         retrieveAcceptedRoutes();
     }
 
-    // add the code that takes us to ViewImageActivity - we will need the onListItemClick() method
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -115,7 +107,6 @@ public class MyRunsFragment extends ListFragment {
 
         // Start the MapsActivityDisplayRoute activity
         startActivityForResult(intent, MY_STATUS_CODE);
-        // startActivity(intent);
     }
 
     @Override
@@ -182,9 +173,7 @@ public class MyRunsFragment extends ListFragment {
                         // cast it to RouteMessageAdapter
                         ((RouteMessageAdapter) getListView().getAdapter()).refill(mAcceptedRoutes);
                     }
-
                 }
-
             }
         });
     }
