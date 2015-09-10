@@ -439,14 +439,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
 
                 for (LatLng enhancedPoint : sectionLatLng) {
-                    Log.i(TAG, "Enhanced for loop with each section LatLng point: " + enhancedPoint.toString());
                     allLatLng.add(enhancedPoint);
                 }
                 Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLng.toString());
-
-                for (LatLng point : mRoute.getMinMaxLatLngArrayList()) {
-                    Log.i(TAG, "Enhanced for loop with all LatLng points using the get method: " + point.toString());
-                }
 
                 // Add Polyline to list and draw on map
                 polylines.add(mMap.addPolyline(lineOptions));

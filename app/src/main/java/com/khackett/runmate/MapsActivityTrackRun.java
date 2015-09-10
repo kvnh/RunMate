@@ -355,7 +355,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
 
-
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -396,20 +395,14 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(strUrl);
-
             // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection) url.openConnection();
-
             // Connecting to url
             urlConnection.connect();
-
             // Reading data from url
             iStream = urlConnection.getInputStream();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
             StringBuffer sb = new StringBuffer();
-
             String line = "";
             while ((line = br.readLine()) != null) {
                 sb.append(line);
@@ -488,9 +481,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             mMap.addPolyline(lineOptions);
         }
     }
-
-
-
 
 
     @Override
@@ -615,7 +605,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                         // set fastest rate for active location updates
                         // app will never receive updates faster than this setting
                 .setFastestInterval(FASTEST_UPDATE_INTERVAL);
-                // .setSmallestDisplacement(DISPLACEMENT);
+        // .setSmallestDisplacement(DISPLACEMENT);
     }
 
     /**
