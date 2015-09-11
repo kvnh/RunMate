@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -60,6 +61,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
+    // Tag for current Activity
+    public static final String TAG = MapsActivityTrackRun.class.getSimpleName();
+
     /**
      * Request code to send to Google Play Services in case of connection failure.
      */
@@ -89,7 +93,13 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     /**
      * The minimum distance from previous update to accept new update in meters.
      */
-    public static final int DISPLACEMENT = 1;
+    public static final int DISPLACEMENT = 2;
+
+    /**
+     * The accuracy of the users current location in metres.
+     * Accuracy is defined as the radius around the user being of 68% confidence.
+     */
+    public static final int LOCATION_ACCURACY = 10;
 
     // Keys for storing activity state in the Bundle.
     private static final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -120,15 +130,31 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      */
     protected LocationSettingsRequest mLocationSettingsRequest;
 
-    // TAg for current Activity
-    public static final String TAG = MapsActivityTrackRun.class.getSimpleName();
-
     // member variables for the UI buttons and text outputs
     protected Button mStartUpdatesButton;
     protected Button mStopUpdatesButton;
-    protected TextView mLastUpdateTimeTextView;
-    protected TextView mLatitudeTextView;
-    protected TextView mLongitudeTextView;
+    protected Button mSaveRunButton;
+    protected TextView mRunTimeTextView;
+    protected long startTime = 0;
+    protected long savedTime = 0;
+    protected long totalTimeMillis;
+
+    // Runs without a timer by reposting this handler at the end of the runnable
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            totalTimeMillis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (totalTimeMillis / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+
+            mRunTimeTextView.setText(String.format("%d:%02d", minutes, seconds));
+
+            timerHandler.postDelayed(this, 500);
+        }
+    };
 
     /**
      * Boolean to to track whether the location updates have been turned on or off by the user.
@@ -142,7 +168,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected String mLastUpdateTime;
 
     // Declare array list for location points
-    private List<LatLng> latLngPointsArray;
+    private List<LatLng> latLngGPSTrackingPoints;
     private Polyline line;
 
     private List<Polyline> polylines;
@@ -161,16 +187,15 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // set up member variables for each UI component
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
         mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
-        mLatitudeTextView = (TextView) findViewById(R.id.latitude_text);
-        mLongitudeTextView = (TextView) findViewById(R.id.longitude_text);
-        mLastUpdateTimeTextView = (TextView) findViewById(R.id.last_update_time_text);
+        mSaveRunButton = (Button) findViewById(R.id.save_run_button);
+        mRunTimeTextView = (TextView) findViewById(R.id.run_time_text);
 
         // set the location update request to false to start the activity
         mCheckLocationUpdates = false;
         mLastUpdateTime = "";
 
         // Initializing array lists
-        latLngPointsArray = new ArrayList<LatLng>();
+        latLngGPSTrackingPoints = new ArrayList<LatLng>();
         polylines = new ArrayList<Polyline>();
 
         // Getting reference to SupportMapFragment of the activity_maps
@@ -237,8 +262,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         for (int i = 0; i < markerPoints.size() - 1; i++) {
 
             /**
-             * For the start location, the colour of the marker is GREEN and
-             * for the end location, the colour of the marker is RED.
+             * For the start location, the colour of the marker is GREEN.
              */
             if (markerPoints.size() == 1) {
                 // Add a green marker for the start position.
@@ -250,8 +274,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 LatLng point1 = markerPoints.get(i);
                 LatLng point2 = markerPoints.get(i + 1);
 
-                // marker.position(point2).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                // marker.position(point2).visible(true);
                 marker.position(point1).visible(false);
 
                 // Getting URL to the Google Directions API
@@ -262,10 +284,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 // Start downloading json data from Google Directions API
                 downloadTask.execute(url);
             }
-
-            // Add a new marker to the map
-            // mMap.addMarker(marker);
-
         }
 
         // Add the start and finish markers to the map
@@ -332,9 +350,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // Destination of route
         String stringDestination = "destination=" + dest.latitude + "," + dest.longitude;
-
-        // Sensor enabled
-        String sensor = "sensor=false";
 
         // Building the parameters to the web service
         String parameters = stringOrigin + "&" + stringDestination;
@@ -421,7 +436,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         return data;
     }
 
-
     /**
      * A class to parse the Google Places in JSON format
      */
@@ -504,7 +518,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected void onPause() {
         super.onPause();
         if (mGoogleApiClient.isConnected()) {
-            // remove location updates, but do not disconnect the GoogleApiClient object
+            // Remove location updates, but do not disconnect the GoogleApiClient object
             stopLocationUpdates();
         }
     }
@@ -532,10 +546,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
                 // Since LOCATION_KEY was found in the Bundle, we can be sure that mCurrentLocation is not null.
                 mCurrentLocation = savedInstanceState.getParcelable(LOCATION_KEY);
-            }
-            // Update the value of mLastUpdateTime from the Bundle.
-            if (savedInstanceState.keySet().contains(LAST_UPDATED_TIME_STRING_KEY)) {
-                mLastUpdateTime = savedInstanceState.getString(LAST_UPDATED_TIME_STRING_KEY);
             }
             // Update the UI.
             updateUI();
@@ -653,9 +663,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                     Log.i(TAG, "PendingIntent unable to execute request.");
                 }
                 break;
-//            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-//                Log.i(TAG, "Location settings are inadequate and cannot be fixed here.");
-//                break;
             default:
                 Log.i(TAG, "Status not recognised - check LocationSettingsResult");
         }
@@ -685,12 +692,22 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public void startUpdatesButton(View view) {
         // check location settings to ensure GPS is enabled, before running location updates
         checkLocationSettings();
+        startTime = System.currentTimeMillis() - savedTime;
+        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     /**
-     * Handles the Stop Run button, and requests removal of location updates.
+     * Handles the Pause Run button, and requests removal of location updates.
      */
     public void stopUpdatesButton(View view) {
+        // stop checking for location updates
+        stopLocationUpdates();
+        // Save the time that has passed
+        savedTime = totalTimeMillis;
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    public void saveRunButton(View view) {
         // stop checking for location updates
         stopLocationUpdates();
     }
@@ -704,6 +721,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         if (mCheckLocationUpdates) {
             mStartUpdatesButton.setEnabled(false);
             mStopUpdatesButton.setEnabled(true);
+            mSaveRunButton.setEnabled(true);
         } else {
             mStartUpdatesButton.setEnabled(true);
             mStopUpdatesButton.setEnabled(false);
@@ -722,8 +740,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // if current location is null, get the last known location of device
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-            // zoomToCurrentLocation(mCurrentLocation);
             updateUI();
         }
 
@@ -736,17 +752,17 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     }
 
-    public void zoomToCurrentLocation(Location location) {
-        Log.d(TAG, location.toString());
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng);
-        mMap.addMarker(options);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
-        mMap.animateCamera(cameraUpdate);
-    }
+//    public void zoomToCurrentLocation(Location location) {
+//        Log.d(TAG, location.toString());
+//        double currentLatitude = location.getLatitude();
+//        double currentLongitude = location.getLongitude();
+//        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+//        MarkerOptions options = new MarkerOptions()
+//                .position(latLng);
+//        mMap.addMarker(options);
+//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
+//        mMap.animateCamera(cameraUpdate);
+//    }
 
     /**
      * Requests location updates from the FusedLocationApi
@@ -787,11 +803,16 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public void onLocationChanged(Location location) {
 
         if (!location.hasAccuracy()) {
+            // Location has no accuracy - ignore reading.
             return;
         }
-        if (location.getAccuracy() > 5) {
+        if (location.getAccuracy() > LOCATION_ACCURACY || location.getAccuracy() == 0) {
+            // Accuracy reading is not within the limits so disregard this reading.
             return;
         }
+
+        // Otherwise location reading is with accuracy limits.
+        // Add point to list and update map.
 
         double latitude, longitude;
         LatLng latLngPoint;
@@ -800,74 +821,34 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         longitude = location.getLongitude();
         latLngPoint = new LatLng(latitude, longitude);
 
-        PolylineOptions polylineOptions = new PolylineOptions()
-                .width(6)
-                .color(Color.BLUE);
-        // .geodesic(true);
-        for (int i = 0; i < latLngPointsArray.size(); i++) {
-            polylineOptions.add(latLngPointsArray.get(i));
+        // Add each new point detected to the latlng array and print to console
+        latLngGPSTrackingPoints.add(latLngPoint);
+        for (LatLng point : latLngGPSTrackingPoints) {
+            Log.i(TAG, "Detected point: " + point);
         }
+
+        PolylineOptions polylineOptions = new PolylineOptions().width(6).color(Color.GREEN);
+        for (int i = 0; i < latLngGPSTrackingPoints.size(); i++) {
+            polylineOptions.add(latLngGPSTrackingPoints.get(i));
+        }
+
         line = mMap.addPolyline(polylineOptions);
-        latLngPointsArray.add(latLngPoint);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngPoint, 20);
         mMap.animateCamera(cameraUpdate);
 
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
         Toast.makeText(this, getResources().getString(R.string.location_updated_message), Toast.LENGTH_SHORT).show();
 
-//        mCurrentLocation = location;
-//        mLat = mCurrentLocation.getLatitude();
-//        mLng = mCurrentLocation.getLongitude();
-//        // LatLng newLatLngPoint = new LatLng((int) (mLat * 1e6), (int) (mLng * 1e6));
-//        LatLng newLatLngPoint = new LatLng(mLat, mLng);
-//
-//        // add each new point detected to the latlng array and print to console
-//        latLngPointsArray.add(newLatLngPoint);
-//        System.out.println("Printing lat & lng points array accurate");
-//        for (LatLng point : latLngPointsArray) {
-//            System.out.println(point);
-//        }
     }
 
-    //    public void onLocationChanged(Location location) {
-//        String msg = "Location:" + location.getLatitude() + "," + location.getLongitude();
-//        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-//        double new_lat = location.getLatitude();
-//        double new_long = location.getLongitude();
-//        double previous_lat = new_lat;
-//        double previous_long = new_long;
-//        drawTrack(new_lat, new_long, previous_lat, previous_long);
-//    }
-//
-//    private void drawTrack(double new_lat, double new_long, double previous_lat, double previous_long) {
-//        PolylineOptions options = new PolylineOptions();
-//        options.add(new LatLng(previous_lat, previous_long));
-//        options.add(new LatLng(new_lat, new_long));
-//        options.width(10);
-//        options.color(Color.RED);
-//        mMap.addPolyline(options);
-//
-//        googleMap.addPolyline(new PolylineOptions()
-//                .add(new LatLng(Double.parseDouble(YOUR PREVIOUS LATITUDE VALUE),
-//                        Double.parseDouble(YOUR PREVIOUS LONGITUDE VALUE),
-//                        new LatLng(Double.parseDouble(YOUR LATEST LATITUDE VALUE),
-//                                Double.parseDouble(YOUR LATEST LONGITUDE VALUE)
-//                                        .width(5).color(getResources()
-//                                        .getColor(R.color.BLACK))
-//                                        .geodesic(true));
-//    }
-
     /**
-     * Updates the latitude, longitude, and last location time in the UI.
+     * Updates the UI.
      */
     private void updateUI() {
         setButtonsEnabledState();
         if (mCurrentLocation != null) {
-            mLatitudeTextView.setText(String.valueOf(mCurrentLocation.getLatitude()));
-            mLongitudeTextView.setText(String.valueOf(mCurrentLocation.getLongitude()));
-            mLastUpdateTimeTextView.setText(mLastUpdateTime);
+            // mLastUpdateTimeTextView.setText(mLastUpdateTime);
         }
     }
 
@@ -905,11 +886,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
      * install/update the Google Play services APK on their device.
      * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.

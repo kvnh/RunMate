@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/maps_activity_tool_bar"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -20,81 +20,55 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginEnd="@dimen/ui_group_side_margin"
+            android:layout_marginStart="@dimen/ui_group_side_margin"
             android:layout_marginTop="@dimen/ui_group_top_margin"
             android:layout_weight="1"
             android:onClick="startUpdatesButton"
-            android:text="@string/start_updates"/>
+            android:radius="3dp"
+            android:text="@string/start_updates"
+            android:textColor="@color/backgroundPurple"/>
 
         <Button
             android:id="@+id/stop_updates_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginEnd="@dimen/ui_group_side_margin"
             android:layout_marginTop="@dimen/ui_group_top_margin"
             android:layout_weight="1"
             android:enabled="false"
             android:onClick="stopUpdatesButton"
-            android:text="@string/stop_updates"/>
+            android:text="@string/stop_updates"
+            android:textColor="@color/backgroundPurple"/>
 
-        <TextView
-            android:id="@+id/latitude_label"
+        <Button
+            android:id="@+id/save_run_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/start_updates_button"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
             android:layout_marginTop="@dimen/ui_group_top_margin"
             android:layout_weight="1"
-            android:text="@string/latitude_label"
-            android:textSize="@dimen/default_text_size"/>
+            android:enabled="false"
+            android:onClick="saveRunButton"
+            android:text="@string/save_run"
+            android:textColor="@color/backgroundPurple"/>
 
         <TextView
-            android:id="@+id/latitude_text"
+            android:id="@+id/run_time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/latitude_label"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginEnd="@dimen/ui_group_top_margin"
             android:layout_marginLeft="@dimen/small_margin_left"
-            android:layout_toRightOf="@+id/latitude_label"
+            android:layout_marginTop="@dimen/ui_group_top_margin"
+            android:layout_toRightOf="@+id/run_time_label"
             android:layout_weight="1"
-            android:textSize="@dimen/default_text_size"/>
-
-        <TextView
-            android:id="@+id/longitude_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/latitude_label"
-            android:layout_weight="1"
-            android:text="@string/longitude_label"
-            android:textSize="@dimen/default_text_size"/>
-
-        <TextView
-            android:id="@+id/longitude_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/longitude_label"
-            android:layout_marginLeft="@dimen/small_margin_left"
-            android:layout_toRightOf="@+id/longitude_label"
-            android:layout_weight="1"
-            android:textSize="@dimen/default_text_size"/>
-
-        <TextView
-            android:id="@+id/last_update_time_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/longitude_label"
-            android:layout_weight="1"
-            android:text="@string/last_update_time_label"
-            android:textSize="@dimen/default_text_size"/>
-
-        <TextView
-            android:id="@+id/last_update_time_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/last_update_time_label"
-            android:layout_marginLeft="@dimen/small_margin_left"
-            android:layout_toRightOf="@+id/last_update_time_label"
-            android:layout_weight="1"
+            android:text="@string/run_time_label"
+            android:textColor="@color/backgroundPurple"
             android:textSize="@dimen/default_text_size"/>
 
     </LinearLayout>

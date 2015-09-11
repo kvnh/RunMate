@@ -157,7 +157,7 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
         // Create an instance of SimpleDateFormat used for formatting
         // the string representation of date (month/day/year)
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         Date proposedTimeParse = route.getDate(ParseConstants.KEY_ROUTE_PROPOSED_TIME);
         String proposedTimeString = dateFormat.format(proposedTimeParse);
         holder.timeAndDateLabel.setText(proposedTimeString);
