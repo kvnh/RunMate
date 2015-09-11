@@ -123,6 +123,9 @@
     <string name="error_sending_route_message">There was an error sending your route. Please try again</string>
     <string name="title_activity_maps_activity_display_route">Map</string>
     <string name="title_activity_inbox_route_fragment">InboxRouteFragment</string>
+    <string name="success_route_run">Route sent</string>
+    <string name="error_saving_run_message">There was an error saving your run.</string>
+    <string name="error_saving_run_title">Sorry...</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

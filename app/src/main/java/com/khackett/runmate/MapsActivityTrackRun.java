@@ -1,6 +1,7 @@
 package com.khackett.runmate;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Color;
@@ -37,7 +38,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.khackett.runmate.ui.MainActivity;
 import com.khackett.runmate.utils.DirectionsJSONParser;
+import com.khackett.runmate.utils.ParseConstants;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -130,6 +138,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      */
     protected LocationSettingsRequest mLocationSettingsRequest;
 
+    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
+    // Values are those points clicked on the map
+    protected ArrayList<ParseGeoPoint> parseLatLngList;
+
     // member variables for the UI buttons and text outputs
     protected Button mStartUpdatesButton;
     protected Button mStopUpdatesButton;
@@ -168,7 +180,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected String mLastUpdateTime;
 
     // Declare array list for location points
-    private List<LatLng> latLngGPSTrackingPoints;
+    private ArrayList<LatLng> latLngGPSTrackingPoints;
     private Polyline line;
 
     private List<Polyline> polylines;
@@ -704,12 +716,85 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         stopLocationUpdates();
         // Save the time that has passed
         savedTime = totalTimeMillis;
+        // Remove callbacks to the Runnable object
         timerHandler.removeCallbacks(timerRunnable);
     }
 
     public void saveRunButton(View view) {
-        // stop checking for location updates
+        // stop checking for location updates.
         stopLocationUpdates();
+
+        // Remove callbacks to the Runnable object.
+        timerHandler.removeCallbacks(timerRunnable);
+
+        // Create a ParseObject and save it to the backend.
+        ParseObject completedRoute = createCompletedRoute();
+        saveCompletedRoute(completedRoute);
+
+        // Send the user back to the main activity right after the run is saved.
+        // Use finish() to close the current activity.
+        finish();
+//        Intent intent = new Intent(this, MainActivity.class);
+//        startActivity(intent);
+    }
+
+    public ParseObject createCompletedRoute() {
+        // create a new parse object called route
+        // (we can create a whole new class of parse objects in the back end by simply using a new name)
+        ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_ROUTES);
+
+        // add the LatLng points from the tracked run to the ParseObject completedRoute
+        completedRoute.addAll(ParseConstants.KEY_LATLNG_GPS_POINTS, (convertLatLngToParseGeoPointArray(latLngGPSTrackingPoints)));
+
+//        // add the max and min lat and long points from the plotted map to the ParseObject route
+//        completedRoute.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
+
+        // Recorders ID.
+        completedRoute.put(ParseConstants.KEY_SENDER_IDS, ParseUser.getCurrentUser().getObjectId());
+        // Recorders name.
+        completedRoute.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+
+        completedRoute.add(ParseConstants.KEY_ROUTE_TIME, totalTimeMillis);
+
+        // completedRoute.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
+
+        // return a successful route
+        return completedRoute;
+    }
+
+    /**
+     * Method to convert an array of LatLng elements to an array of ParseGeoPoint elements.
+     *
+     * @param list
+     * @return
+     */
+    protected ArrayList<ParseGeoPoint> convertLatLngToParseGeoPointArray(ArrayList<LatLng> list) {
+        parseLatLngList = new ArrayList<ParseGeoPoint>();
+        for (LatLng item : list) {
+            ParseGeoPoint parseGeoPoint = new ParseGeoPoint(item.latitude, item.longitude);
+            parseLatLngList.add(parseGeoPoint);
+        }
+        return parseLatLngList;
+    }
+
+    public void saveCompletedRoute(ParseObject completedRoute) {
+        completedRoute.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    // successful
+                    Toast.makeText(MapsActivityTrackRun.this, R.string.success_route_run, Toast.LENGTH_LONG).show();
+                } else {
+                    // there is an error - notify the user so they don't miss it
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityTrackRun.this);
+                    builder.setMessage(R.string.error_saving_run_message)
+                            .setTitle(R.string.error_saving_run_title)
+                            .setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
     }
 
     /**
@@ -749,20 +834,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         if (mCheckLocationUpdates) {
             startLocationUpdates();
         }
-
     }
-
-//    public void zoomToCurrentLocation(Location location) {
-//        Log.d(TAG, location.toString());
-//        double currentLatitude = location.getLatitude();
-//        double currentLongitude = location.getLongitude();
-//        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
-//        MarkerOptions options = new MarkerOptions()
-//                .position(latLng);
-//        mMap.addMarker(options);
-//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
-//        mMap.animateCamera(cameraUpdate);
-//    }
 
     /**
      * Requests location updates from the FusedLocationApi
