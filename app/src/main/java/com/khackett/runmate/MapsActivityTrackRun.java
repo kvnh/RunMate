@@ -150,6 +150,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected long startTime = 0;
     protected long savedTime = 0;
     protected long totalTimeMillis;
+    protected int totalDistance;
 
     // Runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
@@ -181,6 +182,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     // Declare array list for location points
     private ArrayList<LatLng> latLngGPSTrackingPoints;
+
     private Polyline line;
 
     private List<Polyline> polylines;
@@ -195,6 +197,8 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         setUpMapIfNeeded();
 
         markerPoints = new ArrayList<LatLng>();
+
+        totalDistance = 0;
 
         // set up member variables for each UI component
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
@@ -749,14 +753,14 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 //        // add the max and min lat and long points from the plotted map to the ParseObject route
 //        completedRoute.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
 
-        // Recorders ID.
-        completedRoute.put(ParseConstants.KEY_SENDER_IDS, ParseUser.getCurrentUser().getObjectId());
-        // Recorders name.
-        completedRoute.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+        // Runners ID.
+        completedRoute.put(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
+        // Runners name.
+        completedRoute.put(ParseConstants.KEY_RUNNER_NAME, ParseUser.getCurrentUser().getUsername());
 
-        completedRoute.add(ParseConstants.KEY_ROUTE_TIME, totalTimeMillis);
+        completedRoute.add(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
 
-        // completedRoute.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
+        completedRoute.add(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, totalDistance);
 
         // return a successful route
         return completedRoute;
@@ -783,7 +787,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             public void done(ParseException e) {
                 if (e == null) {
                     // successful
-                    Toast.makeText(MapsActivityTrackRun.this, R.string.success_route_run, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MapsActivityTrackRun.this, R.string.success_save_run, Toast.LENGTH_LONG).show();
                 } else {
                     // there is an error - notify the user so they don't miss it
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityTrackRun.this);

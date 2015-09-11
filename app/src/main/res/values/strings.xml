@@ -124,6 +124,7 @@
     <string name="title_activity_maps_activity_display_route">Map</string>
     <string name="title_activity_inbox_route_fragment">InboxRouteFragment</string>
     <string name="success_route_run">Route sent</string>
+    <string name="success_save_run">Run saved</string>
     <string name="error_saving_run_message">There was an error saving your run.</string>
     <string name="error_saving_run_title">Sorry...</string>
 

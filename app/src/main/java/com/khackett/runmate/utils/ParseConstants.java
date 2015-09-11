@@ -23,6 +23,8 @@ public final class ParseConstants {
     public static final String KEY_ACCEPTED_RECIPIENT_IDS = "acceptedRecipientIds";
     public static final String KEY_SENDER_IDS = "senderId";
     public static final String KEY_SENDER_NAME = "senderName";
+    public static final String KEY_RUNNER_IDS = "runnerId";
+    public static final String KEY_RUNNER_NAME = "runnerName";
     public static final String KEY_CREATED_AT = "createdAt";
     public static final String TYPE_IMAGE = "image";
     public static final String KEY_LATLNG_GPS_POINTS = "latLngGPSPoints";
@@ -30,8 +32,9 @@ public final class ParseConstants {
     public static final String KEY_LATLNG_BOUNDARY_POINTS = "latLngBoundaryPoints";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_ROUTE_DISTANCE = "routeDistance";
+    public static final String KEY_COMPLETED_RUN_DISTANCE = "completedRunDistance";
     public static final String KEY_ROUTE_NAME = "routeName";
     public static final String KEY_ROUTE_PROPOSED_TIME = "proposedTime";
-    public static final String KEY_ROUTE_TIME = "completedTime";
+    public static final String KEY_RUN_TIME = "completedTime";
     public static final String KEY_ALL_LATLNG_POINTS = "allLatLngPoints";
 }

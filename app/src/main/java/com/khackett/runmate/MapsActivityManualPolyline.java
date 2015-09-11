@@ -71,19 +71,6 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     }
 
     /**
-     * method to change the type of the map between normal view and satellite view
-     *
-     * @param view
-     */
-    public void changeType(View view) {
-        if (mMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
-            mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        } else {
-            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        }
-    }
-
-    /**
      * checks if a map fragment has already been created
      * if not, then it creates one and calls the setUpMap() method
      */
@@ -167,23 +154,6 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         mMap.clear();
         // Clears all values from the arraylist
         arrayPoints.clear();
-    }
-
-
-    // @Override
-    public void onLocationChanged(Location location) {
-        // Draw the marker, if destination location is not set
-        if (arrayPoints.size() < 2) {
-
-            mLatitude = location.getLatitude();
-            mLongitude = location.getLongitude();
-            LatLng point = new LatLng(mLatitude, mLongitude);
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-
-            // drawMarker(point);
-        }
     }
 
 

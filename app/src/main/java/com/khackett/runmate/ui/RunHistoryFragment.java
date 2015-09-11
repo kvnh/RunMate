@@ -9,10 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.khackett.runmate.MapsActivityDisplayRoute;
 import com.khackett.runmate.R;
 import com.khackett.runmate.adapters.RouteMessageAdapter;
+import com.khackett.runmate.adapters.RunHistoryAdapter;
 import com.khackett.runmate.utils.ParseConstants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -24,18 +24,18 @@ import org.json.JSONArray;
 
 import java.util.List;
 
-public class InboxRouteFragment extends ListFragment {
+public class RunHistoryFragment extends ListFragment {
 
 
     protected SwipeRefreshLayout mSwipeRefreshLayout;
 
     // member variable to store the list of routes received by the user
-    protected List<ParseObject> mRoutes;
+    protected List<ParseObject> mCompletedRuns;
 
     private int MY_STATUS_CODE = 1111;
 
     // Default constructor for InboxRouteFragment
-    public InboxRouteFragment() {
+    public RunHistoryFragment() {
     }
 
     @Override
@@ -45,7 +45,7 @@ public class InboxRouteFragment extends ListFragment {
         // 3rd parameter should be false whenever a fragment is added to an activity in code.
         // Inflater object used to create a new view using the layout provided.
         // View then attached to the parent - the ViewPager object from MainActivity.
-        View rootView = inflater.inflate(R.layout.fragment_inbox_route, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_run_history, container, false);
 
         // Set SwipeRefreshLayout component
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
@@ -66,7 +66,7 @@ public class InboxRouteFragment extends ListFragment {
         super.onResume();
 
         // Retrieve the routes from the Parse backend
-        retrieveRoutes();
+        retrieveCompletedRuns();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class InboxRouteFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         // to tell whether it is an image or a video, we need to access the type of the message
         // create the message object which is set to the message at the current position
-        ParseObject route = mRoutes.get(position);
+        ParseObject route = mCompletedRuns.get(position);
 
 
         // set the data for the intent using the setData() method - this requires a URI
@@ -99,17 +99,17 @@ public class InboxRouteFragment extends ListFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MY_STATUS_CODE) {
             // Refresh the fragment.
-            retrieveRoutes();
+            retrieveCompletedRuns();
         }
     }
 
-    private void retrieveRoutes() {
+    private void retrieveCompletedRuns() {
         // query the routes class/table in parse
         // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
         // querying the message class is similar to how we have been querying users
-        ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_ROUTES);
+        ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_COMPLETED_ROUTES);
         // use the 'where' clause to search through the messages to find where our user ID is one of the recipients
-        queryRoute.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
+        queryRoute.whereEqualTo(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
         // order results so that most recent message are at the top of the inbox
         queryRoute.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
         // query is ready - run it
@@ -130,16 +130,16 @@ public class InboxRouteFragment extends ListFragment {
                 // the list being returned is a list of routes
                 if (e == null) {
                     // successful - routes found.  They are stored as a list in messages
-                    mRoutes = routes;
+                    mCompletedRuns = routes;
 
                     // adapt this data for the list view, showing the senders name
 
                     // Create an array of strings to store usernames.
                     // Set the size equal to that of the list returned.
-                    String[] usernames = new String[mRoutes.size()];
+                    String[] usernames = new String[mCompletedRuns.size()];
                     // Enhanced for loop to go through the list of users and create an array of usernames
                     int i = 0;
-                    for (ParseObject message : mRoutes) {
+                    for (ParseObject message : mCompletedRuns) {
                         // Get the specific key
                         usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
                         i++;
@@ -148,7 +148,7 @@ public class InboxRouteFragment extends ListFragment {
                     // Create the adapter once and update its state on each refresh.
                     if (getListView().getAdapter() == null) {
                         // the above adapter code is now replaced with the following line
-                        RouteMessageAdapter adapter = new RouteMessageAdapter(getListView().getContext(), mRoutes);
+                        RunHistoryAdapter adapter = new RunHistoryAdapter(getListView().getContext(), mCompletedRuns);
 
                         // Force a refresh of the list once data has changed.
                         adapter.notifyDataSetChanged();
@@ -157,8 +157,8 @@ public class InboxRouteFragment extends ListFragment {
                         setListAdapter(adapter);
                     } else {
                         // Refill the adapter.
-                        // Cast it to RouteMessageAdapter.
-                        ((RouteMessageAdapter) getListView().getAdapter()).refill(mRoutes);
+                        // Cast it to RunHistoryAdapter.
+                        ((RunHistoryAdapter) getListView().getAdapter()).refill(mCompletedRuns);
                     }
                 }
             }
@@ -169,7 +169,7 @@ public class InboxRouteFragment extends ListFragment {
         @Override
         public void onRefresh() {
             // When list is swiped down to refresh, retrieve the latest routes from the backend.
-            retrieveRoutes();
+            retrieveCompletedRuns();
         }
     };
 }
