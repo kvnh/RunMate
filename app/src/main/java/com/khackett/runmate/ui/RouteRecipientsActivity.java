@@ -57,6 +57,8 @@ public class RouteRecipientsActivity extends Activity {
     // member variable to represent the array of LatLng values plotted my the user and passed into this activity via the intent that started it
     protected ArrayList<LatLng> markerPoints;
 
+    protected ArrayList<LatLng> allLatLngPoints;
+
     protected LatLngBounds latLngBounds;
 
     protected double mRouteDistance;
@@ -105,6 +107,8 @@ public class RouteRecipientsActivity extends Activity {
 
         // get the array of LatLng points from the passed in intent
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
+
+        allLatLngPoints = getIntent().getParcelableArrayListExtra("allLatLngPoints");
 
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
 
@@ -261,6 +265,8 @@ public class RouteRecipientsActivity extends Activity {
 
         // add the LatLng points from the plotted map to the ParseObject route
         route.addAll(ParseConstants.KEY_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(markerPoints)));
+
+        route.addAll(ParseConstants.KEY_ALL_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(allLatLngPoints)));
 
         // add the max and min lat and long points from the plotted map to the ParseObject route
         route.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));

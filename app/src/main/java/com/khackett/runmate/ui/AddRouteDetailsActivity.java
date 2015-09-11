@@ -30,6 +30,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
     // member variable to represent the array of LatLng values plotted my the user and passed into this activity via the intent that started it
     protected ArrayList<LatLng> markerPoints;
+    protected ArrayList<LatLng> allLatLngPoints;
     protected LatLngBounds latLngBounds;
     protected double mRouteDistance;
 
@@ -52,6 +53,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
         // get the array of LatLng points passed in from the map intent
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
+        allLatLngPoints = getIntent().getParcelableArrayListExtra("allLatLngPoints");
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
         mRouteDistance = getIntent().getDoubleExtra("routeDistance", mRouteDistance);
 
@@ -161,6 +163,8 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", markerPoints);
+
+            createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
 
             // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", latLngBounds);

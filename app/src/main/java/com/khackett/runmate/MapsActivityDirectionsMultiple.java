@@ -56,7 +56,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     private Route mRoute;
 
-    protected ArrayList<LatLng> allLatLng;
+    protected ArrayList<LatLng> allLatLngPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         mRoute = new Route();
 
         // Instantiate allLatLng ArrayList
-        allLatLng = new ArrayList<LatLng>();
+        allLatLngPoints = new ArrayList<LatLng>();
 
         // Getting reference to SupportMapFragment of the activity_maps
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -161,6 +161,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             Intent createRouteIntent = new Intent(MapsActivityDirectionsMultiple.this, AddRouteDetailsActivity.class);
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", mRoute.getMarkerPoints());
+
+            createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
 
             // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", mRoute.getLatLngBounds());
@@ -439,9 +441,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
 
                 for (LatLng enhancedPoint : sectionLatLng) {
-                    allLatLng.add(enhancedPoint);
+                    allLatLngPoints.add(enhancedPoint);
                 }
-                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLng.toString());
+                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLngPoints.toString());
 
                 // Add Polyline to list and draw on map
                 polylines.add(mMap.addPolyline(lineOptions));

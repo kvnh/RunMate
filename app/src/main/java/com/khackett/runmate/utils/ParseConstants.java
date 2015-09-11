@@ -33,4 +33,5 @@ public final class ParseConstants {
     public static final String KEY_ROUTE_NAME = "routeName";
     public static final String KEY_ROUTE_PROPOSED_TIME = "proposedTime";
     public static final String KEY_ROUTE_TIME = "completedTime";
+    public static final String KEY_ALL_LATLNG_POINTS = "allLatLngPoints";
 }
