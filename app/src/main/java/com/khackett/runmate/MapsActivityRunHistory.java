@@ -2,17 +2,11 @@ package com.khackett.runmate;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -20,17 +14,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.khackett.runmate.utils.DirectionsJSONParser;
+import com.khackett.runmate.utils.DirectionsUtility;
 import com.khackett.runmate.utils.ParseConstants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -69,6 +60,8 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
     protected PolylineOptions polylineOptions;
 
+    protected DirectionsUtility directionsUtility;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +73,8 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
         // Instantiate allNonDuplicateLatLng ArrayList
         allNonDuplicateLatLng = new ArrayList<LatLng>();
+
+        directionsUtility = new DirectionsUtility();
 
         // Getting reference to SupportMapFragment of the activity_maps
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -196,7 +191,8 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
                 // Getting URL to the Google Directions API
                 // send these values to the getDirectionsUrl() method and assign returned value to string variable url
-                String url = getDirectionsUrl(point1, point2);
+                String url = directionsUtility.getDirectionsUrl(point1, point2);
+
                 // create a DownloadTask object - see nested class below
                 DownloadTask downloadTask = new DownloadTask();
                 // Start downloading json data from Google Directions API
@@ -317,45 +313,6 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
         }
     }
 
-
-    /**
-     * Creates a url containing the origin and destination points and other parameters
-     * which can then be sent as a HTTP request to the Google Directions API to create data in JSON format
-     *
-     * @param origin
-     * @param dest
-     * @return
-     */
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
-
-        // Origin of route
-        String stringOrigin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        // Destination of route
-        String stringDestination = "destination=" + dest.latitude + "," + dest.longitude;
-
-        // Sensor enabled
-        String sensor = "sensor=false";
-
-        // Building the parameters to the web service
-        String parameters = stringOrigin + "&" + stringDestination;
-
-        // Output format
-        String output = "json";
-
-        // Transport mode
-        String transMode = "&mode=walking";
-
-        // Building the url to the web service
-        // see https://developers.google.com/maps/documentation/directions/#DirectionsRequests
-        // eg. https://maps.googleapis.com/maps/api/directions/json?origin=40.722543,-73.998585&destination=40.7577,-73.9857&mode=walking
-        // ... would give the points between lower_manhattan and times_square and the directions in between in JSON format
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + transMode;
-
-        return url;
-    }
-
-
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -441,10 +398,9 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
             try {
                 jObject = new JSONObject(jsonData[0]);
-                DirectionsJSONParser parser = new DirectionsJSONParser();
-
+                
                 // Starts parsing data
-                routes = parser.parse(jObject);
+                routes = directionsUtility.parseJSONObject(jObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }

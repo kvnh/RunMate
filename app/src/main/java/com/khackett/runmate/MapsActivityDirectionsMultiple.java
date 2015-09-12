@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,7 +23,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.model.Route;
 import com.khackett.runmate.ui.AddRouteDetailsActivity;
-import com.khackett.runmate.utils.DirectionsJSONParser;
+import com.khackett.runmate.utils.DirectionsUtility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,6 +57,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     protected ArrayList<LatLng> allLatLngPoints;
 
+    protected DirectionsUtility directionsUtility;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -71,6 +72,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
         // Instantiate allLatLng ArrayList
         allLatLngPoints = new ArrayList<LatLng>();
+
+        directionsUtility = new DirectionsUtility();
 
         // Getting reference to SupportMapFragment of the activity_maps
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -259,7 +262,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Getting URL to the Google Directions API
             // Send these values to the getDirectionsUrl() method and assign returned value to string variable url
-            String url = getDirectionsUrl(point1, point2);
+            String url = directionsUtility.getDirectionsUrl(point1, point2);
+
             // Create a DownloadTask object - see nested class below
             DownloadTask downloadTask = new DownloadTask();
             // Start downloading json data from Google Directions API
@@ -294,36 +298,6 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         } else {
             return true;
         }
-    }
-
-    /**
-     * Creates a url containing the origin and destination points and other parameters
-     * which can then be sent as a HTTP request to the Google Directions API to create data in JSON format
-     *
-     * @param origin
-     * @param dest
-     * @return
-     */
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
-        // Origin of route
-        String stringOrigin = "origin=" + origin.latitude + "," + origin.longitude;
-        // Destination of route
-        String stringDestination = "destination=" + dest.latitude + "," + dest.longitude;
-        // Sensor enabled
-        String sensor = "sensor=false";
-        // Building the parameters to the web service
-        String parameters = stringOrigin + "&" + stringDestination;
-        // Output format
-        String output = "json";
-        // transport mode
-        String transMode = "&mode=walking";
-        // Building the url to the web service
-        // See https://developers.google.com/maps/documentation/directions/#DirectionsRequests
-        // eg. https://maps.googleapis.com/maps/api/directions/json?origin=40.722543,-73.998585&destination=40.7577,-73.9857&mode=walking
-        // ... would give the points between lower_manhattan and times_square and the directions in between in JSON format
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + transMode;
-
-        return url;
     }
 
     /**
@@ -401,9 +375,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             List<List<HashMap<String, String>>> routes = null;
             try {
                 jObject = new JSONObject(jsonData[0]);
-                DirectionsJSONParser parser = new DirectionsJSONParser();
+
                 // Start parsing data
-                routes = parser.parse(jObject);
+                routes = directionsUtility.parseJSONObject(jObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
