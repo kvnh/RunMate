@@ -94,16 +94,18 @@ public class MyRunsFragment extends ListFragment {
         // (URI's and URL's can often be used interchangeably)
         // Uri fileUri = Uri.parse(file.getUrl());
 
-        JSONArray parseList = route.getJSONArray("latLngPoints");
-        JSONArray parseListBounds = route.getJSONArray("latLngBoundaryPoints");
+        JSONArray parseList = route.getJSONArray(ParseConstants.KEY_LATLNG_POINTS);
+        JSONArray parseListBounds = route.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
         String objectId = route.getObjectId();
+        String routeName = route.getString(ParseConstants.KEY_ROUTE_NAME);
         // JSONArray ids = route.getJSONArray(ParseConstants.KEY_RECIPIENT_IDS);
 
         // Start a map activity to display the route
         Intent intent = new Intent(getActivity(), MapsActivityTrackRun.class);
         intent.putExtra("parseLatLngList", parseList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
-        intent.putExtra("myObjectId", objectId);
+        intent.putExtra("myRunsObjectId", objectId);
+        intent.putExtra("myRunsRouteName", routeName);
 
         // Start the MapsActivityDisplayRoute activity
         startActivityForResult(intent, MY_STATUS_CODE);

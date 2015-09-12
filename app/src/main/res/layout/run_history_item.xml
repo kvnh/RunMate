@@ -14,18 +14,18 @@
         android:layout_marginTop="@dimen/inbox_vertical_margin"
         android:background="@android:color/white">
 
-        <TextView
-            android:id="@+id/distanceLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/senderLabel"
-            android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:paddingRight="@dimen/profile_pic_horizontal_margin"
-            android:paddingTop="@dimen/message_vertical_padding"
-            android:text="@string/distance_count"
-            android:textColor="@color/lightGray"
-            android:textSize="20sp"/>
+        <!--<TextView-->
+            <!--android:id="@+id/distanceLabel"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignBottom="@+id/senderLabel"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:gravity="center"-->
+            <!--android:paddingRight="@dimen/profile_pic_horizontal_margin"-->
+            <!--android:paddingTop="@dimen/message_vertical_padding"-->
+            <!--android:text="@string/distance_count"-->
+            <!--android:textColor="@color/lightGray"-->
+            <!--android:textSize="20sp"/>-->
 
         <TextView
             android:id="@+id/routeNameLabel"
@@ -39,29 +39,29 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"/>
 
-        <TextView
-            android:id="@+id/runTimeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/message_vertical_padding"
-            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
-            android:text="TextView"
-            android:textColor="@color/lightGray"
-            android:textSize="@dimen/message_time_text"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/distanceLabel"/>
+        <!--<TextView-->
+            <!--android:id="@+id/runTimeLabel"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:paddingBottom="@dimen/message_vertical_padding"-->
+            <!--android:paddingLeft="@dimen/profile_pic_horizontal_margin"-->
+            <!--android:text="TextView"-->
+            <!--android:textColor="@color/lightGray"-->
+            <!--android:textSize="@dimen/message_time_text"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_toStartOf="@+id/distanceLabel"/>-->
 
         <TextView
             android:id="@+id/timeAndDateLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="@dimen/profile_pic_horizontal_margin"
+            android:paddingLeft="@dimen/profile_pic_horizontal_margin"
             android:paddingTop="@dimen/message_vertical_padding"
             android:text="TextView"
             android:textColor="@color/lightGray"
-            android:textSize="@dimen/message_time_text"
+            android:textSize="@dimen/completed_on_text"
             android:layout_below="@+id/routeNameLabel"
-            android:layout_alignEnd="@+id/routeNameLabel"/>
+            android:layout_alignParentStart="true"/>
 
     </RelativeLayout>
 

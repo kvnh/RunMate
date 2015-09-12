@@ -49,32 +49,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivityDisplayRoute extends FragmentActivity implements View.OnClickListener {
+public class MapsActivityRunHistory extends FragmentActivity implements View.OnClickListener {
 
-    public static final String TAG = MapsActivityDisplayRoute.class.getSimpleName();
+    public static final String TAG = MapsActivityRunHistory.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     // Member variable for the UI buttons
-    protected Button mButtonAccept;
-    protected Button mButtonDecline;
-    protected Button mButtonAnimate;
+    protected Button mButtonDelete;
+    protected Button mButtonStats;
 
     // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
-    protected ArrayList<LatLng> markerPoints;
+    protected ArrayList<LatLng> sentRoutePoints;
 
-    // member variable to represent an array of ParseGeoPoint values, retrieved from the parse cloud
-    protected ArrayList<ParseGeoPoint> parseList;
+    protected ArrayList<LatLng> myRunPoints;
 
     // All returned LatLng points from the Directions API - used for animation
     protected ArrayList<LatLng> allNonDuplicateLatLng;
 
+    protected PolylineOptions polylineOptions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_activity_display_route);
+        setContentView(R.layout.activity_maps_activity_run_history);
 
-        markerPoints = new ArrayList<LatLng>();
+        sentRoutePoints = new ArrayList<LatLng>();
+
+        myRunPoints = new ArrayList<LatLng>();
 
         // Instantiate allNonDuplicateLatLng ArrayList
         allNonDuplicateLatLng = new ArrayList<LatLng>();
@@ -86,7 +88,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         if (mMap != null) {
 
-            plotRoute();
+            // plotRoute();
+
+            plotMyRun();
 
             mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                 @Override
@@ -104,14 +108,46 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         }
 
         // Set up member variables for each UI component
-        mButtonAnimate = (Button) findViewById(R.id.btn_animate);
-        mButtonAccept = (Button) findViewById(R.id.btn_accept);
-        mButtonDecline = (Button) findViewById(R.id.btn_decline);
+        mButtonDelete = (Button) findViewById(R.id.btn_delete);
+        mButtonStats = (Button) findViewById(R.id.btn_stats);
 
         // Register buttons with the listener
-        mButtonAnimate.setOnClickListener(this);
-        mButtonAccept.setOnClickListener(this);
-        mButtonDecline.setOnClickListener(this);
+        // mButtonAnimate.setOnClickListener(this);
+        // mButtonDecline.setOnClickListener(this);
+    }
+
+
+    public void plotMyRun() {
+        // assign the JSON String value from the passed in intent to a new String variable
+        String jsonArray = getIntent().getStringExtra("parseLatLngList");
+        JSONArray array = null;
+
+        try {
+            // convert String to a JSONArray
+            array = new JSONArray(jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray arrayPoints = array;
+
+        for (int i = 0; i < arrayPoints.length(); i++) {
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+
+            // Adding new latlng point to the array list
+            myRunPoints.add(latLngObject);
+        }
+
+        // initialising the polyline in the map and setting some values
+        polylineOptions = new PolylineOptions()
+                .color(Color.GREEN)
+                .width(6);
+
+        // Setting points of polyline
+        polylineOptions.addAll(myRunPoints);
+
+        // Adding the polyline to the map
+        mMap.addPolyline(polylineOptions);
     }
 
     public void plotRoute() {
@@ -132,27 +168,27 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
 
             // Adding new latlng point to the array list
-            markerPoints.add(latLngObject);
+            sentRoutePoints.add(latLngObject);
         }
 
         // Creating MarkerOptions object
         MarkerOptions marker = new MarkerOptions();
 
-        for (int i = 0; i < markerPoints.size() - 1; i++) {
+        for (int i = 0; i < sentRoutePoints.size() - 1; i++) {
 
             /**
              * For the start location, the colour of the marker is GREEN and
              * for the end location, the colour of the marker is RED.
              */
-            if (markerPoints.size() == 1) {
+            if (sentRoutePoints.size() == 1) {
                 // Add a green marker for the start position.
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
 
-            if (markerPoints.size() >= 2) {
+            if (sentRoutePoints.size() >= 2) {
 
-                LatLng point1 = markerPoints.get(i);
-                LatLng point2 = markerPoints.get(i + 1);
+                LatLng point1 = sentRoutePoints.get(i);
+                LatLng point2 = sentRoutePoints.get(i + 1);
 
                 // marker.position(point2).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 // marker.position(point2).visible(true);
@@ -173,7 +209,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         }
 
         // Add the start and finish markers to the map
-        addMarkersToMap(markerPoints);
+        addMarkersToMap(sentRoutePoints);
     }
 
     /**
@@ -184,43 +220,12 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_accept:
-                acceptRoute();
-                break;
             case R.id.btn_decline:
                 declineRoute();
-                break;
-            case R.id.btn_animate:
-                animateRoute();
                 break;
             default:
                 Log.i(TAG, "Problem with input");
         }
-    }
-
-    public void acceptRoute() {
-        String objectId = getIntent().getStringExtra("myObjectId");
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
-
-        query.getInBackground(objectId, new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    acceptUserRoute(object);
-                } else {
-                    // there is an error - notify the user
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDisplayRoute.this);
-                    builder.setMessage(R.string.error_accepting_route_message)
-                            .setTitle(R.string.error_accepting_route_title)
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-            }
-        });
-
-        // Send the user back to the main activity right after the message is deleted.
-        // Use finish() to close the current activity, returning to the main activity
-        finish();
     }
 
     public void declineRoute() {
@@ -232,7 +237,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     deleteUserRoute(object);
                 } else {
                     // there is an error - notify the user
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDisplayRoute.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityRunHistory.this);
                     builder.setMessage(R.string.error_declining_route_message)
                             .setTitle(R.string.error_declining_route_title)
                             .setPositiveButton(android.R.string.ok, null);
@@ -245,30 +250,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Send the user back to the main activity right after the message is deleted.
         // Use finish() to close the current activity, returning to the main activity
         finish();
-    }
-
-    public void acceptUserRoute(ParseObject object) {
-        ParseObject route = object;
-        // Add the current user to the accepted list
-        ArrayList<String> acceptedRecipientIds = new ArrayList<String>();
-        acceptedRecipientIds.add(ParseUser.getCurrentUser().getObjectId());
-        route.put(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, acceptedRecipientIds);
-
-        List<String> ids = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
-        if (ids.size() == 1) {
-            // Last recipient - delete the route object
-            route.deleteInBackground();
-        } else {
-            // Remove the recipient and save.
-            ids.remove(ParseUser.getCurrentUser().getObjectId());
-
-            ArrayList<String> idsToRemove = new ArrayList<String>();
-            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
-
-            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
-            route.saveInBackground();
-        }
-        Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_accept_route, Toast.LENGTH_LONG).show();
     }
 
     public void deleteUserRoute(ParseObject object) {
@@ -288,7 +269,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
             route.saveInBackground();
         }
-        Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_decline_route, Toast.LENGTH_LONG).show();
+        Toast.makeText(MapsActivityRunHistory.this, R.string.success_decline_route, Toast.LENGTH_LONG).show();
     }
 
     public void zoomToViewRoute() {
@@ -305,10 +286,8 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         JSONArray arrayPoints = array;
 
-        LatLng southWest = new LatLng(arrayPoints.optJSONObject(0).optDouble("latitude"),
-                arrayPoints.optJSONObject(0).optDouble("longitude"));
-        LatLng northEast = new LatLng(arrayPoints.optJSONObject(1).optDouble("latitude"),
-                arrayPoints.optJSONObject(1).optDouble("longitude"));
+        LatLng southWest = new LatLng(arrayPoints.optJSONObject(0).optDouble("latitude"), arrayPoints.optJSONObject(0).optDouble("longitude"));
+        LatLng northEast = new LatLng(arrayPoints.optJSONObject(1).optDouble("latitude"), arrayPoints.optJSONObject(1).optDouble("longitude"));
 
         LatLngBounds latLngBounds = new LatLngBounds(southWest, northEast);
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 60));
@@ -560,182 +539,4 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
-    public void animateRoute() {
-        // Keep the screen on while the user is animating the route
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        animator.startAnimation();
-    }
-
-    private Animator animator = new Animator();
-    private final Handler mHandler = new Handler();
-
-    private float cameraZoomLevel = 0.1f;
-
-    public class Animator implements Runnable {
-
-        // Set the speed of the camera between points to 1.5 second
-        private static final int CAMERA_SPEED = 1500;
-        private static final int CAMERA_SPEED_TURN = 1000;
-
-        // Linear interpolator to define the rate of change of animation.
-        private final Interpolator interpolator = new LinearInterpolator();
-
-        // Set the currentLatLngCheck to the first index of the array.
-        private int currentLatLngIndex = 0;
-
-        private float tilt = 90;
-
-        private long startTime = SystemClock.uptimeMillis();
-
-        private LatLng beginLatLng = null;
-        private LatLng endLatLng = null;
-
-        private Marker trackingMarker;
-
-        public void startAnimation() {
-            if (allNonDuplicateLatLng.size() > 2) {
-                animator.initialize();
-            }
-        }
-
-        public void reset() {
-            startTime = SystemClock.uptimeMillis();
-            currentLatLngIndex = 0;
-            endLatLng = getEndLatLng();
-            beginLatLng = getBeginLatLng();
-        }
-
-        /**
-         * Method to set the initial position of the camera based on the first and second LatLng points
-         */
-        public void initialize() {
-            reset();
-
-            LatLng firstPoint = allNonDuplicateLatLng.get(0);
-            LatLng secondPoint = allNonDuplicateLatLng.get(1);
-
-            setupCameraPositionForMovement(firstPoint, secondPoint);
-        }
-
-        private void setupCameraPositionForMovement(LatLng firstPoint, LatLng secondPoint) {
-
-            float cameraBearingStart = bearingBetweenLatLngPoints(firstPoint, secondPoint);
-
-            trackingMarker = mMap.addMarker(new MarkerOptions()
-                    .position(firstPoint)
-                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_directions_run_black_24dp)));
-
-            // Set up camera position for the start point.
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(firstPoint) // Set the initial view for the camera.
-                    .tilt(tilt)
-                    .bearing(cameraBearingStart)  // Set the camera orientation angle for th first point.
-                    .zoom(mMap.getCameraPosition().zoom >= 16 ? mMap.getCameraPosition().zoom : 16) // Set the zoom value.
-                    .build();   // Create a CameraPosition from the builder.
-
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                    CAMERA_SPEED_TURN,
-                    new GoogleMap.CancelableCallback() {
-
-                        @Override
-                        public void onFinish() {
-                            Log.i(TAG, "Camera finished");
-                            animator.reset();
-                            Handler handler = new Handler();
-                            handler.post(animator);
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            Log.i(TAG, "Cancelling camera animation");
-                        }
-                    });
-        }
-
-        @Override
-        public void run() {
-
-            long elapsedTime = SystemClock.uptimeMillis() - startTime;
-            double timeInterpolator = interpolator.getInterpolation((float) elapsedTime / CAMERA_SPEED);
-
-            double lat = timeInterpolator * endLatLng.latitude + (1 - timeInterpolator) * beginLatLng.latitude;
-            double lng = timeInterpolator * endLatLng.longitude + (1 - timeInterpolator) * beginLatLng.longitude;
-            LatLng newPosition = new LatLng(lat, lng);
-
-            trackingMarker.setPosition(newPosition);
-
-            if (timeInterpolator < 1) {
-                mHandler.postDelayed(this, 16);
-            } else {
-
-                if (currentLatLngIndex < allNonDuplicateLatLng.size() - 2) {
-
-                    currentLatLngIndex++;
-
-                    endLatLng = getEndLatLng();
-                    beginLatLng = getBeginLatLng();
-
-                    startTime = SystemClock.uptimeMillis();
-
-                    LatLng firstPoint = getBeginLatLng();
-                    LatLng nextPoint = getEndLatLng();
-
-                    float cameraBearing = bearingBetweenLatLngPoints(firstPoint, nextPoint);
-
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(nextPoint)
-                            .bearing(cameraBearing)
-                            .tilt(tilt)
-                            .zoom(mMap.getCameraPosition().zoom)
-                            .build();
-
-                    Log.i(TAG, (currentLatLngIndex + 1) + " of " + allNonDuplicateLatLng.size() + " - bearing: " + cameraBearing + " / " + nextPoint);
-
-                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                            CAMERA_SPEED_TURN,
-                            null);
-
-                    startTime = SystemClock.uptimeMillis();
-                    mHandler.postDelayed(animator, 16);
-
-                } else {
-                    currentLatLngIndex++;
-                    // Zoom out to view route once the camera finishes animating.
-                    zoomToViewRoute();
-                    // Remove the runner icon
-                    trackingMarker.remove();
-                    // Remove any callbacks to the Handler object
-                    mHandler.removeCallbacks(animator);
-                }
-            }
-        }
-
-        private LatLng getEndLatLng() {
-            return allNonDuplicateLatLng.get(currentLatLngIndex + 1);
-        }
-
-        private LatLng getBeginLatLng() {
-            return allNonDuplicateLatLng.get(currentLatLngIndex);
-        }
-
-        /**
-         * Method to
-         *
-         * @param latLng
-         * @return
-         */
-        private Location convertLatLngToLocation(LatLng latLng) {
-            Location location = new Location("someLocation");
-            location.setLatitude(latLng.latitude);
-            location.setLongitude(latLng.longitude);
-            return location;
-        }
-
-        private float bearingBetweenLatLngPoints(LatLng start, LatLng end) {
-            Location startLocation = convertLatLngToLocation(start);
-            Location endLocation = convertLatLngToLocation(end);
-            return startLocation.bearingTo(endLocation);
-        }
-
-    }
 }

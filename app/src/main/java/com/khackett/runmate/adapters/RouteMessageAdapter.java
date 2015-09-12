@@ -25,12 +25,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-// need to create a custom list view adapter - very similar to the way it is done in fragments
-// our adapter has 2 parts: we need to define a custom layout that will be used for each item in the list;
-// then we need to create a custom class that adapts one message of our parse objects into the layout
-
 /**
  * Custom adapter that uses the message_item.xml layout file
+ * Adapter has two parts:
+ * Define a custom layout that will be used for each item in the list;
+ * Then create a custom class that adapts one item/message of the parse objects into the layout.
  * Created by KHackett on 31/07/15.
  */
 public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
@@ -163,7 +162,6 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         holder.timeAndDateLabel.setText(proposedTimeString);
 
         double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
-        // holder.distanceLabel.setText(String.valueOf(distance));
         holder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));
 
         return convertView;

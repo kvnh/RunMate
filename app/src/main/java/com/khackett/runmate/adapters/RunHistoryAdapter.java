@@ -25,12 +25,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-// need to create a custom list view adapter - very similar to the way it is done in fragments
-// our adapter has 2 parts: we need to define a custom layout that will be used for each item in the list;
-// then we need to create a custom class that adapts one message of our parse objects into the layout
-
 /**
- * Custom adapter that uses the completed_run_item.xml layout file
+ * Custom list view adapter that uses the completed_run_item.xml layout file.
+ * Adapter has two parts:
+ * A custom layout that will be used for each item in the list;
+ * A custom class that adapts each item of the parse objects into the layout.
  * Created by KHackett on 31/07/15.
  */
 public class RunHistoryAdapter extends ArrayAdapter<ParseObject> {
@@ -40,97 +39,93 @@ public class RunHistoryAdapter extends ArrayAdapter<ParseObject> {
     protected Context mContext;
     protected List<ParseObject> mCompletedRun;
 
-    // pass the list of activities to the RouteMessageAdapter
-
     /**
+     * Constructor to pass the list of activities to the RunHistoryAdapter
+     *
      * @param context
-     * @param completedRun - the list of
+     * @param completedRun - the list of completed runs
      */
     public RunHistoryAdapter(Context context, List<ParseObject> completedRun) {
-        super(context, R.layout.message_item, completedRun);
+        super(context, R.layout.run_history_item, completedRun);
         mContext = context;
         mCompletedRun = completedRun;
     }
 
     /**
-     * Custom class that contains the data that is going to be displayed in the custom layout for each item.
+     * Custom class that contains the data to be displayed in the custom layout for each run_history_item.
+     * Convention when creating a custom list adapter is to create a private static class that can be referenced in getView().
      */
     private static class ViewHolder {
-        // The name of the route
+        // The name of the route.
         TextView routeNameLabel;
-        // The distance of the route
-        TextView distanceLabel;
-        // The time taken to complete the run
-        TextView runTimeLabel;
-        // The average seed throughout the run
-        TextView averageSpeedLabel;
-        // The time and date of the route
+        // The time and date of the run.
         TextView timeAndDateLabel;
     }
 
-    // in fragments, the adapter called an appropriate method to get a fragment, then it adapter it and then put in the view
-    // ...the same thing is happening here - this adapter (which is going to be attached to a list view) is going to call a
-    // method called getView(), its going to create the view, inflate it into a layout and then attach it into the list view
-    // override getView() to use a custom list adapter
+    // In fragments, the adapter calls an appropriate method to get a fragment, then it adapts it and put it in the view.
+    // Same thing happening here - this adapter (which is going to be attached to a list view) calls getView()
+    // It creates the view, inflates it into a layout and then attach it into the list view.
+    // Override getView() to use a custom list adapter.
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // we want to create a method that is efficient for the list view
-        // the more efficient we are in this method, the better our list view will perform
-        // - this affects things like scrolling or tapping on items
-        // a common pattern that help with this is the ViewHolder PATTERN!!!
-        final ViewHolder holder; // we need to create this ViewHolder class
+        // Create a method for the list view - the more efficient, the better the list view will perform.
+        // - this affects things like scrolling or tapping on items.
+        // Use the ViewHolder pattern to aid with this.
 
-        // when doing a custom list adapter, the convention is to create a private static class that we can reference - see below
+        // Create a ViewHolder object.
+        final ViewHolder holder;
 
-        // this method is called in such a way that the views are recycled for the list view
-        // the android system recycles the views if they already exist
+        // When this method is called, the views are recycled for the list view.
+        // The android system recycles the views as if they already exist.
         if (convertView == null) {
-            // we want to inflate the view (convertView) from the layout file, using the context, and then return it to the list
-            // Done by using the LayoutInflater - an Android object that takes XML layouts and turns them into views in code that we can use
+            // Inflate the view (convertView) from the layout file, using the context, and then return it to the list.
+            // Done by using the LayoutInflater - an Android object that takes XML layouts and turns them into views in code that can be used.
             convertView = LayoutInflater.from(mContext).inflate(R.layout.run_history_item, null);
 
-            // initialise holder as a new ViewHolder - and initialise the image view and text view inside it
+            // Initialise the ViewHolder - and initialise the necessary items inside it.
             holder = new ViewHolder();
-            // findViewById() is an activity method, but we can call it from the convert view
+            // findViewById() is an activity method, but can be called from the convertView object.
             holder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
-            holder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
-            holder.runTimeLabel = (TextView) convertView.findViewById(R.id.runTimeLabel);
             holder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
             convertView.setTag(holder);
         } else {
-            // then it already exists and we can reuse the components - they are already there in memory - we just need to change the data
-            // so instead of creating the holder from scratch, do the following. getTag() gets us the ViewHolder that was already created - this is part of the ViewHolder pattern
+            // Otherwise it already exists and components can be reused.
+            // Components are already in memory - just need to change the values.
+            // Instead of creating the holder from scratch - getTag() gets the ViewHolder
+            // that was already created - part of the ViewHolder pattern in action.
             holder = (ViewHolder) convertView.getTag();
         }
 
-        // set the data in the view - picture icon and name
-        // get the parse object that corresponds to position, because getView() is going to be called for each position in the list
+        // Set the data in the view.
+        // Get the parse object that corresponds to the selected position in the list.
+        // getView() will be called for each position in the list.
         ParseObject completedRun = mCompletedRun.get(position);
 
-        // Create an instance of SimpleDateFormat used for formatting
+        // Set the name of the run from the completed run.
+        holder.routeNameLabel.setText(completedRun.getString(ParseConstants.KEY_ROUTE_NAME));
+
+        // Create an instance of SimpleDateFormat used for formatting.
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        // Convert Date object into a String object to be used in the text view
+        // Convert Date object into a String object to be used in the text view.
         Date completedOn = completedRun.getCreatedAt();
         String completedOnString = dateFormat.format(completedOn);
-        // Use newly created String Date in the Text View
+        // Use newly created String Date in the Text View.
         holder.timeAndDateLabel.setText(completedOnString);
-
-//        int completedRunTime = completedRun.getInt(ParseConstants.KEY_RUN_TIME);
-//        holder.runTimeLabel.setText(completedRunTime);
-
-        double completedRunDistance = completedRun.getDouble(ParseConstants.KEY_COMPLETED_RUN_DISTANCE);
-        holder.distanceLabel.setText(String.format("%.2f km", completedRunDistance / 1000));
 
         return convertView;
     }
 
-    // method to refill the list with ParseObject data if it is not null
-    public void refill(List<ParseObject> messages) {
-        // clear the current data
+    /**
+     * Method to refill the list with ParseObject data if it is not null
+     *
+     * @param runs
+     */
+    public void refill(List<ParseObject> runs) {
+        // Clear the current data.
         mCompletedRun.clear();
-        // add all the new ones
-        mCompletedRun.addAll(messages);
-        //  need to call notifyDataSetChanged() on the adapter after changing its contents
+        // Add all the new runs.
+        mCompletedRun.addAll(runs);
+        // Call notifyDataSetChanged() on the adapter after changing its contents.
         notifyDataSetChanged();
     }
 }

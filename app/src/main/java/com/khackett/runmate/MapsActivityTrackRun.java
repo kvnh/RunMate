@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.khackett.runmate.model.Route;
 import com.khackett.runmate.ui.MainActivity;
 import com.khackett.runmate.utils.DirectionsJSONParser;
 import com.khackett.runmate.utils.ParseConstants;
@@ -190,6 +191,12 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
     protected ArrayList<LatLng> markerPoints;
 
+    private Route mTrackedRun;
+
+    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
+    // Values are the southwest and northeast LatLng points at the bounds of the route
+    protected ArrayList<ParseGeoPoint> parseLatLngBoundsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,6 +206,8 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         markerPoints = new ArrayList<LatLng>();
 
         totalDistance = 0;
+
+        mTrackedRun = new Route();
 
         // set up member variables for each UI component
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
@@ -745,22 +754,25 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public ParseObject createCompletedRoute() {
         // create a new parse object called route
         // (we can create a whole new class of parse objects in the back end by simply using a new name)
-        ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_ROUTES);
+        ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_RUNS);
 
-        // add the LatLng points from the tracked run to the ParseObject completedRoute
+        // Add all of the location points to the Route object.
+        mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
+
+        // Add the LatLng points from the tracked run to the ParseObject completedRoute.
         completedRoute.addAll(ParseConstants.KEY_LATLNG_GPS_POINTS, (convertLatLngToParseGeoPointArray(latLngGPSTrackingPoints)));
 
-//        // add the max and min lat and long points from the plotted map to the ParseObject route
-//        completedRoute.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
+        // Add the min and max lat and long points to the ParseObject completedRoute.
+        completedRoute.put(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, convertLatLngBoundsToParseGeoPointArray(mTrackedRun.getLatLngBounds()));
 
-        // Runners ID.
+        // Add the runners ID to the ParseObject completedRoute.
         completedRoute.put(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
-        // Runners name.
+        // Add the runners name to the ParseObject completedRoute.
         completedRoute.put(ParseConstants.KEY_RUNNER_NAME, ParseUser.getCurrentUser().getUsername());
-
-        completedRoute.add(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
-
-        completedRoute.add(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, totalDistance);
+        completedRoute.put(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
+        completedRoute.put(ParseConstants.KEY_ORIGINAL_ROUTE_ID, getIntent().getStringExtra("myRunsObjectId"));
+        completedRoute.put(ParseConstants.KEY_ROUTE_NAME, getIntent().getStringExtra("myRunsRouteName"));
+        completedRoute.put(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, totalDistance);
 
         // return a successful route
         return completedRoute;
@@ -779,6 +791,24 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             parseLatLngList.add(parseGeoPoint);
         }
         return parseLatLngList;
+    }
+
+    protected ArrayList<ParseGeoPoint> convertLatLngBoundsToParseGeoPointArray(LatLngBounds latLngBounds) {
+
+        parseLatLngBoundsList = new ArrayList<ParseGeoPoint>();
+
+        LatLng southWest = latLngBounds.southwest;
+        LatLng northEast = latLngBounds.northeast;
+
+        ParseGeoPoint geoPointSouthWest = new ParseGeoPoint(southWest.latitude, southWest.longitude);
+        ParseGeoPoint geoPointNorthEast = new ParseGeoPoint(northEast.latitude, northEast.longitude);
+
+        // Add the ParseGeoPoints to the ArrayList
+        parseLatLngBoundsList.add(0, geoPointSouthWest);
+        parseLatLngBoundsList.add(1, geoPointNorthEast);
+
+        // return list
+        return parseLatLngBoundsList;
     }
 
     public void saveCompletedRoute(ParseObject completedRoute) {

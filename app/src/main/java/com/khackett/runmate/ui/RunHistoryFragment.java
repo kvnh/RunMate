@@ -9,9 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.khackett.runmate.MapsActivityDisplayRoute;
+import com.khackett.runmate.MapsActivityRunHistory;
 import com.khackett.runmate.R;
-import com.khackett.runmate.adapters.RouteMessageAdapter;
 import com.khackett.runmate.adapters.RunHistoryAdapter;
 import com.khackett.runmate.utils.ParseConstants;
 import com.parse.FindCallback;
@@ -34,7 +33,7 @@ public class RunHistoryFragment extends ListFragment {
 
     private int MY_STATUS_CODE = 1111;
 
-    // Default constructor for InboxRouteFragment
+    // Default constructor for RunHistoryFragment
     public RunHistoryFragment() {
     }
 
@@ -64,7 +63,6 @@ public class RunHistoryFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // Retrieve the routes from the Parse backend
         retrieveCompletedRuns();
     }
@@ -72,26 +70,22 @@ public class RunHistoryFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // to tell whether it is an image or a video, we need to access the type of the message
-        // create the message object which is set to the message at the current position
-        ParseObject route = mCompletedRuns.get(position);
+        // Create a ParseObject which is set to the completed run in the current list position.
+        ParseObject completedRun = mCompletedRuns.get(position);
 
-
-        // set the data for the intent using the setData() method - this requires a URI
-        // (URI's and URL's can often be used interchangeably)
-        // Uri fileUri = Uri.parse(file.getUrl());
-
-        JSONArray parseList = route.getJSONArray("latLngPoints");
-        JSONArray parseListBounds = route.getJSONArray("latLngBoundaryPoints");
-        String objectId = route.getObjectId();
+        JSONArray parseLatLngGPSList = completedRun.getJSONArray(ParseConstants.KEY_LATLNG_GPS_POINTS);
+        JSONArray parseListBounds = completedRun.getJSONArray("latLngBoundaryPoints");
+        String objectId = completedRun.getObjectId();
+        double myRunDistance = completedRun.getDouble(ParseConstants.KEY_COMPLETED_RUN_DISTANCE);
 
         // Create an intent to display the route.
-        Intent intent = new Intent(getActivity(), MapsActivityDisplayRoute.class);
-        intent.putExtra("parseLatLngList", parseList.toString());
+        Intent intent = new Intent(getActivity(), MapsActivityRunHistory.class);
+        intent.putExtra("parseLatLngList", parseLatLngGPSList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
-        intent.putExtra("myObjectId", objectId);
+        intent.putExtra("myRunHistoryObjectId", objectId);
+        intent.putExtra("myRunDistance", myRunDistance);
 
-        // Start the MapsActivityDisplayRoute activity.
+        // Start the MapsActivityRunHistory activity.
         startActivityForResult(intent, MY_STATUS_CODE);
     }
 
@@ -104,17 +98,16 @@ public class RunHistoryFragment extends ListFragment {
     }
 
     private void retrieveCompletedRuns() {
-        // query the routes class/table in parse
-        // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
-        // querying the message class is similar to how we have been querying users
-        ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_COMPLETED_ROUTES);
-        // use the 'where' clause to search through the messages to find where our user ID is one of the recipients
-        queryRoute.whereEqualTo(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
-        // order results so that most recent message are at the top of the inbox
-        queryRoute.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
-        // query is ready - run it
-        queryRoute.findInBackground(new FindCallback<ParseObject>() {
-            // When the retrieval is done from the Parse query, the done() callback method is called
+        // Query the CompletedRoutes table in backend.
+        // Get runs where the logged in user ID is equal to the runnerId.
+        ParseQuery<ParseObject> queryCompletedRun = new ParseQuery<ParseObject>(ParseConstants.CLASS_COMPLETED_RUNS);
+        // Use 'where' clause to search through the runs to find where the user ID is equal to the runnerId.
+        queryCompletedRun.whereEqualTo(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
+        // Order results so that most recent runs are at the top of the inbox.
+        queryCompletedRun.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
+        // Query is ready - run it.
+        queryCompletedRun.findInBackground(new FindCallback<ParseObject>() {
+            // When retrieval from query is complete, the done() callback method is called.
             @Override
             public void done(List<ParseObject> routes, ParseException e) {
                 // dismiss the progress indicator here
@@ -156,8 +149,7 @@ public class RunHistoryFragment extends ListFragment {
                         // Call setListAdapter (from ListActivity class) for this activity.
                         setListAdapter(adapter);
                     } else {
-                        // Refill the adapter.
-                        // Cast it to RunHistoryAdapter.
+                        // Refill the adapter - Cast it to RunHistoryAdapter.
                         ((RunHistoryAdapter) getListView().getAdapter()).refill(mCompletedRuns);
                     }
                 }

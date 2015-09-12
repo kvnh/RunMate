@@ -28,6 +28,7 @@
     <dimen name="route_name_vertical_padding">2dp</dimen>
 
     <dimen name="message_time_text">12sp</dimen>
+    <dimen name="completed_on_text">16sp</dimen>
 
     <dimen name="user_item_height">44dp</dimen>
     <dimen name="user_item_padding">4dp</dimen>

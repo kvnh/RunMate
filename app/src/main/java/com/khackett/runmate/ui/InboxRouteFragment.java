@@ -64,7 +64,6 @@ public class InboxRouteFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // Retrieve the routes from the Parse backend
         retrieveRoutes();
     }

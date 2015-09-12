@@ -6,7 +6,7 @@
     <string name="login_error_message">Please enter a username and password</string>
     <string name="login_error_title">Sorry, there was a problem</string>
 
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Login</string>
     <string name="password_hint">Password</string>
     <string name="username_hint">Username</string>
     <string name="login_button_label">SIGN IN</string>
@@ -16,7 +16,7 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+    <string name="title_activity_forgot_password">Forgot Password</string>
     <string name="forgot_password_error_title">Sorry, there was a problem</string>
     <string name="forgot_password_error_message">Please enter an email address</string>
     <string name="forgot_password_progress_dialog_title">Please wait...</string>
@@ -24,7 +24,7 @@
     <string name="reset_password_success_title">Reset request successful</string>
     <string name="reset_password_success_message">Please check your email account</string>
 
-    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_sign_up">Sign Up</string>
     <string name="email_hint">Email</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="full_name_hint">Name</string>
@@ -76,6 +76,8 @@
     <string name="str_btn_accept">Accept</string>
     <string name="str_btn_decline">Decline</string>
     <string name="str_btn_animate">Animate \nRoute</string>
+    <string name="str_btn_delete_route">Delete</string>
+    <string name="str_btn_run_stats">Stats</string>
 
     <string-array name="camera_choices">
         <item>Take Picture</item>
@@ -112,17 +114,17 @@
     <string name="menu_send_label">Send</string>
     <string name="success_message">Message sent</string>
     <string name="title_activity_view_image">RunMate</string>
-    <string name="title_activity_maps_activity_directions_multiple">MapDirectionsMultiple</string>
+    <string name="title_activity_maps_activity_directions_multiple">Directions Map</string>
 
     <string name="route_creation_error_message">Please ensure you have at least 2 points selected</string>
     <string name="route_creation_error_title">Tap the map</string>
     <string name="route_undo_error_message">No more routes to undo</string>
     <string name="route_undo_error_title">Steady on...</string>
-    <string name="title_activity_route_recipients">RouteRecipientsActivity</string>
+    <string name="title_activity_route_recipients">Route Recipients</string>
     <string name="success_route">Route sent</string>
     <string name="error_sending_route_message">There was an error sending your route. Please try again</string>
-    <string name="title_activity_maps_activity_display_route">Map</string>
-    <string name="title_activity_inbox_route_fragment">InboxRouteFragment</string>
+    <string name="title_activity_maps_activity_display_route">Display Route</string>
+    <string name="title_activity_inbox_route_fragment">Route Inbox</string>
     <string name="success_route_run">Route sent</string>
     <string name="success_save_run">Run saved</string>
     <string name="error_saving_run_message">There was an error saving your run.</string>
@@ -134,7 +136,8 @@
     <string name="distance_count">0 km</string>
     <string name="str_btn_undo">Undo</string>
     <string name="str_btn_complete_loop">Complete Loop</string>
-    <string name="title_activity_maps_activity_track_run">Map</string>
+    <string name="title_activity_maps_activity_track_run">Track Run</string>
+    <string name="title_activity_maps_activity_run_history">Run History</string>
 
     <string name="start_updates">Start Run</string>
     <string name="stop_updates">Pause</string>
@@ -162,9 +165,6 @@
     <string name="content_desc_user_checkmark">User checked</string>
 
     <string name="push_notification_message">New RunMate route from %s</string>
-    <string name="title_activity_squad_fragment">SquadFragment</string>
-
-    <string name="hello_world">Hello world!</string>
 
     <string name="instructions_title">Using RunMate:</string>
     <string name="instructions_sub_title">Plotting a Route</string>

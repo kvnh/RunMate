@@ -11,7 +11,7 @@ public final class ParseConstants {
      * - naming convention is for classes to begin with a capital letter
      */
     public static final String CLASS_ROUTES = "Routes";
-    public static final String CLASS_COMPLETED_ROUTES = "CompletedRoutes";
+    public static final String CLASS_COMPLETED_RUNS = "CompletedRuns";
 
     /**
      * Field names - Prefix KEY to the constant name.  Fields to begin with lowercase.
@@ -37,4 +37,5 @@ public final class ParseConstants {
     public static final String KEY_ROUTE_PROPOSED_TIME = "proposedTime";
     public static final String KEY_RUN_TIME = "completedTime";
     public static final String KEY_ALL_LATLNG_POINTS = "allLatLngPoints";
+    public static final String KEY_ORIGINAL_ROUTE_ID = "originalRouteId";
 }
