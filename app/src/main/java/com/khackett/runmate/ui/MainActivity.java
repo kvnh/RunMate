@@ -40,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Check to see if a user is logged in before the intent is started.
         // If getCurrentUser() returns a parse user, which is cached on the device by the Parse SDK,
-        // then a user is logged in as a ParseUser and they will be stored in the currentUser variable.
+        // then a user is logged in as a ParseUser and they will be stored in the ParseUser object.
         ParseUser currentUser = ParseUser.getCurrentUser();
 
         if (currentUser == null) {
-            // If no user returned, user is not logged in - take them to the login page
+            // If no user returned, user is not logged in - take them to the login page.
             navigateToLogin();
         } else {
             // User is already logged in - output a log statement displaying their name.
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mFragmentTransaction.replace(R.id.containerView, new TabFragmentContainer()).commit();
 
         // Setup click events on the NavigationView items.
+        // When an item is selected, replace the tab fragment container with the requested fragment.
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -77,18 +78,16 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction settingsFragment = mFragmentManager.beginTransaction();
                     settingsFragment.replace(R.id.containerView, new SettingsFragment()).commit();
                 }
-
                 if (menuItem.getItemId() == R.id.navItemHelp) {
                     FragmentTransaction instructionsFragment = mFragmentManager.beginTransaction();
                     instructionsFragment.replace(R.id.containerView, new InstructionsFragment()).commit();
                 }
-
                 if (menuItem.getItemId() == R.id.navItemMyProfile) {
                     FragmentTransaction myProfileFragment = mFragmentManager.beginTransaction();
                     myProfileFragment.replace(R.id.containerView, new MyProfileFragment()).commit();
                 }
                 if (menuItem.getItemId() == R.id.navItemLogOut) {
-                    // User has tapped on the log out option
+                    // User has selected log out option. Log user out and return to login screen.
                     ParseUser.logOut();
                     navigateToLogin();
                 }
@@ -108,11 +107,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Setup the ActionBarDrawerToggle functionality for the Toolbar
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout,
-                toolbar,
-                R.string.app_name,
-                R.string.app_name);
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
     }
@@ -126,22 +122,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here. Action bar will handle clicks on the Home/Up button.
+        // Therefore need to specify a parent activity in AndroidManifest.xml for each activity.
         int itemId = item.getItemId();
 
         switch (itemId) {
             case R.id.action_add_friends:
-                // Create and start a new intent to add/remove friends
+                // Create and start a new intent to add/remove friends.
                 Intent intent = new Intent(this, EditFriendsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.action_plot_route:
-                // Open an alert dialog.
+                // Open an alert dialog to select a route creation procedure.
                 AlertDialog.Builder builderPlot = new AlertDialog.Builder(this);
-                // get the list the strings file
-                // code for listener will be long, so create a member variable for it and pass that in instead
+                // Get the list in the Strings file.
+                // Create a member variable, mDialogListenerPlotRoute, for the listener below.
                 builderPlot.setItems(R.array.plot_route_choices, mDialogListenerPlotRoute);
                 AlertDialog dialogPlot = builderPlot.create();
                 dialogPlot.show();
@@ -150,40 +145,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Method to show the login screen
-     */
-    private void navigateToLogin() {
-        // All activities are started through intents so create a new intent object
-        // It requires two parameters - first is the context (this is the current system context within
-        // which the app is operating; so whenever we are working inside an activity, that is our context (activity is actually a subclass of context).
-        // ... the 2nd parameter is the class of the activity that we want to start
-        Intent intent = new Intent(this, LoginActivity.class);
-
-        // remove the main activity from the history so that it is skipped when we go backwards with the back button fromm login activity
-        // create a flag when we set the intent for the login activity
-        // a task refers to a collection of activities in the order in which a user uses them to complete a task
-        // in this case, we are saying that logging in is a new task, and the old task (starting the app), should be cleared so that we can't get back to it
-        // FLAG_ACTIVITY_CLEAR_TASK will cause any existing task that would be associated with the activity to be cleared before the activity is started.
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        // start this new activity using the startActivity() method
-        startActivity(intent);
-    }
-
-    // define and set listener for the array list dialogs in camera and plot_route
+    // Define and set listener for the array list dialog.
     protected DialogInterface.OnClickListener mDialogListenerPlotRoute = new DialogInterface.OnClickListener() {
         @Override
-        // which tells us the index of the value that was tapped on in the dialog list
-        public void onClick(DialogInterface dialog, int which) {
-            // create a switch statement to look at the switch statement
-            switch (which) {
-                case 0: // Choose Map option 1: polylines
+        // Get the index of the value that was tapped on in the dialog list.
+        public void onClick(DialogInterface dialog, int index) {
+            // Create a switch statement to select the relevant route creation procedure.
+            switch (index) {
+                case 0: // Choose Map option 1: manual
                     Intent intent1 = new Intent(MainActivity.this, MapsActivityManualPolyline.class);
                     startActivity(intent1);
                     break;
-                case 1: // Choose Map option 2: directions(multiple)
+                case 1: // Choose Map option 2: directions assisted
                     Intent intent2 = new Intent(MainActivity.this, MapsActivityDirectionsMultiple.class);
                     startActivity(intent2);
                     break;
@@ -194,6 +167,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    /**
+     * Method to show the login screen
+     */
+    private void navigateToLogin() {
+        // All activities are started through intents so create a new intent object.
+        // Two parameters required:
+        // The current system context within which the app is operating.
+        // The class of the activity to start.
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        // Remove MainActivity from the history so that it is skipped when user selects the back button from the newly created LoginActivity.
+        // Create flags and add to the intent for LoginActivity.
+        // In this case, logging in is a new task, and the old task (starting the app), should be cleared so that the user can't get back to it.
+        // FLAG_ACTIVITY_CLEAR_TASK will cause any existing task that would be associated with the activity to be cleared before the activity is started.
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // Start the new LoginActivity activity using the startActivity() method.
+        startActivity(intent);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
