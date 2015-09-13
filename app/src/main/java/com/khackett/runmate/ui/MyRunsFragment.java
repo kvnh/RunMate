@@ -68,11 +68,14 @@ public class MyRunsFragment extends ListFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         // Retrieve the accepted routes from the Parse backend
         retrieveAcceptedRoutes();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override

@@ -62,10 +62,14 @@ public class InboxRouteFragment extends ListFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         // Retrieve the routes from the Parse backend
         retrieveRoutes();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
