@@ -299,40 +299,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             return true;
         }
     }
-
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-            // Connecting to url
-            urlConnection.connect();
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-            StringBuffer sb = new StringBuffer();
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            data = sb.toString();
-            br.close();
-        } catch (Exception e) {
-            Log.d("Problem downloading url", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-    }
-
-
+    
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -343,7 +310,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             String data = "";
             try {
                 // Fetch and process the web page content and return resultant String
-                data = downloadUrl(url[0]);
+                data = directionsUtility.downloadUrl(url[0]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
