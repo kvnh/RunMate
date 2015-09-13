@@ -64,10 +64,14 @@ public class RunHistoryFragment extends ListFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         // Retrieve the routes from the Parse backend
         retrieveCompletedRuns();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override

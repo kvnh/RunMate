@@ -135,11 +135,11 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
     public void showRunStats() {
 
-        String runName = getIntent().getStringExtra("myRunName");
+        String myRunName = getIntent().getStringExtra("myRunName");
 
         // Get the distance from the intent and convert into a String format.
         double myRunDistance = getIntent().getIntExtra("myRunDistance", 0);
-        String myRunDistanceString = String.format("%.2f km", myRunDistance / 1000);
+        String myRunDistanceString = String.format("%.3f km", myRunDistance / 1000);
         Log.i(TAG, "Run distance in dialog: " + myRunDistanceString);
 
         // Get the time from the intent and convert into a String format.
@@ -163,7 +163,7 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
         // Open an alert dialog to select a route creation procedure.
         AlertDialog.Builder builderStats = new AlertDialog.Builder(this);
-        builderStats.setTitle(runName + " statistics").setItems(statItems, null);
+        builderStats.setTitle(myRunName + " statistics").setItems(statItems, null);
         AlertDialog dialogStats = builderStats.create();
         dialogStats.show();
     }
