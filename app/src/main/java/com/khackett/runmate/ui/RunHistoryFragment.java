@@ -90,6 +90,8 @@ public class RunHistoryFragment extends ListFragment {
         // Get the time of the selected run from the backend.
         int myRunTimeMillis = completedRun.getInt(ParseConstants.KEY_RUN_TIME);
 
+        String myRunName = completedRun.getString(ParseConstants.KEY_ROUTE_NAME);
+
         // Create an intent to display the route and add all the run values to it.
         Intent intent = new Intent(getActivity(), MapsActivityRunHistory.class);
         intent.putExtra("myRunLatLngList", parseLatLngGPSList.toString());
@@ -97,6 +99,7 @@ public class RunHistoryFragment extends ListFragment {
         intent.putExtra("myRunHistoryObjectId", objectId);
         intent.putExtra("myRunDistance", myRunDistance);
         intent.putExtra("myRunTime", myRunTimeMillis);
+        intent.putExtra("myRunName", myRunName);
 
         // Start the MapsActivityRunHistory activity.
         startActivityForResult(intent, MY_STATUS_CODE);
