@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import com.parse.ParseUser;
 import org.json.JSONArray;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RunHistoryFragment extends ListFragment {
 
+    public static final String TAG = RunHistoryFragment.class.getSimpleName();
 
     protected SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -70,20 +73,30 @@ public class RunHistoryFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+
         // Create a ParseObject which is set to the completed run in the current list position.
         ParseObject completedRun = mCompletedRuns.get(position);
 
+        // Get the GeoPoints for the selected run from the backend.
         JSONArray parseLatLngGPSList = completedRun.getJSONArray(ParseConstants.KEY_LATLNG_GPS_POINTS);
-        JSONArray parseListBounds = completedRun.getJSONArray("latLngBoundaryPoints");
-        String objectId = completedRun.getObjectId();
-        double myRunDistance = completedRun.getDouble(ParseConstants.KEY_COMPLETED_RUN_DISTANCE);
+        JSONArray parseLatLngBounds = completedRun.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
 
-        // Create an intent to display the route.
+        // Get the unique ID of the run from the backend.
+        String objectId = completedRun.getObjectId();
+
+        // Get the distance of the selected run from the backend.
+        int myRunDistance = completedRun.getInt(ParseConstants.KEY_COMPLETED_RUN_DISTANCE);
+
+        // Get the time of the selected run from the backend.
+        int myRunTimeMillis = completedRun.getInt(ParseConstants.KEY_RUN_TIME);
+
+        // Create an intent to display the route and add all the run values to it.
         Intent intent = new Intent(getActivity(), MapsActivityRunHistory.class);
-        intent.putExtra("parseLatLngList", parseLatLngGPSList.toString());
-        intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
+        intent.putExtra("myRunLatLngList", parseLatLngGPSList.toString());
+        intent.putExtra("myRunLatLngBoundsList", parseLatLngBounds.toString());
         intent.putExtra("myRunHistoryObjectId", objectId);
         intent.putExtra("myRunDistance", myRunDistance);
+        intent.putExtra("myRunTime", myRunTimeMillis);
 
         // Start the MapsActivityRunHistory activity.
         startActivityForResult(intent, MY_STATUS_CODE);

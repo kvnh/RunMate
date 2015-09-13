@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,8 @@ import com.parse.ParseUser;
  * Class to log a registered user into RunMate
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    public static final String TAG = LoginActivity.class.getSimpleName();
 
     // Member variables that correspond to items in the layout.
     protected EditText mUserName;
@@ -73,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 forgotPassword();
                 break;
             default:
-                System.out.println("Problem with input");
+                Log.i(TAG, "Problem with input");
         }
     }
 

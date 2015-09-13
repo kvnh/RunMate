@@ -148,7 +148,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected long startTime = 0;
     protected long savedTime = 0;
     protected long totalTimeMillis;
-    protected int totalDistance;
+    // protected double totalDistance;
 
     // Runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
@@ -204,7 +204,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         markerPoints = new ArrayList<LatLng>();
 
-        totalDistance = 0;
+        // totalDistance = 0;
 
         mTrackedRun = new Route();
 
@@ -406,7 +406,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
             try {
                 jObject = new JSONObject(jsonData[0]);
-                
+
                 // Starts parsing data
                 routes = directionsUtility.parseJSONObject(jObject);
             } catch (Exception e) {
@@ -702,7 +702,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         completedRoute.put(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
         completedRoute.put(ParseConstants.KEY_ORIGINAL_ROUTE_ID, getIntent().getStringExtra("myRunsObjectId"));
         completedRoute.put(ParseConstants.KEY_ROUTE_NAME, getIntent().getStringExtra("myRunsRouteName"));
-        completedRoute.put(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, totalDistance);
+        completedRoute.put(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, calculateDistanceOfRun(latLngGPSTrackingPoints));
 
         // return a successful route
         return completedRoute;
@@ -739,6 +739,26 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // return list
         return parseLatLngBoundsList;
+    }
+
+    public double calculateDistanceOfRun(ArrayList<LatLng> latLngGPSTrackingPoints) {
+
+        Location locationA = new Location("locationA");
+        Location locationB = new Location("locationB");
+
+        float totalDistance = locationA.distanceTo(locationB);
+
+        for (int i = 0; i < latLngGPSTrackingPoints.size() - 1; i++) {
+            locationA.setLatitude(latLngGPSTrackingPoints.get(i).latitude);
+            locationA.setLongitude(latLngGPSTrackingPoints.get(i).longitude);
+            locationB.setLatitude(latLngGPSTrackingPoints.get(i + 1).latitude);
+            locationB.setLongitude(latLngGPSTrackingPoints.get(i + 1).longitude);
+
+            float distance = locationA.distanceTo(locationB);
+            totalDistance += distance;
+        }
+
+        return totalDistance;
     }
 
     public void saveCompletedRoute(ParseObject completedRoute) {

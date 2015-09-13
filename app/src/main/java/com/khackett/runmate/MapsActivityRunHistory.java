@@ -39,6 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MapsActivityRunHistory extends FragmentActivity implements View.OnClickListener {
 
@@ -107,14 +108,55 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
         mButtonStats = (Button) findViewById(R.id.btn_stats);
 
         // Register buttons with the listener
-        // mButtonAnimate.setOnClickListener(this);
-        // mButtonDecline.setOnClickListener(this);
+        mButtonDelete.setOnClickListener(this);
+        mButtonStats.setOnClickListener(this);
     }
 
 
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        // Switch statement to select which action to take depending on button/text pressed
+        switch (v.getId()) {
+            case R.id.btn_delete:
+                // deleteRun();
+                break;
+            case R.id.btn_stats:
+                showRunStats();
+                break;
+            default:
+                Log.i(TAG, "Problem with input");
+        }
+    }
+
+    public void showRunStats() {
+
+        // Get the distance from the intent and convert into a String format.
+        double myRunDistance = getIntent().getIntExtra("myRunDistance", 0);
+        String myRunDistanceString = String.format("%.2f km", myRunDistance / 1000);
+        Log.i(TAG, "Run distance in dialog: " + myRunDistanceString);
+
+        // Get the time from the intent and convert into a String format.
+        int myRunTimeMillis = getIntent().getIntExtra("myRunTime", 0);
+        String myRunTimeString = String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(myRunTimeMillis),
+                TimeUnit.MILLISECONDS.toMinutes(myRunTimeMillis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(myRunTimeMillis) % TimeUnit.MINUTES.toSeconds(1));
+        Log.i(TAG, "Run time: " + myRunTimeString);
+
+        // Get the average speed of the run and convert to a String format.
+        double myRunAverageSpeed = ((myRunDistance * 3600) / (myRunTimeMillis));
+        String myRunAverageSpeedString = String.format("%.2f km/h", myRunAverageSpeed);
+        Log.i(TAG, "Run average speed: " + myRunAverageSpeedString);
+    }
+
     public void plotMyRun() {
-        // assign the JSON String value from the passed in intent to a new String variable
-        String jsonArray = getIntent().getStringExtra("parseLatLngList");
+        // Assign the JSON String value from the passed in intent to a new String object.
+        String jsonArray = getIntent().getStringExtra("myRunLatLngList");
         JSONArray array = null;
 
         try {
@@ -133,21 +175,22 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
             myRunPoints.add(latLngObject);
         }
 
-        // initialising the polyline in the map and setting some values
-        polylineOptions = new PolylineOptions()
-                .color(Color.GREEN)
-                .width(6);
+        // Initialising the polyline in the map and setting values.
+        polylineOptions = new PolylineOptions().color(Color.GREEN).width(6);
 
-        // Setting points of polyline
+        // Setting points of polyline.
         polylineOptions.addAll(myRunPoints);
 
-        // Adding the polyline to the map
+        // Adding the polyline to the map.
         mMap.addPolyline(polylineOptions);
+
+        // Add start/finish markers to the run.
+        addMarkersToMap(myRunPoints);
     }
 
     public void plotRoute() {
         // assign the JSON String value from the passed in intent to a new String variable
-        String jsonArray = getIntent().getStringExtra("parseLatLngList");
+        String jsonArray = getIntent().getStringExtra("myRunLatLngList");
         JSONArray array = null;
 
         try {
@@ -208,22 +251,6 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
         addMarkersToMap(sentRoutePoints);
     }
 
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_decline:
-                declineRoute();
-                break;
-            default:
-                Log.i(TAG, "Problem with input");
-        }
-    }
-
     public void declineRoute() {
         String objectId = getIntent().getStringExtra("myObjectId");
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
@@ -270,7 +297,7 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
     public void zoomToViewRoute() {
         // assign the JSON String value from the passed in intent to a new String variable
-        String jsonArray = getIntent().getStringExtra("parseLatLngBoundsList");
+        String jsonArray = getIntent().getStringExtra("myRunLatLngBoundsList");
         JSONArray array = null;
 
         try {
@@ -343,7 +370,7 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
             parserTask.execute(result);
         }
     }
-    
+
     /**
      * A class to parse the Google Places in JSON format
      */
@@ -358,7 +385,7 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
 
             try {
                 jObject = new JSONObject(jsonData[0]);
-                
+
                 // Starts parsing data
                 routes = directionsUtility.parseJSONObject(jObject);
             } catch (Exception e) {
