@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khackett.runmate.R;
-import com.khackett.runmate.utils.MD5Util;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
