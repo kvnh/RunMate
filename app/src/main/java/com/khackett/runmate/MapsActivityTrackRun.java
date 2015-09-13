@@ -146,9 +146,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected Button mSaveRunButton;
     protected TextView mRunTimeTextView;
     protected long startTime = 0;
-    protected long savedTime = 0;
     protected long totalTimeMillis;
-    // protected double totalDistance;
 
     // Runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
@@ -203,8 +201,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         setUpMapIfNeeded();
 
         markerPoints = new ArrayList<LatLng>();
-
-        // totalDistance = 0;
 
         mTrackedRun = new Route();
 
@@ -647,27 +643,24 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public void startUpdatesButton(View view) {
         // check location settings to ensure GPS is enabled, before running location updates
         checkLocationSettings();
-        startTime = System.currentTimeMillis() - savedTime;
-        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     /**
      * Handles the Pause Run button, and requests removal of location updates.
      */
     public void stopUpdatesButton(View view) {
-        // stop checking for location updates
+        // Stop checking for location updates.
         stopLocationUpdates();
-        // Save the time that has passed
-        savedTime = totalTimeMillis;
-        // Remove callbacks to the Runnable object
+
+        // Remove callbacks to the Runnable object and stop timer.
         timerHandler.removeCallbacks(timerRunnable);
     }
 
     public void saveRunButton(View view) {
-        // stop checking for location updates.
+        // Stop checking for location updates.
         stopLocationUpdates();
 
-        // Remove callbacks to the Runnable object.
+        // Remove callbacks to the Runnable object and stop timer.
         timerHandler.removeCallbacks(timerRunnable);
 
         // Create a ParseObject and save it to the backend.
@@ -790,7 +783,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         if (mCheckLocationUpdates) {
             mStartUpdatesButton.setEnabled(false);
             mStopUpdatesButton.setEnabled(true);
-            mSaveRunButton.setEnabled(true);
         } else {
             mStartUpdatesButton.setEnabled(true);
             mStopUpdatesButton.setEnabled(false);
@@ -894,8 +886,25 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         mMap.animateCamera(cameraUpdate);
 
         updateUI();
-        Toast.makeText(this, getResources().getString(R.string.location_updated_message), Toast.LENGTH_SHORT).show();
 
+        // Start the timer.
+        startTimer();
+        // New location has been detected so allow the user to save the run.
+        mSaveRunButton.setEnabled(true);
+    }
+
+    public void startTimer() {
+        if (latLngGPSTrackingPoints.size() < 2) {
+            // Start the timer once a new location has been detected
+            startTime = System.currentTimeMillis() - totalTimeMillis;
+            timerHandler.postDelayed(timerRunnable, 0);
+            Toast.makeText(this, getResources().getString(R.string.start_run_message), Toast.LENGTH_SHORT).show();
+        } else {
+            // Start the timer once a new location has been detected
+            startTime = System.currentTimeMillis() - totalTimeMillis;
+            timerHandler.postDelayed(timerRunnable, 0);
+            Toast.makeText(this, getResources().getString(R.string.location_updated_message), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
