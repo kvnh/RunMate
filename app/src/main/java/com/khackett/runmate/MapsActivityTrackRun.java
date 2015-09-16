@@ -231,14 +231,20 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         if (mMap != null) {
 
-            plotRoute();
+            String checkIntent = getIntent().getStringExtra("parseLatLngList");
+            if (checkIntent != null) {
 
-            mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-                    zoomToViewRoute();
-                }
-            });
+                plotRoute();
+
+
+                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                    @Override
+                    public void onMapLoaded() {
+                        zoomToViewRoute();
+                    }
+                });
+
+            }
 
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
