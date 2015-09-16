@@ -134,6 +134,29 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
     }
 
     public void deleteRun() {
+        String objectId = getIntent().getStringExtra("myRunHistoryObjectId");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_COMPLETED_RUNS);
+        query.getInBackground(objectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    object.deleteInBackground();
+                    Toast.makeText(MapsActivityRunHistory.this, R.string.success_delete_route, Toast.LENGTH_LONG).show();
+                } else {
+                    // there is an error - notify the user
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityRunHistory.this);
+                    builder.setMessage(R.string.error_delete_route_message)
+                            .setTitle(R.string.error_deleting_route_title)
+                            .setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
+
+        // Send the user back to the main activity right after the message is deleted.
+        // Use finish() to close the current activity, returning to the main activity
+        finish();
+
     }
 
     public void showRunStats() {
