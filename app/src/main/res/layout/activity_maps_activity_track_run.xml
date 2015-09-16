@@ -5,11 +5,10 @@
     android:layout_height="match_parent"
     tools:context="com.khackett.runmate.MapsActivityTrackRun">
 
-
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/maps_activity_tool_bar"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -26,7 +25,6 @@
             android:layout_marginTop="@dimen/ui_group_top_margin"
             android:layout_weight="1"
             android:onClick="startUpdatesButton"
-            android:radius="3dp"
             android:text="@string/start_updates"
             android:textColor="@color/backgroundPurple"/>
 
@@ -57,22 +55,19 @@
             android:text="@string/save_run"
             android:textColor="@color/backgroundPurple"/>
 
-        <TextView
-            android:id="@+id/run_time_text"
+        <Button
+            android:id="@+id/delete_run_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_marginBottom="@dimen/ui_group_top_margin"
-            android:layout_marginEnd="@dimen/ui_group_top_margin"
-            android:layout_marginLeft="@dimen/small_margin_left"
             android:layout_marginTop="@dimen/ui_group_top_margin"
-            android:layout_toRightOf="@+id/run_time_label"
             android:layout_weight="1"
-            android:text="@string/run_time_label"
-            android:textColor="@color/backgroundPurple"
-            android:textSize="@dimen/default_text_size"/>
+            android:onClick="deleteRunButton"
+            android:text="@string/delete_run"
+            android:textColor="@color/backgroundPurple"/>
 
     </LinearLayout>
-
 
     <fragment
         android:id="@+id/map"
@@ -82,6 +77,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/linearLayout"
-        tools:context="com.khackett.runmate.MapsActivityTrackRun"/>
+        tools:context="com.khackett.runmate.MapsActivityTrackRun">
+
+        <TextView
+            android:id="@+id/run_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:layout_marginTop="15dp"
+            android:background="#07000000"
+            android:paddingStart="15dp"
+            android:text="@string/run_time_label"
+            android:textColor="@color/ColorPrimaryRed"
+            android:textSize="26dp"
+            android:textStyle="bold"/>
+
+    </fragment>
 
 </RelativeLayout>

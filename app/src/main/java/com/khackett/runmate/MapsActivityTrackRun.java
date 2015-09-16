@@ -41,9 +41,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.model.Route;
 import com.khackett.runmate.utils.DirectionsUtility;
 import com.khackett.runmate.utils.ParseConstants;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -144,6 +146,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected Button mStartUpdatesButton;
     protected Button mStopUpdatesButton;
     protected Button mSaveRunButton;
+    protected Button mDeleteRunButton;
     protected TextView mRunTimeTextView;
     protected long startTime = 0;
     protected long totalTimeMillis;
@@ -208,6 +211,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
         mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
         mSaveRunButton = (Button) findViewById(R.id.save_run_button);
+        mDeleteRunButton = (Button) findViewById(R.id.delete_run_button);
         mRunTimeTextView = (TextView) findViewById(R.id.run_time_text);
 
         // set the location update request to false to start the activity
@@ -672,6 +676,52 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         finish();
 //        Intent intent = new Intent(this, MainActivity.class);
 //        startActivity(intent);
+    }
+
+    public void deleteRunButton(View view) {
+        String objectId = getIntent().getStringExtra("myRunsObjectId");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
+        query.getInBackground(objectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    // object.deleteInBackground();
+                    deleteUserRoute(object);
+                } else {
+                    // there is an error - notify the user
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityTrackRun.this);
+                    builder.setMessage(R.string.error_delete_route_message)
+                            .setTitle(R.string.error_deleting_route_title)
+                            .setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
+
+        // Send the user back to the main activity right after the message is deleted.
+        // Use finish() to close the current activity, returning to the main activity
+        finish();
+    }
+
+    public void deleteUserRoute(ParseObject object) {
+        ParseObject completedRuns = object;
+        List<String> completedRunsAcceptedID = completedRuns.getList(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS);
+        List<String> completedRunsRecipientsID = completedRuns.getList(ParseConstants.KEY_RECIPIENT_IDS);
+
+        if (completedRunsAcceptedID.size() == 1 && completedRunsRecipientsID.size() == 0) {
+            // last recipient - delete the route object
+            completedRuns.deleteInBackground();
+        } else {
+            // remove the recipient and save
+            completedRunsAcceptedID.remove(ParseUser.getCurrentUser().getObjectId());
+
+            ArrayList<String> idsToRemove = new ArrayList<String>();
+            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+
+            completedRuns.removeAll(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, idsToRemove);
+            completedRuns.saveInBackground();
+        }
+        Toast.makeText(MapsActivityTrackRun.this, R.string.success_delete_route, Toast.LENGTH_LONG).show();
     }
 
     public ParseObject createCompletedRoute() {

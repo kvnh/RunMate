@@ -123,7 +123,7 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
         // Switch statement to select which action to take depending on button/text pressed
         switch (v.getId()) {
             case R.id.btn_delete:
-                // deleteRun();
+                deleteRun();
                 break;
             case R.id.btn_stats:
                 showRunStats();
@@ -131,6 +131,9 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
             default:
                 Log.i(TAG, "Problem with input");
         }
+    }
+
+    public void deleteRun() {
     }
 
     public void showRunStats() {
