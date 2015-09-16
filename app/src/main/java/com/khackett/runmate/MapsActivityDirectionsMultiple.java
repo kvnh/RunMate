@@ -85,18 +85,13 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
-
             // Set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
-
-            // Centre the camera to the users current location
-            // centreCamera();
 
             // Setting onClick event listener for the map
             mMap.setOnMapClickListener(this);
             // Setting onClickLong event listener for the map
             mMap.setOnMapLongClickListener(this);
-
         }
 
         // Set up member variables for each UI component
@@ -172,6 +167,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Add the total distance of the route to the intent object
             createRouteIntent.putExtra("routeDistance", mRoute.getTotalDistance());
+
+            // Add the creation type of the route to the intent object
+            createRouteIntent.putExtra("routeCreationMethod", "DIRECTIONS_API");
 
             // Start RouteRecipientsActivity in order to choose recipients
             startActivity(createRouteIntent);
@@ -299,7 +297,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             return true;
         }
     }
-    
+
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String> {
 

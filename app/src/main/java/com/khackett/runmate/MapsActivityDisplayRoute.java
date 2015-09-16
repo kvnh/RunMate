@@ -90,7 +90,13 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         if (mMap != null) {
 
-            plotRoute();
+            String creationType = getIntent().getStringExtra("creationType");
+            if (creationType.equals("MANUAL")) {
+                plotManualRoute();
+                Log.i(TAG, "Plotting manually");
+            } else {
+                plotDirectionsRoute();
+            }
 
             mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                 @Override
@@ -118,7 +124,42 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mButtonDecline.setOnClickListener(this);
     }
 
-    public void plotRoute() {
+    public void plotManualRoute() {
+        // assign the JSON String value from the passed in intent to a new String variable
+        String jsonArray = getIntent().getStringExtra("parseLatLngList");
+        JSONArray array = null;
+        PolylineOptions polylineOptions = null;
+
+        try {
+            // convert String to a JSONArray
+            array = new JSONArray(jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray arrayPoints = array;
+
+        for (int i = 0; i < arrayPoints.length(); i++) {
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+
+            // Adding new latlng point to the array list
+            markerPoints.add(latLngObject);
+
+            // Initialising the polyline in the map and setting some values
+            polylineOptions = new PolylineOptions()
+                    .color(Color.BLUE)
+                    .width(6);
+
+            // Setting points of polyline
+            polylineOptions.addAll(markerPoints);
+
+        }
+
+        // Adding the polyline to the map
+        mMap.addPolyline(polylineOptions);
+    }
+
+    public void plotDirectionsRoute() {
         // assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;

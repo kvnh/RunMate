@@ -63,6 +63,7 @@ public class InboxRouteFragment extends ListFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         // Retrieve the routes from the Parse backend
         retrieveRoutes();
     }
@@ -79,20 +80,17 @@ public class InboxRouteFragment extends ListFragment {
         // create the message object which is set to the message at the current position
         ParseObject route = mRoutes.get(position);
 
-
-        // set the data for the intent using the setData() method - this requires a URI
-        // (URI's and URL's can often be used interchangeably)
-        // Uri fileUri = Uri.parse(file.getUrl());
-
-        JSONArray parseList = route.getJSONArray("latLngPoints");
-        JSONArray parseListBounds = route.getJSONArray("latLngBoundaryPoints");
+        JSONArray parseList = route.getJSONArray(ParseConstants.KEY_LATLNG_POINTS);
+        JSONArray parseListBounds = route.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
         String objectId = route.getObjectId();
+        String creationType = route.getString(ParseConstants.KEY_ROUTE_CREATION_TYPE);
 
         // Create an intent to display the route.
         Intent intent = new Intent(getActivity(), MapsActivityDisplayRoute.class);
         intent.putExtra("parseLatLngList", parseList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
         intent.putExtra("myObjectId", objectId);
+        intent.putExtra("creationType", creationType);
 
         // Start the MapsActivityDisplayRoute activity.
         startActivityForResult(intent, MY_STATUS_CODE);
@@ -100,10 +98,10 @@ public class InboxRouteFragment extends ListFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == MY_STATUS_CODE) {
-            // Refresh the fragment.
-            retrieveRoutes();
-        }
+//        if (requestCode == MY_STATUS_CODE) {
+//            // Refresh the fragment.
+//            retrieveRoutes();
+//        }
     }
 
     private void retrieveRoutes() {

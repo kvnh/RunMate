@@ -234,8 +234,13 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             String checkIntent = getIntent().getStringExtra("parseLatLngList");
             if (checkIntent != null) {
 
-                plotRoute();
-
+                String creationType = getIntent().getStringExtra("creationType");
+                if (creationType.equals("MANUAL")) {
+                    plotManualRoute();
+                    Log.i(TAG, "Plotting manually");
+                } else {
+                    plotDirectionsRoute();
+                }
 
                 mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
@@ -243,7 +248,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                         zoomToViewRoute();
                     }
                 });
-
             }
 
             // Enable MyLocation Button in the Map
@@ -264,10 +268,44 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             createLocationRequest();
             buildLocationSettingsRequest();
         }
-
     }
 
-    public void plotRoute() {
+    public void plotManualRoute() {
+        // assign the JSON String value from the passed in intent to a new String variable
+        String jsonArray = getIntent().getStringExtra("parseLatLngList");
+        JSONArray array = null;
+        PolylineOptions polylineOptions = null;
+
+        try {
+            // convert String to a JSONArray
+            array = new JSONArray(jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray arrayPoints = array;
+
+        for (int i = 0; i < arrayPoints.length(); i++) {
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+
+            // Adding new latlng point to the array list
+            markerPoints.add(latLngObject);
+
+            // Initialising the polyline in the map and setting some values
+            polylineOptions = new PolylineOptions()
+                    .color(Color.BLUE)
+                    .width(6);
+
+            // Setting points of polyline
+            polylineOptions.addAll(markerPoints);
+
+        }
+
+        // Adding the polyline to the map
+        mMap.addPolyline(polylineOptions);
+    }
+
+    public void plotDirectionsRoute() {
         // assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;
@@ -751,7 +789,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         completedRoute.put(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
         completedRoute.put(ParseConstants.KEY_ORIGINAL_ROUTE_ID, getIntent().getStringExtra("myRunsObjectId"));
         completedRoute.put(ParseConstants.KEY_ROUTE_NAME, getIntent().getStringExtra("myRunsRouteName"));
-        completedRoute.put(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, calculateDistanceOfRun(latLngGPSTrackingPoints));
+        completedRoute.put(ParseConstants.KEY_COMPLETED_RUN_DISTANCE, mTrackedRun.calculateDistanceBetweenLocations(latLngGPSTrackingPoints));
 
         // return a successful route
         return completedRoute;
@@ -788,26 +826,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // return list
         return parseLatLngBoundsList;
-    }
-
-    public double calculateDistanceOfRun(ArrayList<LatLng> latLngGPSTrackingPoints) {
-
-        Location locationA = new Location("locationA");
-        Location locationB = new Location("locationB");
-
-        float totalDistance = locationA.distanceTo(locationB);
-
-        for (int i = 0; i < latLngGPSTrackingPoints.size() - 1; i++) {
-            locationA.setLatitude(latLngGPSTrackingPoints.get(i).latitude);
-            locationA.setLongitude(latLngGPSTrackingPoints.get(i).longitude);
-            locationB.setLatitude(latLngGPSTrackingPoints.get(i + 1).latitude);
-            locationB.setLongitude(latLngGPSTrackingPoints.get(i + 1).longitude);
-
-            float distance = locationA.distanceTo(locationB);
-            totalDistance += distance;
-        }
-
-        return totalDistance;
     }
 
     public void saveCompletedRoute(ParseObject completedRoute) {

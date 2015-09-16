@@ -38,4 +38,6 @@ public final class ParseConstants {
     public static final String KEY_RUN_TIME = "completedTime";
     public static final String KEY_ALL_LATLNG_POINTS = "allLatLngPoints";
     public static final String KEY_ORIGINAL_ROUTE_ID = "originalRouteId";
+    public static final String KEY_ROUTE_CREATION_TYPE = "creationType";
+
 }

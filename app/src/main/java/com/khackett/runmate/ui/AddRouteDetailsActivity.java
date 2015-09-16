@@ -32,7 +32,8 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     protected ArrayList<LatLng> markerPoints;
     protected ArrayList<LatLng> allLatLngPoints;
     protected LatLngBounds latLngBounds;
-    protected double mRouteDistance;
+    protected double routeDistance;
+    protected String creationType;
 
     protected EditText mRouteName;
     protected TextView mProposedDate;
@@ -55,7 +56,8 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
         allLatLngPoints = getIntent().getParcelableArrayListExtra("allLatLngPoints");
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
-        mRouteDistance = getIntent().getDoubleExtra("routeDistance", mRouteDistance);
+        routeDistance = getIntent().getDoubleExtra("routeDistance", routeDistance);
+        creationType = getIntent().getStringExtra("routeCreationMethod");
 
         mRouteName = (EditText) findViewById(R.id.routeName);
         mProposedDate = (TextView) findViewById(R.id.proposedDate);
@@ -170,11 +172,13 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
             createRouteIntent.putExtra("boundaryPoints", latLngBounds);
 
             // Add the total distance of the route to the intent object
-            createRouteIntent.putExtra("routeDistance", mRouteDistance);
+            createRouteIntent.putExtra("routeDistance", routeDistance);
 
             // Add the name of the route to Parse
             createRouteIntent.putExtra("routeName", routeName);
 
+            // Add the creation type of the route to Parse
+            createRouteIntent.putExtra("routeCreationMethod", creationType);
 
             // Add the proposed date and time for the run
             createRouteIntent.putExtra("proposedTime", proposedDateTime);

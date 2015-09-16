@@ -1,32 +1,36 @@
 package com.khackett.runmate;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.khackett.runmate.model.Route;
+import com.khackett.runmate.ui.AddRouteDetailsActivity;
 
 import java.util.ArrayList;
 
-public class MapsActivityManualPolyline extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+public class MapsActivityManualPolyline extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
+
+    public static final String TAG = MapsActivityManualPolyline.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    private double mLatitude = 0;
-    private double mLongitude = 0;
-
     // create an array list to contain all of the points tapped on the map.
     // These points will contain latitude and longitude points
-    private ArrayList<LatLng> arrayPoints = null;
+    private ArrayList<LatLng> allLatLngPoints;
 
     // A Polyline object consists of a set of LatLng locations,
     // and creates a series of line segments that connect those locations in an ordered sequence.
@@ -34,16 +38,26 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     // instantiate a new polyline object
     PolylineOptions polylineOptions;
 
+    // Member variable for the UI buttons
+    protected ImageButton mButtonSend;
+    protected ImageButton mButtonUndo;
+    protected ImageButton mButtonCompleteLoop;
+    protected TextView mDistanceCount;
+
+    private Route mManualRoute;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_activity_manual_polyline);
+        setContentView(R.layout.activity_maps_activity_directions_multiple);
 
         setUpMapIfNeeded();
 
-        // instantiate arrayPoints object
-        arrayPoints = new ArrayList<LatLng>();
+        mManualRoute = new Route();
+
+        // instantiate ArrayList LatLng object
+        allLatLngPoints = new ArrayList<LatLng>();
 
         // Getting reference to the SupportMapFragment of activity_maps.xml
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -51,18 +65,180 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         // setting the GoogleMap object to the fragment
         mMap = fm.getMap();
 
-        // Enabling MyLocation Layer of Google Map - this will set a blue marker to the users location
-        mMap.setMyLocationEnabled(true);
+        if (mMap != null) {
 
-        // centres the camera on the users current location when the map loads
-        centreCamera();
+            // Enable MyLocation Button in the Map - Sets a blue marker to the users location
+            mMap.setMyLocationEnabled(true);
+            // Set the zoom controls to visible
+            mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+            // Setting onClick event listener for the map
+            mMap.setOnMapClickListener(this);
+            // Setting onClickLong event listener for the map
+            mMap.setOnMapLongClickListener(this);
 
-        // setting click event handlers for the map
-        mMap.setOnMapClickListener(this);
-        mMap.setOnMapLongClickListener(this);
+        }
+        // Set up member variables for each UI component
+        mButtonSend = (ImageButton) findViewById(R.id.btn_send);
+        mButtonUndo = (ImageButton) findViewById(R.id.btn_undo);
+        mButtonCompleteLoop = (ImageButton) findViewById(R.id.btn_complete_loop);
+        mDistanceCount = (TextView) findViewById(R.id.distanceCount);
+
+        // Register buttons with the listener
+        mButtonSend.setOnClickListener(this);
+        mButtonUndo.setOnClickListener(this);
+        mButtonCompleteLoop.setOnClickListener(this);
     }
+
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_send:
+                sendRoute();
+                break;
+            case R.id.btn_undo:
+                // undoClick();
+                break;
+            case R.id.btn_complete_loop:
+                // completeLoop();
+                break;
+            default:
+                Log.i(TAG, "Problem with input");
+        }
+    }
+
+    /**
+     * Called when the user makes a tap gesture on the map, but only if none of the overlays of the map handled the gesture.
+     * Implementations of this method are always invoked on the main thread.
+     *
+     * @param point
+     */
+    @Override
+    public void onMapClick(LatLng point) {
+
+        // some help from
+        // http://www.androidhub4you.com/2013/07/draw-polyline-in-google-map-version-2.html
+        // http://wptrafficanalyzer.in/blog/adding-marker-on-touched-location-of-google-maps-using-android-api-v2-with-supportmapfragment/
+        // http://wptrafficanalyzer.in/blog/drawing-polyline-and-markers-along-the-tapped-positions-in-google-map-android-api-v2-using-arraylist/
+        // to create some of these functions
+
+        plotPoint(point);
+
+    }
+
+    public void plotPoint(LatLng point) {
+        // Animate camera to centre on touched position
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
+
+        // Adding new LatLng point to the array list
+        mManualRoute.setMarkerPoint(point);
+
+        // Creating MarkerOptions object
+        MarkerOptions marker = new MarkerOptions();
+
+        // Sets the location for the marker to the touched point
+        marker.position(point);
+
+        // For the start location, the colour of the marker is GREEN
+        if (mManualRoute.getMarkerPoints().size() == 1) {
+            // Place a green marker for the start position
+            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            mMap.addMarker(marker);
+        }
+
+        // Initialising the polyline in the map and setting some values
+        polylineOptions = new PolylineOptions()
+                .color(Color.BLUE)
+                .width(6);
+
+        // Adding the tapped point to the ArrayList
+        allLatLngPoints.add(point);
+        // Adding the tapped point to the section ArrayList in Route object
+        mManualRoute.setMinMaxLatLngSectionArrayList(allLatLngPoints);
+
+        // Setting points of polyline
+        polylineOptions.addAll(allLatLngPoints);
+
+        // Adding the polyline to the map
+        mMap.addPolyline(polylineOptions);
+
+        double routeDistance = mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints);
+        String routeDistanceString = String.format("%.3f km", routeDistance / 1000);
+        mDistanceCount.setText(routeDistanceString);
+    }
+
+    /**
+     * after long clicking the map, all markers are cleared
+     *
+     * @param point
+     */
+    @Override
+    public void onMapLongClick(LatLng point) {
+        // Removes all markers, polylines, polygons, overlays, etc from the map.
+        mMap.clear();
+        // Clears all values from the arraylist
+        allLatLngPoints.clear();
+        // Removes all marker points from the map
+        mManualRoute.getMarkerPoints().clear();
+        // Removes all LatLng points from the map
+        mManualRoute.getMinMaxLatLngArrayList().clear();
+        mManualRoute.getMinMaxLatLngSectionArrayList().clear();
+
+        double routeDistance = mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints);
+        mDistanceCount.setText(routeDistance / 1000 + "km");
+    }
+
+    public void sendRoute() {
+        // First ensure that there are at least 2 points in the ArrayList
+        if (!markerCountValidCheck()) {
+            // alert user to add more points
+        } else {
+            // Declare intent to capture a route
+            Intent createRouteIntent = new Intent(MapsActivityManualPolyline.this, AddRouteDetailsActivity.class);
+            // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
+            createRouteIntent.putParcelableArrayListExtra("markerPoints", mManualRoute.getMarkerPoints());
+
+            createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
+
+            // Add the min and max lat and long points to the intent object
+            createRouteIntent.putExtra("boundaryPoints", mManualRoute.getLatLngBounds());
+
+            // Add the total distance of the route to the intent object
+            createRouteIntent.putExtra("routeDistance", mManualRoute.getTotalDistance());
+
+            // Add the creation type of the route to the intent object
+            createRouteIntent.putExtra("routeCreationMethod", "MANUAL");
+
+            // Start RouteRecipientsActivity in order to choose recipients
+            startActivity(createRouteIntent);
+        }
+    }
+
+    private boolean markerCountValidCheck() {
+        // Ensure that there are at least 2 points in the ArrayList
+        if (mManualRoute.getMarkerPoints().size() <= 1) {
+            // If not, display a message to the user - use a dialog so that some user interaction is required before it disappears
+            // Use Builder to build and configure the alert
+            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityManualPolyline.this);
+            // Set the message title and text for the button - use String resources for all of these values
+            // Chain the methods together as they are all referencing the builder object
+            builder.setMessage(R.string.route_creation_error_message)
+                    .setTitle(R.string.route_creation_error_title)
+                    .setPositiveButton(android.R.string.ok, null);
+            // We need to create a dialog and show it
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     @Override
     protected void onResume() {
@@ -90,99 +266,6 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     private void setUpMap() {
         // set the app to locate the users current location
         mMap.setMyLocationEnabled(true);
-    }
-
-    /**
-     * Called when the user makes a tap gesture on the map, but only if none of the overlays of the map handled the gesture.
-     * Implementations of this method are always invoked on the main thread.
-     *
-     * @param point
-     */
-    @Override
-    public void onMapClick(LatLng point) {
-
-        // some help from
-        // http://www.androidhub4you.com/2013/07/draw-polyline-in-google-map-version-2.html
-        // http://wptrafficanalyzer.in/blog/adding-marker-on-touched-location-of-google-maps-using-android-api-v2-with-supportmapfragment/
-        // http://wptrafficanalyzer.in/blog/drawing-polyline-and-markers-along-the-tapped-positions-in-google-map-android-api-v2-using-arraylist/
-        // to create some of these functions
-
-        // instantiate a marker object
-        MarkerOptions marker = new MarkerOptions();
-
-        // set the position and title to display co-ordinates
-        // this will be displayed upon tapping the marker
-        marker.position(point).title(point.latitude + " : " + point.longitude).snippet("blabla");
-
-        // Setting the content of the infowindow of the marker
-        // Again, this will be displayed upon tapping the marker
-        marker.snippet("Latitude:" + point.latitude + "," + "Longitude:" + point.longitude);
-
-        // Clears the marker of the previously touched position
-        // This will only be seen on the 2nd click and thereafter
-        mMap.clear();
-
-        // animates the camera to centre on the touched position
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
-
-        // place a marker on the touched position
-        mMap.addMarker(marker);
-
-        // initialising the polyline in the map and setting some values
-        polylineOptions = new PolylineOptions()
-                .color(Color.RED)
-                .width(5);
-
-        // Adding the tapped point to the ArrayList
-        arrayPoints.add(point);
-
-        // Setting points of polyline
-        polylineOptions.addAll(arrayPoints);
-
-        // Adding the polyline to the map
-        mMap.addPolyline(polylineOptions);
-    }
-
-    /**
-     * after long clicking the map, all markers are cleared
-     *
-     * @param point
-     */
-    @Override
-    public void onMapLongClick(LatLng point) {
-        // Removes all markers, polylines, polygons, overlays, etc from the map.
-        mMap.clear();
-        // Clears all values from the arraylist
-        arrayPoints.clear();
-    }
-
-
-    /**
-     * set the camera to centre on the users current location
-     */
-    public void centreCamera() {
-
-        // http://stackoverflow.com/questions/23226056/to-use-or-not-to-use-getmylocation-in-google-maps-api-v2-for-android
-
-        // Getting LocationManager object from System Service LOCATION_SERVICE
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        // Creating a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-
-        // Getting the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
-
-        // Getting Current Location From GPS
-        Location location = locationManager.getLastKnownLocation(provider);
-
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
-        LatLng point = new LatLng(mLatitude, mLongitude);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-
     }
 
 }

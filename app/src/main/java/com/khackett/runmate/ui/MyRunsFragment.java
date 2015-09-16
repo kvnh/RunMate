@@ -69,6 +69,7 @@ public class MyRunsFragment extends ListFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         // Retrieve the accepted routes from the Parse backend
         retrieveAcceptedRoutes();
     }
@@ -85,23 +86,11 @@ public class MyRunsFragment extends ListFragment {
         // create the message object which is set to the message at the current position
         ParseObject route = mAcceptedRoutes.get(position);
 
-        // String messageType = message.getString(ParseConstants.KEY_FILE_TYPE);
-
-        // for both image and videos, we can view them directly from the backend on parse by getting their URL
-        // When we upload the files to parse, unique URL's are created that we can access through the parse file object
-        // So we need to get the parse file for this message
-        // ParseFile file = message.getParseFile(ParseConstants.KEY_FILE);
-        // ParseFile has a method getU
-
-        // set the data for the intent using the setData() method - this requires a URI
-        // (URI's and URL's can often be used interchangeably)
-        // Uri fileUri = Uri.parse(file.getUrl());
-
         JSONArray parseList = route.getJSONArray(ParseConstants.KEY_LATLNG_POINTS);
         JSONArray parseListBounds = route.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
         String objectId = route.getObjectId();
         String routeName = route.getString(ParseConstants.KEY_ROUTE_NAME);
-        // JSONArray ids = route.getJSONArray(ParseConstants.KEY_RECIPIENT_IDS);
+        String creationType = route.getString(ParseConstants.KEY_ROUTE_CREATION_TYPE);
 
         // Start a map activity to display the route
         Intent intent = new Intent(getActivity(), MapsActivityTrackRun.class);
@@ -109,6 +98,7 @@ public class MyRunsFragment extends ListFragment {
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
         intent.putExtra("myRunsObjectId", objectId);
         intent.putExtra("myRunsRouteName", routeName);
+        intent.putExtra("creationType", creationType);
 
         // Start the MapsActivityDisplayRoute activity
         startActivityForResult(intent, MY_STATUS_CODE);

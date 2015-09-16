@@ -1,5 +1,7 @@
 package com.khackett.runmate.model;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
@@ -62,7 +64,7 @@ public class Route {
     /**
      * Clear the total distance array
      */
-    public void clearTotalDistance(){
+    public void clearTotalDistance() {
         totalDistanceArray.clear();
     }
 
@@ -143,6 +145,7 @@ public class Route {
 
     /**
      * Sets the section of LatLng points to an array list
+     *
      * @param minMaxLatLngSectionArrayList
      */
     public void setMinMaxLatLngSectionArrayList(ArrayList<LatLng> minMaxLatLngSectionArrayList) {
@@ -235,12 +238,23 @@ public class Route {
         return latLngBounds;
     }
 
-    public List<Polyline> getPolylines() {
-        return polylines;
-    }
+    public double calculateDistanceBetweenLocations(ArrayList<LatLng> latLngPoints) {
 
-    public void setPolylines(ArrayList<Polyline> polylines) {
-        this.polylines = polylines;
+        Location locationA = new Location("locationA");
+        Location locationB = new Location("locationB");
+
+        float totalDistance = locationA.distanceTo(locationB);
+
+        for (int i = 0; i < latLngPoints.size() - 1; i++) {
+            locationA.setLatitude(latLngPoints.get(i).latitude);
+            locationA.setLongitude(latLngPoints.get(i).longitude);
+            locationB.setLatitude(latLngPoints.get(i + 1).latitude);
+            locationB.setLongitude(latLngPoints.get(i + 1).longitude);
+
+            float distance = locationA.distanceTo(locationB);
+            totalDistance += distance;
+        }
+        return totalDistance;
     }
 
 }

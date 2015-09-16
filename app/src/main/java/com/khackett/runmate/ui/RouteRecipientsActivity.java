@@ -76,6 +76,8 @@ public class RouteRecipientsActivity extends Activity {
 
     protected String mRouteName;
 
+    protected String mCreationType;
+
     protected Calendar mProposedDateTime;
 
     // Declare the context of the activity.
@@ -118,6 +120,8 @@ public class RouteRecipientsActivity extends Activity {
         // Get the name of the route from the passed in intent
         mRouteName = getIntent().getStringExtra("routeName");
 
+        mCreationType = getIntent().getStringExtra("routeCreationMethod");
+
         // Get the proposed date and time from the passed in intent
         mProposedDateTime = (Calendar) getIntent().getSerializableExtra("proposedTime");
         Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is: " + mProposedDateTime);
@@ -156,7 +160,7 @@ public class RouteRecipientsActivity extends Activity {
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
-                
+
                 // Dismiss progress dialog once result returned from backend
                 progressDialog.dismiss();
 
@@ -283,6 +287,8 @@ public class RouteRecipientsActivity extends Activity {
         route.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
 
         route.put(ParseConstants.KEY_ROUTE_NAME, mRouteName);
+
+        route.put(ParseConstants.KEY_ROUTE_CREATION_TYPE, mCreationType);
 
         route.put(ParseConstants.KEY_ROUTE_PROPOSED_TIME, mProposedDateTime.getTime());
 
