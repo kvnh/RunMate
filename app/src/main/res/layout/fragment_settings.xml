@@ -6,36 +6,21 @@
     android:orientation="vertical"
     tools:context=".SettingsFragment$PlaceholderFragment">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        style="@style/AuthenticationBackgroundImage"
+        android:background="@mipmap/background_fill"
+        android:contentDescription="@string/content_description_background"/>
+
     <TextView
         android:id="@+id/label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:text="SETTINGS"
-        android:textSize="45dp"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:id="@+id/text2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/label"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
-        android:text="Edit fragment_settings.xml to change the appearance"
-        android:textSize="12dp"/>
-
-    <TextView
-        android:id="@+id/label2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text2"
-        android:layout_marginTop="200dp"
-        android:gravity="center_horizontal"
-        android:text="SETTINGS"
+        android:textColor="#ffffff"
         android:textSize="45dp"
         android:textStyle="bold"/>
 

@@ -17,7 +17,6 @@
         android:verticalSpacing="@dimen/user_grid_spacing">
     </GridView>
 
-
     <TextView
         android:id="@android:id/empty"
         android:layout_width="match_parent"

@@ -8,6 +8,12 @@
     android:background="@color/pressedPurpleButton"
     tools:context=".InstructionsFragment$PlaceholderFragment">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        style="@style/AuthenticationBackgroundImage"
+        android:background="@mipmap/background_fill"
+        android:contentDescription="@string/content_description_background"/>
+
     <TextView
         android:id="@+id/instructionsTitle"
         android:layout_width="fill_parent"
@@ -15,6 +21,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:text="@string/my_profile_title"
+        android:textColor="#ffffff"
         android:textSize="45dp"
         android:textStyle="bold"/>
 
@@ -26,23 +33,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:src="@drawable/ic_action_name"/>
-
-    <!--<ImageView-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:id="@+id/imageViewFullSized"-->
-        <!--android:layout_below="@id/instructionsTitle"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:src="@drawable/ic_action_name" />-->
-
-    <!--<ImageView-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="100dp"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:layout_below="@id/instructionsTitle"-->
-        <!--android:id="@+id/imageViewThumbnail"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:src="@drawable/ic_action_name" />-->
 
     <ImageView
         android:id="@+id/buttonDivider"
@@ -56,8 +46,8 @@
     <Button
         android:id="@+id/takePictureButton"
         style="@style/AuthenticationButton"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginRight="0dp"
         android:layout_toLeftOf="@id/buttonDivider"
         android:text="@string/take_picture_button_label"/>
@@ -65,8 +55,8 @@
     <Button
         android:id="@+id/choosePictureButton"
         style="@style/AuthenticationButton"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="0dp"
         android:layout_toRightOf="@id/buttonDivider"
         android:text="@string/pick_from_gallery_button_label"/>
