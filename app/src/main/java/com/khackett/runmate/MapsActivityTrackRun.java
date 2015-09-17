@@ -64,7 +64,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
-    // Tag for current Activity
+    /**
+     * Tag for current Activity
+     */
     public static final String TAG = MapsActivityTrackRun.class.getSimpleName();
 
     /**
@@ -104,13 +106,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      */
     public static final int LOCATION_ACCURACY = 10;
 
-    // Keys for storing activity state in the Bundle.
-    private static final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
-    private static final String LOCATION_KEY = "location-key";
-    private static final String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     /**
      * Provides the entry point to Google Play services.
      */
@@ -123,7 +118,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     private LocationRequest mLocationRequest;
 
     /**
-     * The current location of the device
+     * The current location of the device.
      */
     private Location mCurrentLocation;
 
@@ -131,21 +126,28 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * Stores the types of location services the client is requesting.
      * Used to check settings and determine if the device has the required location settings.
      */
-    protected LocationSettingsRequest mLocationSettingsRequest;
+    private LocationSettingsRequest mLocationSettingsRequest;
 
-    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
+    // Keys for storing activity state in the Bundle.
+    private static final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
+    private static final String LOCATION_KEY = "location-key";
+    private static final String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
+
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+    // Member variable to represent an array of ParseGeoPoint values to be stored in the backend
     // Values are those points clicked on the map
-    protected ArrayList<ParseGeoPoint> parseLatLngList;
+    private ArrayList<ParseGeoPoint> parseLatLngList;
 
-    // member variables for the UI buttons and text outputs
-    protected Button mStartUpdatesButton;
-    protected Button mStopUpdatesButton;
-    protected Button mSaveRunButton;
-    protected Button mSendRunButton;
-    protected Button mDeleteRunButton;
-    protected TextView mRunTimeTextView;
-    protected long startTime = 0;
-    protected long totalTimeMillis;
+    // Member variables for the UI buttons and text outputs
+    private Button mStartUpdatesButton;
+    private Button mStopUpdatesButton;
+    private Button mSaveRunButton;
+    private Button mSendRunButton;
+    private Button mDeleteRunButton;
+    private TextView mRunTimeTextView;
+    private long startTime = 0;
+    private long totalTimeMillis;
 
     // Runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
@@ -168,12 +170,12 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * Boolean to to track whether the location updates have been turned on or off by the user.
      * Value changes when the user presses the Start Run and Stop Run buttons.
      */
-    protected Boolean mCheckLocationUpdates;
+    private Boolean mCheckLocationUpdates;
 
     /**
      * Time when the location was updated represented as a String.
      */
-    protected String mLastUpdateTime;
+    private String mLastUpdateTime;
 
     // Declare array list for location points
     private ArrayList<LatLng> latLngGPSTrackingPoints;
@@ -183,25 +185,25 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     private List<Polyline> polylines;
 
     // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
-    protected ArrayList<LatLng> markerPoints;
+    private ArrayList<LatLng> markerPoints;
 
     private Route mTrackedRun;
 
     // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
     // Values are the southwest and northeast LatLng points at the bounds of the route
-    protected ArrayList<ParseGeoPoint> parseLatLngBoundsList;
+    private ArrayList<ParseGeoPoint> parseLatLngBoundsList;
 
-    protected DirectionsUtility directionsUtility;
+    private DirectionsUtility directionsUtility;
 
     // Get the name of the passed intent
-    String intentName;
+    private String intentName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Determine which layout to set depending on the starting fragment.
         intentName = getIntent().getStringExtra("intentName");
-
         if (intentName.equals("MyRunsFragment")) {
             setContentView(R.layout.activity_maps_activity_track_run_save);
         } else {
@@ -210,25 +212,16 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         setUpMapIfNeeded();
 
+        // Initializing array lists
+        latLngGPSTrackingPoints = new ArrayList<LatLng>();
+        polylines = new ArrayList<Polyline>();
         markerPoints = new ArrayList<LatLng>();
-
         mTrackedRun = new Route();
-
-        // set up member variables for each UI component
-        mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
-        mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
-        mSaveRunButton = (Button) findViewById(R.id.save_run_button);
-        mSendRunButton = (Button) findViewById(R.id.send_run_button);
-        mDeleteRunButton = (Button) findViewById(R.id.delete_run_button);
-        mRunTimeTextView = (TextView) findViewById(R.id.run_time_text);
 
         // set the location update request to false to start the activity
         mCheckLocationUpdates = false;
         mLastUpdateTime = "";
 
-        // Initializing array lists
-        latLngGPSTrackingPoints = new ArrayList<LatLng>();
-        polylines = new ArrayList<Polyline>();
 
         directionsUtility = new DirectionsUtility();
 
@@ -239,20 +232,24 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         if (mMap != null) {
 
+            // Check if there is a path to plot, or if the user just wants to create a run.
             String checkIntent = getIntent().getStringExtra("parseLatLngList");
             if (checkIntent != null) {
 
+                // Plot the route depending on the creation type.
                 String creationType = getIntent().getStringExtra("creationType");
                 if (creationType.equals("MANUAL")) {
+                    // Plot the manually created route
                     plotManualRoute();
-                    Log.i(TAG, "Plotting manually");
                 } else {
+                    // Plot the directions assisted route
                     plotDirectionsRoute();
                 }
 
                 mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
+                        // Once the map is loaded, zoom to view the route
                         zoomToViewRoute();
                     }
                 });
@@ -261,17 +258,25 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
 
-            // set the zoom controls to visible
+            // Set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
 
         }
+
+        // set up member variables for each UI component
+        mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
+        mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
+        mSaveRunButton = (Button) findViewById(R.id.save_run_button);
+        mSendRunButton = (Button) findViewById(R.id.send_run_button);
+        mDeleteRunButton = (Button) findViewById(R.id.delete_run_button);
+        mRunTimeTextView = (TextView) findViewById(R.id.run_time_text);
 
         // Update previous settings using data stored in the Bundle object
         updateSettingsFromBundle(savedInstanceState);
 
         // Check availability of Google Play services
         if (checkGooglePlayServices()) {
-            // create the Google API client and the location request and request the location services API
+            // Create the Google API client and LocationRequest and request the location services API
             createGoogleApiClient();
             createLocationRequest();
             buildLocationSettingsRequest();
@@ -573,14 +578,14 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * Method to verify that Google Play Services is available on the device
      */
     private boolean checkGooglePlayServices() {
-        // create instance of GoogleApiAvailability
+        // Create instance of GoogleApiAvailability
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-        // obtain a status code indicating whether there was an error
+        // Obtain a status code indicating whether there was an error
         int result = googleAPI.isGooglePlayServicesAvailable(this);
         if (result != ConnectionResult.SUCCESS) {
-            // if error can be resolved via user action
+            // If error can be resolved via user action
             if (googleAPI.isUserResolvableError(result)) {
-                // return dialog to user, and direct them to Play Store if Google Play services is out of date or missing
+                // Return dialog to user, and direct them to Play Store if Google Play services is out of date or missing
                 googleAPI.getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
                 // otherwise, display a message informing user that Google Play services is out of date

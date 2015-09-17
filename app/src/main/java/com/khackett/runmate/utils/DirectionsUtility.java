@@ -85,7 +85,8 @@ public class DirectionsUtility {
     }
 
     /**
-     * Receives a JSONObject and returns a list of lists containing latitude and longitude values.
+     * Method that receives a JSONObject and returns a list of lists
+     * containing latitude and longitude values of the JSONObject.
      *
      * @param jObject
      * @return
