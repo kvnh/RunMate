@@ -75,12 +75,15 @@ public class MyRunsFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (view == null) {
-            Log.i(TAG, "No list view to display for MyRunsFragment");
-        } else {
-            // Retrieve the accepted routes from the Parse backend
-            retrieveAcceptedRoutes();
-        }
+//        if (view == null) {
+//            Log.i(TAG, "No list view to display for MyRunsFragment");
+//        } else {
+//            // Retrieve the accepted routes from the Parse backend
+//            retrieveAcceptedRoutes();
+//        }
+
+        // Retrieve the accepted routes from the Parse backend
+        retrieveAcceptedRoutes();
     }
 
     @Override

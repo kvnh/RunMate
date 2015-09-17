@@ -16,11 +16,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.model.Route;
 import com.khackett.runmate.ui.AddRouteDetailsActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivityManualPolyline extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
 
@@ -31,6 +33,8 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     // create an array list to contain all of the points tapped on the map.
     // These points will contain latitude and longitude points
     private ArrayList<LatLng> allLatLngPoints;
+
+    private List<Polyline> polylines;
 
     // A Polyline object consists of a set of LatLng locations,
     // and creates a series of line segments that connect those locations in an ordered sequence.
@@ -58,6 +62,9 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
 
         // instantiate ArrayList LatLng object
         allLatLngPoints = new ArrayList<LatLng>();
+
+        // Initialising array lists
+        polylines = new ArrayList<Polyline>();
 
         // Getting reference to the SupportMapFragment of activity_maps.xml
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -111,6 +118,48 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
                 Log.i(TAG, "Problem with input");
         }
     }
+
+
+//    public void undoClick() {
+//        if (mManualRoute.getMarkerPoints().size() <= 1) {
+//            // Alert user that they cannot trigger the undo action any more
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityManualPolyline.this);
+//            // Set the message title and text for the button - use String resources for all of these values
+//            // Chain the methods together as they are all referencing the builder object
+//            builder.setMessage(R.string.route_undo_error_message)
+//                    .setTitle(R.string.route_undo_error_title)
+//                            // Button to dismiss the dialog.  Set the listener to null as we only want to dismiss the dialog
+//                            // ok is gotten from android resources
+//                    .setPositiveButton(android.R.string.ok, null);
+//            // We need to create a dialog and show it
+//            AlertDialog dialog = builder.create();
+//            dialog.show();
+//        } else {
+//            // Create variable for the 2nd last point clicked and assign value form markerPoints array list
+//            LatLng lastPoint;
+//            lastPoint = mManualRoute.getMarkerPoints().get(mManualRoute.getMarkerPoints().size() - 2);
+//
+//            // Animate camera to centre on the previously touched position
+//            Log.i(TAG, "Centering camera to previous position at " + lastPoint.toString());
+//            mMap.animateCamera(CameraUpdateFactory.newLatLng(lastPoint));
+//
+//            // Remove polyline object from the map
+//            for (Polyline line : polylines) {
+//                if (polylines.get(polylines.size() - 1).equals(line)) {
+//                    line.remove();
+//                    polylines.remove(line);
+//                }
+//            }
+//
+//            // Remove last value from the markerPoints array list
+//            mManualRoute.undoLastMarkerPoint();
+//            mManualRoute.undoLastMinMaxLatLng();
+//
+//            // Update the distance text and output new value to UI
+//            double routeDistance = mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints);
+//            mDistanceCount.setText(routeDistance / 1000 + "km");
+//        }
+//    }
 
     /**
      * Called when the user makes a tap gesture on the map, but only if none of the overlays of the map handled the gesture.
@@ -167,6 +216,9 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         // Adding the polyline to the map
         mMap.addPolyline(polylineOptions);
 
+        // Add Polyline to list and draw on map
+        polylines.add(mMap.addPolyline(polylineOptions));
+
         double routeDistance = mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints);
         String routeDistanceString = String.format("%.3f km", routeDistance / 1000);
         mDistanceCount.setText(routeDistanceString);
@@ -209,7 +261,7 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
             createRouteIntent.putExtra("boundaryPoints", mManualRoute.getLatLngBounds());
 
             // Add the total distance of the route to the intent object
-            createRouteIntent.putExtra("routeDistance", mManualRoute.getTotalDistance());
+            createRouteIntent.putExtra("routeDistance", mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints));
 
             // Add the creation type of the route to the intent object
             createRouteIntent.putExtra("routeCreationMethod", "MANUAL");
