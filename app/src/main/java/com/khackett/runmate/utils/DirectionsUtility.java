@@ -25,10 +25,10 @@ public class DirectionsUtility {
 
     /**
      * Creates a url containing the origin and destination points and other parameters.
-     * These are then sent as a HTTP request to the Google Directions API to create data in JSON format.
+     * These are then sent as a HTTP request to the Google Directions API to create route data in JSON format.
      *
-     * @param origin
-     * @param dest
+     * @param origin - the origin of the route
+     * @param dest   - the destination of the route
      * @return
      */
     public String getDirectionsUrl(LatLng origin, LatLng dest) {
@@ -36,49 +36,48 @@ public class DirectionsUtility {
         String stringOrigin = "origin=" + origin.latitude + "," + origin.longitude;
         // Destination of route
         String stringDestination = "destination=" + dest.latitude + "," + dest.longitude;
-        // Sensor enabled
-        String sensor = "sensor=false";
-        // Building the parameters to the web service
-        String parameters = stringOrigin + "&" + stringDestination;
-        // Output format
+        // Output format in JSON
         String output = "json";
-        // transport mode
+        // Transport mode walking to replicate a pedestrian/runner
         String transMode = "&mode=walking";
         // Building the url to the web service
-        // See https://developers.google.com/maps/documentation/directions/#DirectionsRequests
-        // eg. https://maps.googleapis.com/maps/api/directions/json?origin=40.722543,-73.998585&destination=40.7577,-73.9857&mode=walking
-        // ... would give the points between lower_manhattan and times_square and the directions in between in JSON format
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + transMode;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + stringOrigin + "&" + stringDestination + transMode;
 
         return url;
     }
 
     /**
-     * A method to download json data from url
+     * Method that when given a URL, a HttpUrlConnection is established and
+     * web page content is retrieved as an InputStream and returned as a String.
      */
     public String downloadUrl(String stringUrl) throws IOException {
         String data = "";
-        InputStream inputStream = null;
         HttpURLConnection httpURLConnection = null;
+        InputStream inputStream = null;
         try {
             URL url = new URL(stringUrl);
-            // Creating an http connection to communicate with url
+            // Creating an http connection to communicate with the url
             httpURLConnection = (HttpURLConnection) url.openConnection();
-            // Connecting to url
+            // Connecting to the url
             httpURLConnection.connect();
-            // Reading data from url
+            // Reading data from the url
             inputStream = httpURLConnection.getInputStream();
+            // Wrap the inputStream object and buffer the input
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer stringBuffer = new StringBuffer();
+            // Instantiate a StringBuilder object to convert a given datum and append the characters of it to the object
+            StringBuilder stringBuilder = new StringBuilder();
             String line = "";
             while ((line = bufferedReader.readLine()) != null) {
-                stringBuffer.append(line);
+                // Append each character of the JSON format file to the StringBuilder
+                stringBuilder.append(line);
             }
-            data = stringBuffer.toString();
+            data = stringBuilder.toString();
+            // Close the BufferedReader
             bufferedReader.close();
         } catch (Exception e) {
             Log.d("Problem downloading url", e.toString());
         } finally {
+            // Close the InputStream and disconnect the HttpURLConnection
             inputStream.close();
             httpURLConnection.disconnect();
         }
@@ -87,6 +86,9 @@ public class DirectionsUtility {
 
     /**
      * Receives a JSONObject and returns a list of lists containing latitude and longitude values.
+     *
+     * @param jObject
+     * @return
      */
     public List<List<HashMap<String, String>>> parseJSONObject(JSONObject jObject) {
 
@@ -97,32 +99,33 @@ public class DirectionsUtility {
 
         try {
 
+            // Get all values in the routes array from the JSONObject
             jsonRoutes = jObject.getJSONArray("routes");
 
-            // Traversing through all routes
+            // Iterate through routes array to get legs
             for (int i = 0; i < jsonRoutes.length(); i++) {
                 jsonLegs = ((JSONObject) jsonRoutes.get(i)).getJSONArray("legs");
-                List path = new ArrayList<HashMap<String, String>>();
+                List route = new ArrayList<HashMap<String, String>>();
 
-                // Traversing through all legs
+                // Iterate through legs array to get steps
                 for (int j = 0; j < jsonLegs.length(); j++) {
                     jsonSteps = ((JSONObject) jsonLegs.get(j)).getJSONArray("steps");
 
-                    // Traversing through all steps
+                    // Iterate through steps array to get each of the points value
                     for (int k = 0; k < jsonSteps.length(); k++) {
                         String polyline = "";
                         polyline = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("polyline")).get("points");
-                        List<LatLng> list = decodePoly(polyline);
+                        List<LatLng> points = decodePoly(polyline);
 
-                        // Traversing through all points
-                        for (int l = 0; l < list.size(); l++) {
-                            HashMap<String, String> hashMap = new HashMap<String, String>();
-                            hashMap.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
-                            hashMap.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
-                            path.add(hashMap);
+                        // Iterate through points array
+                        for (int l = 0; l < points.size(); l++) {
+                            HashMap<String, String> pointsHashMap = new HashMap<String, String>();
+                            pointsHashMap.put("lat", Double.toString(((LatLng) points.get(l)).latitude));
+                            pointsHashMap.put("lng", Double.toString(((LatLng) points.get(l)).longitude));
+                            route.add(pointsHashMap);
                         }
                     }
-                    routes.add(path);
+                    routes.add(route);
                 }
             }
 

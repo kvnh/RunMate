@@ -47,31 +47,29 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     private List<Polyline> polylines;
 
-    // Member variable for the UI buttons
-    protected ImageButton mButtonSend;
-    protected ImageButton mButtonUndo;
-    protected ImageButton mButtonCompleteLoop;
-    protected TextView mDistanceCount;
-
     private Route mRoute;
 
     protected ArrayList<LatLng> allLatLngPoints;
 
     protected DirectionsUtility directionsUtility;
 
+    // Member variable for the UI buttons
+    protected ImageButton mButtonSend;
+    protected ImageButton mButtonUndo;
+    protected ImageButton mButtonCompleteLoop;
+    protected TextView mDistanceCount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        // Set the layout file for this fragment activity
         setContentView(R.layout.activity_maps_activity_directions_multiple);
 
-        // Initialising array lists
+        // Instantiate array lists
         polylines = new ArrayList<Polyline>();
+        allLatLngPoints = new ArrayList<LatLng>();
 
         mRoute = new Route();
-
-        // Instantiate allLatLng ArrayList
-        allLatLngPoints = new ArrayList<LatLng>();
 
         directionsUtility = new DirectionsUtility();
 
@@ -82,12 +80,10 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         mMap = fm.getMap();
 
         if (mMap != null) {
-
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
             // Set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
-
             // Setting onClick event listener for the map
             mMap.setOnMapClickListener(this);
             // Setting onClickLong event listener for the map
@@ -116,10 +112,11 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     public void onMapLongClick(LatLng latLng) {
         // Map will be cleared on long click
         mMap.clear();
-        // Removes all marker points from the map
+        // Removes all marker points from the route
         mRoute.getMarkerPoints().clear();
-        // Removes all LatLng points from the map
+        // Removes all LatLng points from the route
         mRoute.getMinMaxLatLngArrayList().clear();
+        // Removes all LatLng sections from the route
         mRoute.getMinMaxLatLngSectionArrayList().clear();
 
         // Clear the distance array and update UI
@@ -209,9 +206,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Remove last value from the markerPoints array list
             mRoute.undoLastMarkerPoint();
-
+            // Remove last value from the minMaxLatLngSectionArrayList array list
             mRoute.undoLastMinMaxLatLng();
-
             // Remove the last distance added to the distance array
             mRoute.undoLastRouteDistance();
             // Update the distance text and output new value to UI
@@ -229,48 +225,6 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             plotPoint(mRoute.getMarkerPoints().get(0));
             zoomToArea();
         }
-    }
-
-    private void plotPoint(LatLng point) {
-        // Animate camera to centre on touched position
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
-
-        // Adding new latlng point to the array list
-        mRoute.setMarkerPoint(point);
-
-        // Creating MarkerOptions object
-        MarkerOptions marker = new MarkerOptions();
-
-        // Sets the location for the marker to the touched point
-        marker.position(point);
-
-        // For the start location, the colour of the marker is GREEN
-        if (mRoute.getMarkerPoints().size() == 1) {
-            // Place a green marker for the start position
-            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        }
-
-        if (mRoute.getMarkerPoints().size() >= 2) {
-            LatLng point1 = mRoute.getMarkerPoint1();
-            LatLng point2 = mRoute.getMarkerPoint2();
-
-            // marker.position(point2).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            // marker.position(point2).visible(true);
-            marker.position(point1).visible(false);
-
-            // Getting URL to the Google Directions API
-            // Send these values to the getDirectionsUrl() method and assign returned value to string variable url
-            String url = directionsUtility.getDirectionsUrl(point1, point2);
-
-            // Create a DownloadTask object - see nested class below
-            DownloadTask downloadTask = new DownloadTask();
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
-        }
-
-        // Add a new marker to the map
-        mMap.addMarker(marker);
-
     }
 
     private void zoomToArea() {
@@ -298,41 +252,79 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         }
     }
 
-    // Fetches data from url passed
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+    private void plotPoint(LatLng point) {
+        // Animate camera to centre on touched position
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
 
+        // Adding new latlng point to the array list
+        mRoute.setMarkerPoint(point);
+
+        // Creating MarkerOptions object
+        MarkerOptions marker = new MarkerOptions();
+
+        // Sets the location for the marker to the touched point
+        marker.position(point);
+
+        // For the start location, the colour of the marker is GREEN
+        if (mRoute.getMarkerPoints().size() == 1) {
+            // Place a green marker for the start position
+            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        }
+
+        if (mRoute.getMarkerPoints().size() >= 2) {
+            LatLng point1 = mRoute.getMarkerPoint1();
+            LatLng point2 = mRoute.getMarkerPoint2();
+
+            // Hide the next marker for the next position selected
+            marker.position(point1).visible(false);
+
+            // Creating URL to send to the Google Directions API.
+            String url = directionsUtility.getDirectionsUrl(point1, point2);
+            // Create a DownloadTask object - see nested class below
+            DownloadURLTask downloadURLTask = new DownloadURLTask();
+            // Start downloading json data from Google Directions API
+            downloadURLTask.execute(url);
+        }
+
+        // Add a new marker to the map
+        mMap.addMarker(marker);
+    }
+
+    // Asynchronous task to fetch JSON data via the passed in URL
+    private class DownloadURLTask extends AsyncTask<String, Void, String> {
         // Downloading data in non-ui thread
         @Override
         protected String doInBackground(String... url) {
             // For storing data from web service
-            String data = "";
+            String urlJSONData = "";
             try {
                 // Fetch and process the web page content and return resultant String
-                data = directionsUtility.downloadUrl(url[0]);
+                urlJSONData = directionsUtility.downloadUrl(url[0]);
             } catch (Exception e) {
-                Log.d("Background Task", e.toString());
+                Log.d("Background task error: ", e.toString());
             }
-            return data;
+            return urlJSONData;
         }
 
         // Executes in UI thread, after the execution of doInBackground()
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            // create a new ParserTask object and invoke thread for parsing JSON data
-            ParserTask parserTask = new ParserTask();
-            parserTask.execute(result);
-            // create a new ParseDistanceTask object and invoke thread for parsing JSON data
+        protected void onPostExecute(String urlJSONData) {
+            super.onPostExecute(urlJSONData);
+
+            // Create a ParseLatLngValuesTask object and invoke thread for parsing JSON data
+            ParseLatLngValuesTask parseLatLngValuesTask = new ParseLatLngValuesTask();
+            parseLatLngValuesTask.execute(urlJSONData);
+
+            // Create a new ParseDistanceTask object and invoke thread for parsing JSON data
             ParseDistanceTask parseDistanceTask = new ParseDistanceTask();
-            parseDistanceTask.execute(result);
+            parseDistanceTask.execute(urlJSONData);
         }
     }
 
     /**
      * A class to parse the Google Places in JSON format
      */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-
+    private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
         // Parsing the data in non-ui thread
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -344,7 +336,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 // Start parsing data
                 routes = directionsUtility.parseJSONObject(jObject);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("Background task error: ", e.toString());
             }
             return routes;
         }
@@ -415,7 +407,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
                 // Get the value from the distance element and assign to distance
                 distance = Double.parseDouble(distanceJSON.getString("value"));
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.d("Background task error: ", e.toString());
             }
             return distance;
         }
