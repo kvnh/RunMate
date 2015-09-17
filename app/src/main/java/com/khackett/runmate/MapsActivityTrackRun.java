@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.model.Route;
+import com.khackett.runmate.ui.AddRouteDetailsActivity;
 import com.khackett.runmate.utils.DirectionsUtility;
 import com.khackett.runmate.utils.ParseConstants;
 import com.parse.GetCallback;
@@ -53,12 +54,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,6 +141,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected Button mStartUpdatesButton;
     protected Button mStopUpdatesButton;
     protected Button mSaveRunButton;
+    protected Button mSendRunButton;
     protected Button mDeleteRunButton;
     protected TextView mRunTimeTextView;
     protected long startTime = 0;
@@ -197,10 +193,21 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     protected DirectionsUtility directionsUtility;
 
+    // Get the name of the passed intent
+    String intentName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_activity_track_run);
+
+        intentName = getIntent().getStringExtra("intentName");
+
+        if (intentName.equals("MyRunsFragment")) {
+            setContentView(R.layout.activity_maps_activity_track_run_save);
+        } else {
+            setContentView(R.layout.activity_maps_activity_track_run_send);
+        }
+
         setUpMapIfNeeded();
 
         markerPoints = new ArrayList<LatLng>();
@@ -211,6 +218,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
         mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
         mSaveRunButton = (Button) findViewById(R.id.save_run_button);
+        mSendRunButton = (Button) findViewById(R.id.send_run_button);
         mDeleteRunButton = (Button) findViewById(R.id.delete_run_button);
         mRunTimeTextView = (TextView) findViewById(R.id.run_time_text);
 
@@ -711,15 +719,25 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // Remove callbacks to the Runnable object and stop timer.
         timerHandler.removeCallbacks(timerRunnable);
 
-        // Create a ParseObject and save it to the backend.
-        ParseObject completedRoute = createCompletedRoute();
-        saveCompletedRoute(completedRoute);
+        ParseObject saveCompletedRoute = createCompletedRouteToSave();
+        saveCompletedRoute(saveCompletedRoute);
 
         // Send the user back to the main activity right after the run is saved.
         // Use finish() to close the current activity.
         finish();
 //        Intent intent = new Intent(this, MainActivity.class);
 //        startActivity(intent);
+
+    }
+
+    public void sendRunButton(View view) {
+        // Stop checking for location updates.
+        stopLocationUpdates();
+
+        // Remove callbacks to the Runnable object and stop timer.
+        timerHandler.removeCallbacks(timerRunnable);
+
+        createCompletedRouteToSend();
     }
 
     public void deleteRunButton(View view) {
@@ -768,7 +786,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         Toast.makeText(MapsActivityTrackRun.this, R.string.success_delete_route, Toast.LENGTH_LONG).show();
     }
 
-    public ParseObject createCompletedRoute() {
+    public ParseObject createCompletedRouteToSave() {
         // create a new parse object called route
         // (we can create a whole new class of parse objects in the back end by simply using a new name)
         ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_RUNS);
@@ -793,6 +811,56 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // return a successful route
         return completedRoute;
+    }
+
+    public void createCompletedRouteToSend() {
+
+        // Add all of the location points to the Route object.
+        mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
+
+        // Declare intent to capture a route
+        Intent createRouteIntent = new Intent(MapsActivityTrackRun.this, AddRouteDetailsActivity.class);
+
+//        // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
+//        createRouteIntent.putParcelableArrayListExtra("markerPoints", mTrackedRun.getMarkerPoints());
+
+        createRouteIntent.putParcelableArrayListExtra("markerPoints", latLngGPSTrackingPoints);
+        createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", latLngGPSTrackingPoints);
+
+        // Add the min and max lat and long points to the intent object
+        createRouteIntent.putExtra("boundaryPoints", mTrackedRun.getLatLngBounds());
+
+        // Add the total distance of the route to the intent object
+        createRouteIntent.putExtra("routeDistance", mTrackedRun.calculateDistanceBetweenLocations(latLngGPSTrackingPoints));
+
+        // Add the creation type of the route to the intent object
+        createRouteIntent.putExtra("routeCreationMethod", "MANUAL");
+
+        // Start RouteRecipientsActivity in order to choose recipients
+        startActivity(createRouteIntent);
+
+//        // create a new parse object called route
+//        // (we can create a whole new class of parse objects in the back end by simply using a new name)
+//        ParseObject completedRouteToSend = new ParseObject(ParseConstants.CLASS_ROUTES);
+//
+//        // Add all of the location points to the Route object.
+//        mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
+//
+//        // Add the LatLng points from the tracked run.
+//        completedRouteToSend.addAll(ParseConstants.KEY_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(latLngGPSTrackingPoints)));
+//        // Add the min and max lat and long points.
+//        completedRouteToSend.put(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, convertLatLngBoundsToParseGeoPointArray(mTrackedRun.getLatLngBounds()));
+//        // Add the runners ID.
+//        completedRouteToSend.put(ParseConstants.KEY_SENDER_IDS, ParseUser.getCurrentUser().getObjectId());
+//        // Add the runners name.
+//        completedRouteToSend.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+//        // Add the run time.
+//        // completedRouteToSend.put(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
+//        // Add the run distance.
+//        completedRouteToSend.put(ParseConstants.KEY_ROUTE_DISTANCE, mTrackedRun.calculateDistanceBetweenLocations(latLngGPSTrackingPoints));
+//
+//        // return a successful route
+//        return completedRouteToSend;
     }
 
     /**
@@ -963,8 +1031,13 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // Start the timer.
         startTimer();
-        // New location has been detected so allow the user to save the run.
-        mSaveRunButton.setEnabled(true);
+        // New location has been detected so allow the user to save or send the run.
+        if (intentName.equals("MyRunsFragment")) {
+            mSaveRunButton.setEnabled(true);
+        } else {
+            mSendRunButton.setEnabled(true);
+        }
+
     }
 
     public void startTimer() {

@@ -1,0 +1,97 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.khackett.runmate.MapsActivityTrackRun">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/start_updates_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginEnd="@dimen/ui_group_side_margin"
+            android:layout_marginStart="@dimen/ui_group_side_margin"
+            android:layout_marginTop="@dimen/ui_group_top_margin"
+            android:layout_weight="1"
+            android:onClick="startUpdatesButton"
+            android:text="@string/start_updates"
+            android:textColor="@color/backgroundPurple"/>
+
+        <Button
+            android:id="@+id/stop_updates_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginEnd="@dimen/ui_group_side_margin"
+            android:layout_marginTop="@dimen/ui_group_top_margin"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="stopUpdatesButton"
+            android:text="@string/stop_updates"
+            android:textColor="@color/backgroundPurple"/>
+
+        <Button
+            android:id="@+id/send_run_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/ui_group_top_margin"
+            android:layout_marginTop="@dimen/ui_group_top_margin"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="sendRunButton"
+            android:text="@string/save_run"
+            android:textColor="@color/backgroundPurple"/>
+
+        <!--<Button-->
+            <!--android:id="@+id/delete_run_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginBottom="@dimen/ui_group_top_margin"-->
+            <!--android:layout_marginTop="@dimen/ui_group_top_margin"-->
+            <!--android:layout_weight="1"-->
+            <!--android:onClick="deleteRunButton"-->
+            <!--android:text="@string/delete_run"-->
+            <!--android:textColor="@color/backgroundPurple"/>-->
+
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/linearLayout"
+        tools:context="com.khackett.runmate.MapsActivityTrackRun">
+
+        <TextView
+            android:id="@+id/run_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:layout_marginTop="15dp"
+            android:background="#07000000"
+            android:paddingStart="15dp"
+            android:text="@string/run_time_label"
+            android:textColor="@color/ColorPrimaryRed"
+            android:textSize="26dp"
+            android:textStyle="bold"/>
+
+    </fragment>
+
+</RelativeLayout>

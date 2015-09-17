@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 2: // Choose Map option 3: track run via GPS
                     Intent intent3 = new Intent(MainActivity.this, MapsActivityTrackRun.class);
+                    intent3.putExtra("intentName", TAG);
                     startActivity(intent3);
                     break;
             }

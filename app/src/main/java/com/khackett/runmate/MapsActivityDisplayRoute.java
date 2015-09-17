@@ -157,6 +157,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         // Adding the polyline to the map
         mMap.addPolyline(polylineOptions);
+
+        // Add the start and finish markers to the map
+        addMarkersToMap(markerPoints);
     }
 
     public void plotDirectionsRoute() {
@@ -185,10 +188,8 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         for (int i = 0; i < markerPoints.size() - 1; i++) {
 
-            /**
-             * For the start location, the colour of the marker is GREEN and
-             * for the end location, the colour of the marker is RED.
-             */
+            // For the start location, the colour of the marker is GREEN.
+            // For the end location, the colour of the marker is RED.
             if (markerPoints.size() == 1) {
                 // Add a green marker for the start position.
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
@@ -372,14 +373,14 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     .showInfoWindow();
         } else {
             mMap.addMarker(new MarkerOptions()
-                    .position(latLngs.get(0))
-                    .title("Start")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
-                    .showInfoWindow();
-            mMap.addMarker(new MarkerOptions()
                     .position(latLngs.get(latLngs.size() - 1))
                     .title("Finish")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
+                    .showInfoWindow();
+            mMap.addMarker(new MarkerOptions()
+                    .position(latLngs.get(0))
+                    .title("Start")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                     .showInfoWindow();
         }
     }

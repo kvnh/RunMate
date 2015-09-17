@@ -144,7 +144,7 @@
 
     <string name="start_updates">Start Run</string>
     <string name="stop_updates">Pause</string>
-    <string name="save_run">Save Run</string>
+    <string name="save_run">Send Run</string>
     <string name="delete_run">Delete Run</string>
     <string name="run_time_label">0:00</string>
     <string name="location_updated_message">New location detected... keep going</string>

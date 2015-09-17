@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,9 @@ import java.util.List;
  * Created by KHackett on 03/09/15.
  */
 public class MyRunsFragment extends ListFragment {
+
+    // Tag for current Activity
+    public static final String TAG = MyRunsFragment.class.getSimpleName();
 
     protected SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -70,8 +74,13 @@ public class MyRunsFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Retrieve the accepted routes from the Parse backend
-        retrieveAcceptedRoutes();
+
+        if (view == null) {
+            Log.i(TAG, "No list view to display for MyRunsFragment");
+        } else {
+            // Retrieve the accepted routes from the Parse backend
+            retrieveAcceptedRoutes();
+        }
     }
 
     @Override
@@ -99,6 +108,7 @@ public class MyRunsFragment extends ListFragment {
         intent.putExtra("myRunsObjectId", objectId);
         intent.putExtra("myRunsRouteName", routeName);
         intent.putExtra("creationType", creationType);
+        intent.putExtra("intentName", TAG);
 
         // Start the MapsActivityDisplayRoute activity
         startActivityForResult(intent, MY_STATUS_CODE);
@@ -120,7 +130,7 @@ public class MyRunsFragment extends ListFragment {
         // use the 'where' clause to search through the messages to find where our user ID is one of the recipients
         queryRoute.whereEqualTo(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
         // order results so that most recent message are at the top of the inbox
-        queryRoute.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
+        queryRoute.addAscendingOrder(ParseConstants.KEY_ROUTE_PROPOSED_TIME);
         // query is ready - run it
         queryRoute.findInBackground(new FindCallback<ParseObject>() {
             // When the retrieval is done from the Parse query, the done() callback method is called
