@@ -193,7 +193,6 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             lastPoint = mRoute.getMarkerPoints().get(mRoute.getMarkerPoints().size() - 2);
 
             // Animate camera to centre on the previously touched position
-            Log.i(TAG, "Centering camera to previous position at " + lastPoint.toString());
             mMap.animateCamera(CameraUpdateFactory.newLatLng(lastPoint));
 
             // Remove polyline object from the map
@@ -343,34 +342,37 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
         // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+        protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
 
             ArrayList<LatLng> sectionLatLng = null;
             PolylineOptions lineOptions = null;
             // Traversing through all the routes
-            for (int i = 0; i < result.size(); i++) {
+            for (int i = 0; i < routes.size(); i++) {
                 lineOptions = new PolylineOptions();
                 sectionLatLng = new ArrayList<LatLng>();
 
-                // Fetching i-th route
-                List<HashMap<String, String>> path = result.get(i);
-                // Fetching all the points in i-th route
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
+                // Get the value of the routes object and assign to route
+                List<HashMap<String, String>> route = routes.get(i);
+                // Get the lat and lng values from each point in the route
+                for (int j = 0; j < route.size(); j++) {
+                    HashMap<String, String> point = route.get(j);
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
+                    // Create a LatLng object and assign the extracted values
                     LatLng position = new LatLng(lat, lng);
 
+                    // Add to th sections array
                     sectionLatLng.add(position);
-
+                    // Set the min/max lat/lng values for the Route object
                     mRoute.setMinMaxLatLng(position);
-
-                    // Adding all the points in the route to LineOptions
+                    // Add all the points in the route to the PolylineOptions object
                     lineOptions.add(position).width(6).color(Color.BLUE);
                 }
 
+                // Set the min/max lat/lng values for the Route object
                 mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
 
+                // Iterate through the section array list and add to member variable allLatLngPoints
                 for (LatLng enhancedPoint : sectionLatLng) {
                     allLatLngPoints.add(enhancedPoint);
                 }
@@ -386,8 +388,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
      * A class to parse the Google Places in JSON format
      */
     private class ParseDistanceTask extends AsyncTask<String, Integer, Double> {
-
-        // Parsing the data in non-ui thread
+        // Parsing the data in the non-ui thread
         @Override
         protected Double doInBackground(String... jsonData) {
             JSONObject jsonObject;
