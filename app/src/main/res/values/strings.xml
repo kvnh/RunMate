@@ -87,9 +87,9 @@
     </string-array>
 
     <string-array name="plot_route_choices">
-        <item>Manual Plot</item>
-        <item>Directions Assisted Plot</item>
-        <item>Track Run via GPS</item>
+        <item>Plot off-the-track run</item>
+        <item>Plot road run</item>
+        <item>Track your run to send</item>
     </string-array>
 
     <string name="error_external_storage">There was a problem accessing your device\'s external storage</string>

@@ -155,6 +155,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         }
 
+        // Add the markerPoints to allNonDuplicateLatLng for animation feature
+        allNonDuplicateLatLng = new ArrayList<LatLng>(markerPoints);
+
         // Adding the polyline to the map
         mMap.addPolyline(polylineOptions);
 
