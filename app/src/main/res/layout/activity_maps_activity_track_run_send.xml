@@ -52,20 +52,8 @@
             android:layout_weight="1"
             android:enabled="false"
             android:onClick="sendRunButton"
-            android:text="@string/save_run"
+            android:text="@string/send_run"
             android:textColor="@color/backgroundPurple"/>
-
-        <!--<Button-->
-            <!--android:id="@+id/delete_run_button"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginBottom="@dimen/ui_group_top_margin"-->
-            <!--android:layout_marginTop="@dimen/ui_group_top_margin"-->
-            <!--android:layout_weight="1"-->
-            <!--android:onClick="deleteRunButton"-->
-            <!--android:text="@string/delete_run"-->
-            <!--android:textColor="@color/backgroundPurple"/>-->
 
     </LinearLayout>
 

@@ -821,9 +821,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // Declare intent to capture a route
         Intent createRouteIntent = new Intent(MapsActivityTrackRun.this, AddRouteDetailsActivity.class);
 
-//        // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
-//        createRouteIntent.putParcelableArrayListExtra("markerPoints", mTrackedRun.getMarkerPoints());
-
         createRouteIntent.putParcelableArrayListExtra("markerPoints", latLngGPSTrackingPoints);
         createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", latLngGPSTrackingPoints);
 
@@ -838,29 +835,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         // Start RouteRecipientsActivity in order to choose recipients
         startActivity(createRouteIntent);
-
-//        // create a new parse object called route
-//        // (we can create a whole new class of parse objects in the back end by simply using a new name)
-//        ParseObject completedRouteToSend = new ParseObject(ParseConstants.CLASS_ROUTES);
-//
-//        // Add all of the location points to the Route object.
-//        mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
-//
-//        // Add the LatLng points from the tracked run.
-//        completedRouteToSend.addAll(ParseConstants.KEY_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(latLngGPSTrackingPoints)));
-//        // Add the min and max lat and long points.
-//        completedRouteToSend.put(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, convertLatLngBoundsToParseGeoPointArray(mTrackedRun.getLatLngBounds()));
-//        // Add the runners ID.
-//        completedRouteToSend.put(ParseConstants.KEY_SENDER_IDS, ParseUser.getCurrentUser().getObjectId());
-//        // Add the runners name.
-//        completedRouteToSend.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
-//        // Add the run time.
-//        // completedRouteToSend.put(ParseConstants.KEY_RUN_TIME, totalTimeMillis);
-//        // Add the run distance.
-//        completedRouteToSend.put(ParseConstants.KEY_ROUTE_DISTANCE, mTrackedRun.calculateDistanceBetweenLocations(latLngGPSTrackingPoints));
-//
-//        // return a successful route
-//        return completedRouteToSend;
     }
 
     /**
