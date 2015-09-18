@@ -188,6 +188,8 @@
     <string name="pick_from_gallery_button_label">Choose from gallery</string>
     <string name="title_activity_add_route_details">Add some details to your route</string>
 
+    <string name="route_date_hint">Add a meet up date</string>
+    <string name="route_time_hint">Add a meet up time</string>
     <string name="route_name_hint">Name your route</string>
     <string name="proposed_date_button_label">Choose a date</string>
     <string name="proposed_time_button_label">Choose a time</string>

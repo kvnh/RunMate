@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,20 +35,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         // Check to see if a user is logged in before the intent is started.
         // If getCurrentUser() returns a parse user, which is cached on the device by the Parse SDK,
         // then a user is logged in as a ParseUser and they will be stored in the ParseUser object.
         ParseUser currentUser = ParseUser.getCurrentUser();
 
         if (currentUser == null) {
+            Log.i(TAG, "Navigating to the login screen...");
             // If no user returned, user is not logged in - take them to the login page.
             navigateToLogin();
+            finish();
         } else {
             // User is already logged in - output a log statement displaying their name.
             Log.i(TAG, currentUser.getUsername());
         }
+
+        setContentView(R.layout.activity_main);
 
         // Initialise the DrawerLayout and NavigationView views.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);

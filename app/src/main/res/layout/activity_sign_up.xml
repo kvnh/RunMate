@@ -19,7 +19,6 @@
         android:id="@+id/subtitle"
         style="@style/AuthenticationTitle.AuthenticationSubTitle"/>
 
-
     <LinearLayout
         android:id="@+id/editTextLayout"
         style="@style/AuthenticationFieldContainer">

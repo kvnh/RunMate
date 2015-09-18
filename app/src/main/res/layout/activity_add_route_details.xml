@@ -7,50 +7,33 @@
     tools:context="com.khackett.runmate.ui.AddRouteDetailsActivity">
 
     <LinearLayout
-        android:id="@+id/editDateTimeLayout"
-        style="@style/AuthenticationFieldContainer">
+        android:id="@+id/proposeDate"
+        style="@style/AuthenticationFieldContainer"
+        android:layout_alignParentTop="true">
 
         <TextView
-            android:id="@+id/proposedDate"
-            style="@style/AuthenticationEditText"/>
-
-        <TextView
-            android:id="@+id/proposedTime"
-            style="@style/AuthenticationEditText"/>
+            android:id="@+id/proposeDateButton"
+            style="@style/AddRouteDetailsTextView"
+            android:hint="@string/route_date_hint"/>
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/buttonDivider"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editDateTimeLayout"
-        android:layout_centerHorizontal="true"
-        android:contentDescription="@string/content_desc_button_divider"
-        android:src="@mipmap/button_divider"/>
+    <LinearLayout
+        android:id="@+id/proposeTime"
+        style="@style/AuthenticationFieldContainer"
+        android:layout_below="@id/proposeDate">
 
-    <Button
-        android:id="@+id/proposeDateButton"
-        style="@style/AuthenticationButton"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editDateTimeLayout"
-        android:layout_marginRight="0dp"
-        android:layout_toLeftOf="@id/buttonDivider"
-        android:text="@string/proposed_date_button_label"/>
+        <TextView
+            android:id="@+id/proposeTimeButton"
+            style="@style/AddRouteDetailsTextView"
+            android:hint="@string/route_time_hint"/>
 
-    <Button
-        android:id="@+id/proposeTimeButton"
-        style="@style/AuthenticationButton"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/editDateTimeLayout"
-        android:layout_marginLeft="0dp"
-        android:layout_toRightOf="@id/buttonDivider"
-        android:text="@string/proposed_time_button_label"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/editTextLayout"
         style="@style/AuthenticationFieldContainer"
-        android:layout_below="@id/buttonDivider">
+        android:layout_below="@id/proposeTime">
 
         <EditText
             android:id="@+id/routeName"
@@ -61,6 +44,7 @@
 
     <Button
         android:id="@+id/chooseFriendsButton"
+        android:layout_marginTop="40dp"
         style="@style/AuthenticationButton"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/editTextLayout"

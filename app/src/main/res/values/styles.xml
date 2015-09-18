@@ -98,6 +98,14 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="AddRouteDetailsTextView" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:ems">10</item>
+        <item name="android:textColorHint">@color/lightGray</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="AuthenticationButton" parent="android:Widget.Holo.Light.Button">
         <item name="android:background">@drawable/button_custom</item>
         <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>

@@ -36,10 +36,8 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     protected String creationType;
 
     protected EditText mRouteName;
-    protected TextView mProposedDate;
-    protected TextView mProposedTime;
-    protected Button mButtonDatePicker;
-    protected Button mButtonTimePicker;
+    protected TextView mButtonDatePicker;
+    protected TextView mButtonTimePicker;
     protected Button mChooseFriends;
 
     // Variable for storing current date and time
@@ -60,11 +58,9 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         creationType = getIntent().getStringExtra("routeCreationMethod");
 
         mRouteName = (EditText) findViewById(R.id.routeName);
-        mProposedDate = (TextView) findViewById(R.id.proposedDate);
-        mProposedTime = (TextView) findViewById(R.id.proposedTime);
         mChooseFriends = (Button) findViewById(R.id.chooseFriendsButton);
-        mButtonDatePicker = (Button) findViewById(R.id.proposeDateButton);
-        mButtonTimePicker = (Button) findViewById(R.id.proposeTimeButton);
+        mButtonDatePicker = (TextView) findViewById(R.id.proposeDateButton);
+        mButtonTimePicker = (TextView) findViewById(R.id.proposeTimeButton);
 
         mRouteName.setOnClickListener(this);
         mButtonDatePicker.setOnClickListener(this);
@@ -109,7 +105,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 // Display selected date
-                mProposedDate.setText(dayOfMonth + " / " + (monthOfYear + 1) + " / " + year);
+                mButtonDatePicker.setText(dayOfMonth + " / " + (monthOfYear + 1) + " / " + year);
                 // Set the member variable to the returned values form the picker
                 mYear = year;
                 mMonth = monthOfYear;
@@ -132,7 +128,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
                 // Format time so that if the leading digit of the minutes is a zero, this will be displayed
                 String proposedTime = String.format("%02d:%02d", hourOfDay, minute);
                 // Display Selected time
-                mProposedTime.setText(proposedTime);
+                mButtonTimePicker.setText(proposedTime);
                 // Set the member variable to the returned values form the picker
                 mHour = hourOfDay;
                 mMinute = minute;
@@ -152,7 +148,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
 
         // First ensure that all of the fields are filled in correctly
-        if (checkForEmptyFields(routeName, mProposedDate, mProposedTime)) {
+        if (checkForEmptyFields(routeName, mButtonDatePicker, mButtonTimePicker)) {
             // Alert user to fill in all of the fields
             showErrorDialog(R.string.send_route_error_title, R.string.send_route_error_message);
         } else if (!routeTimeDateValidCheck()) {
