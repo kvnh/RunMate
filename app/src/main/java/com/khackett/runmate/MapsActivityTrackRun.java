@@ -93,7 +93,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * The fastest rate for location updates in milliseconds.
      * Updates will never be more frequent than this value.
      */
-    public static final long FASTEST_UPDATE_INTERVAL = 1000 * 1;
+    public static final long FASTEST_UPDATE_INTERVAL = 2000 * 1;
 
     /**
      * The minimum distance from previous update to accept new update in meters.
@@ -148,23 +148,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     private TextView mRunTimeTextView;
     private long startTime = 0;
     private long totalTimeMillis;
-
-    // Runs without a timer by reposting this handler at the end of the runnable
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            totalTimeMillis = System.currentTimeMillis() - startTime;
-            int seconds = (int) (totalTimeMillis / 1000);
-            int minutes = seconds / 60;
-            seconds = seconds % 60;
-
-            mRunTimeTextView.setText(String.format("%d:%02d", minutes, seconds));
-
-            timerHandler.postDelayed(this, 500);
-        }
-    };
 
     /**
      * Boolean to to track whether the location updates have been turned on or off by the user.
@@ -600,10 +583,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     /**
-     * Creates the Google API client used to access Google Play services
+     * Creates the Google API client used to access Google Play Services
      */
     protected synchronized void createGoogleApiClient() {
-        // create a new GoogleApiClient object using the builder pattern
+        // Create a new GoogleApiClient object using the builder pattern
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 // let the client know that this class will handle connection management
                 .addConnectionCallbacks(this)
@@ -649,7 +632,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      */
     protected void checkLocationSettings() {
         PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, mLocationSettingsRequest);
+                LocationServices.SettingsApi.checkLocationSettings(
+                        mGoogleApiClient,
+                        mLocationSettingsRequest);
         result.setResultCallback(this);
     }
 
@@ -727,12 +712,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         ParseObject saveCompletedRoute = createCompletedRouteToSave();
         saveCompletedRoute(saveCompletedRoute);
 
-        // Send the user back to the main activity right after the run is saved.
+        // Send the user back to the main activity after the run is saved.
         // Use finish() to close the current activity.
         finish();
-//        Intent intent = new Intent(this, MainActivity.class);
-//        startActivity(intent);
-
     }
 
     public void sendRunButton(View view) {
@@ -792,19 +774,15 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     public ParseObject createCompletedRouteToSave() {
-        // create a new parse object called route
-        // (we can create a whole new class of parse objects in the back end by simply using a new name)
-        ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_RUNS);
-
         // Add all of the location points to the Route object.
         mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
 
+        // Create a new parse object completedRoute to add to the CompletedRuns class
+        ParseObject completedRoute = new ParseObject(ParseConstants.CLASS_COMPLETED_RUNS);
         // Add the LatLng points from the tracked run to the ParseObject completedRoute.
         completedRoute.addAll(ParseConstants.KEY_LATLNG_GPS_POINTS, (convertLatLngToParseGeoPointArray(latLngGPSTrackingPoints)));
-
         // Add the min and max lat and long points to the ParseObject completedRoute.
         completedRoute.put(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, convertLatLngBoundsToParseGeoPointArray(mTrackedRun.getLatLngBounds()));
-
         // Add the runners ID to the ParseObject completedRoute.
         completedRoute.put(ParseConstants.KEY_RUNNER_IDS, ParseUser.getCurrentUser().getObjectId());
         // Add the runners name to the ParseObject completedRoute.
@@ -819,25 +797,21 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     public void createCompletedRouteToSend() {
-
         // Add all of the location points to the Route object.
         mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
 
         // Declare intent to capture a route
         Intent createRouteIntent = new Intent(MapsActivityTrackRun.this, AddRouteDetailsActivity.class);
-
+        // Add the marker points to the intent object
         createRouteIntent.putParcelableArrayListExtra("markerPoints", latLngGPSTrackingPoints);
+        // Add all LatLng points to the intent object
         createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", latLngGPSTrackingPoints);
-
         // Add the min and max lat and long points to the intent object
         createRouteIntent.putExtra("boundaryPoints", mTrackedRun.getLatLngBounds());
-
         // Add the total distance of the route to the intent object
         createRouteIntent.putExtra("routeDistance", mTrackedRun.calculateDistanceBetweenLocations(latLngGPSTrackingPoints));
-
         // Add the creation type of the route to the intent object
         createRouteIntent.putExtra("routeCreationMethod", "MANUAL");
-
         // Start RouteRecipientsActivity in order to choose recipients
         startActivity(createRouteIntent);
     }
@@ -926,8 +900,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         }
 
         // If Start Run button is pressed before GoogleApiClient connects,
-        // mRequestingLocationUpdates is set to true in startUpdatesButtonHandler()
-        // Then start location updates.
+        // mCheckLocationUpdates is set to true - start location updates.
         if (mCheckLocationUpdates) {
             startLocationUpdates();
         }
@@ -965,59 +938,56 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 });
     }
 
-    /**
-     * Callback from requestLocationUpdates() that is called when the location changes
-     */
-    @Override
-    public void onLocationChanged(Location location) {
+/**
+ * Callback from requestLocationUpdates() that is called when the location changes
+ */
+@Override
+public void onLocationChanged(Location location) {
 
-        if (!location.hasAccuracy()) {
-            // Location has no accuracy - ignore reading.
-            return;
-        }
-        if (location.getAccuracy() > LOCATION_ACCURACY || location.getAccuracy() == 0) {
-            // Accuracy reading is not within the limits so disregard this reading.
-            return;
-        }
-
-        // Otherwise location reading is with accuracy limits.
-        // Add point to list and update map.
-
-        double latitude, longitude;
-        LatLng latLngPoint;
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        latLngPoint = new LatLng(latitude, longitude);
-
-        // Add each new point detected to the latlng array and print to console
-        latLngGPSTrackingPoints.add(latLngPoint);
-        for (LatLng point : latLngGPSTrackingPoints) {
-            Log.i(TAG, "Detected point: " + point);
-        }
-
-        PolylineOptions polylineOptions = new PolylineOptions().width(6).color(Color.GREEN);
-        for (int i = 0; i < latLngGPSTrackingPoints.size(); i++) {
-            polylineOptions.add(latLngGPSTrackingPoints.get(i));
-        }
-
-        line = mMap.addPolyline(polylineOptions);
-
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngPoint, 20);
-        mMap.animateCamera(cameraUpdate);
-
-        updateUI();
-
-        // Start the timer.
-        startTimer();
-        // New location has been detected so allow the user to save or send the run.
-        if (intentName.equals("MyRunsFragment")) {
-            mSaveRunButton.setEnabled(true);
-        } else {
-            mSendRunButton.setEnabled(true);
-        }
-
+    if (!location.hasAccuracy()) {
+        // Location has no accuracy - ignore reading.
+        return;
     }
+    if (location.getAccuracy() > LOCATION_ACCURACY || location.getAccuracy() == 0) {
+        // Accuracy reading is not within the limits - ignore reading.
+        return;
+    }
+
+    // Location reading is with accuracy limits - add point to list and update map.
+
+    // Add the Location objects LatLng values to a new object
+    double latitude, longitude;
+    LatLng latLngPoint;
+    latitude = location.getLatitude();
+    longitude = location.getLongitude();
+    latLngPoint = new LatLng(latitude, longitude);
+
+    // Add each new point detected to the LatLng array
+    latLngGPSTrackingPoints.add(latLngPoint);
+
+    // Create a PolylineOptions object to plot the run on the map
+    PolylineOptions polylineOptions = new PolylineOptions().width(8).color(Color.RED);
+    for (int i = 0; i < latLngGPSTrackingPoints.size(); i++) {
+        polylineOptions.add(latLngGPSTrackingPoints.get(i));
+    }
+    line = mMap.addPolyline(polylineOptions);
+
+    // Update the camera to where the device has been detected
+    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngPoint, 20);
+    mMap.animateCamera(cameraUpdate);
+
+    updateUI();
+
+    // Start the timer.
+    startTimer();
+    // New location has been detected so allow the user to save or send the run.
+    if (intentName.equals("MyRunsFragment")) {
+        mSaveRunButton.setEnabled(true);
+    } else {
+        mSendRunButton.setEnabled(true);
+    }
+
+}
 
     public void startTimer() {
         if (latLngGPSTrackingPoints.size() < 2) {
@@ -1032,6 +1002,21 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             Toast.makeText(this, getResources().getString(R.string.location_updated_message), Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Runs without a timer by reposting this handler at the end of the runnable
+    Handler timerHandler = new Handler();
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            totalTimeMillis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (totalTimeMillis / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+            // Update UI
+            mRunTimeTextView.setText(String.format("%d:%02d", minutes, seconds));
+            timerHandler.postDelayed(this, 500);
+        }
+    };
 
     /**
      * Updates the UI.
