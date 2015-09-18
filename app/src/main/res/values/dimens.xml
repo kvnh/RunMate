@@ -27,6 +27,8 @@
     <dimen name="message_vertical_padding">8dp</dimen>
     <dimen name="route_name_vertical_padding">2dp</dimen>
 
+    <dimen name="password_instructions_vertical_padding">12dp</dimen>
+
     <dimen name="message_time_text">12sp</dimen>
     <dimen name="completed_on_text">16sp</dimen>
 

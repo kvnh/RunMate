@@ -84,4 +84,16 @@
         android:layout_toRightOf="@id/buttonDivider"
         android:text="@string/cancel_sign_up_button_label"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/password_validation_error_message"
+        android:id="@+id/textView"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="@dimen/password_instructions_vertical_padding"
+        android:layout_marginRight="@dimen/password_instructions_vertical_padding"
+        android:layout_below="@+id/buttonDivider"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
 </RelativeLayout>

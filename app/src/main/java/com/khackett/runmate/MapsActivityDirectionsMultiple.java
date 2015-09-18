@@ -49,15 +49,15 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
     private Route mRoute;
 
-    protected ArrayList<LatLng> allLatLngPoints;
+    private ArrayList<LatLng> allLatLngPoints;
 
-    protected DirectionsUtility directionsUtility;
+    private DirectionsUtility directionsUtility;
 
     // Member variable for the UI buttons
-    protected ImageButton mButtonSend;
-    protected ImageButton mButtonUndo;
-    protected ImageButton mButtonCompleteLoop;
-    protected TextView mDistanceCount;
+    private ImageButton mButtonSend;
+    private ImageButton mButtonUndo;
+    private ImageButton mButtonCompleteLoop;
+    private TextView mDistanceCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
