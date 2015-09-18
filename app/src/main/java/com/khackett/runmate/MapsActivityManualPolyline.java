@@ -169,17 +169,14 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
      */
     @Override
     public void onMapClick(LatLng point) {
-
-        // some help from
-        // http://www.androidhub4you.com/2013/07/draw-polyline-in-google-map-version-2.html
-        // http://wptrafficanalyzer.in/blog/adding-marker-on-touched-location-of-google-maps-using-android-api-v2-with-supportmapfragment/
-        // http://wptrafficanalyzer.in/blog/drawing-polyline-and-markers-along-the-tapped-positions-in-google-map-android-api-v2-using-arraylist/
-        // to create some of these functions
-
+        // Plot a point on the map using the returned LatLng value
         plotPoint(point);
-
     }
 
+    /**
+     * Method to plot a point on the map
+     * @param point
+     */
     public void plotPoint(LatLng point) {
         // Animate camera to centre on touched position
         mMap.animateCamera(CameraUpdateFactory.newLatLng(point));

@@ -938,56 +938,56 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 });
     }
 
-/**
- * Callback from requestLocationUpdates() that is called when the location changes
- */
-@Override
-public void onLocationChanged(Location location) {
+    /**
+     * Callback from requestLocationUpdates() that is called when the location changes
+     */
+    @Override
+    public void onLocationChanged(Location location) {
 
-    if (!location.hasAccuracy()) {
-        // Location has no accuracy - ignore reading.
-        return;
+        if (!location.hasAccuracy()) {
+            // Location has no accuracy - ignore reading.
+            return;
+        }
+        if (location.getAccuracy() > LOCATION_ACCURACY || location.getAccuracy() == 0) {
+            // Accuracy reading is not within the limits - ignore reading.
+            return;
+        }
+
+        // Location reading is with accuracy limits - add point to list and update map.
+
+        // Add the Location objects LatLng values to a new object
+        double latitude, longitude;
+        LatLng latLngPoint;
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        latLngPoint = new LatLng(latitude, longitude);
+
+        // Add each new point detected to the LatLng array
+        latLngGPSTrackingPoints.add(latLngPoint);
+
+        // Create a PolylineOptions object to plot the run on the map
+        PolylineOptions polylineOptions = new PolylineOptions().width(8).color(Color.RED);
+        for (int i = 0; i < latLngGPSTrackingPoints.size(); i++) {
+            polylineOptions.add(latLngGPSTrackingPoints.get(i));
+        }
+        line = mMap.addPolyline(polylineOptions);
+
+        // Update the camera to where the device has been detected
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngPoint, 20);
+        mMap.animateCamera(cameraUpdate);
+
+        updateUI();
+
+        // Start the timer.
+        startTimer();
+        // New location has been detected so allow the user to save or send the run.
+        if (intentName.equals("MyRunsFragment")) {
+            mSaveRunButton.setEnabled(true);
+        } else {
+            mSendRunButton.setEnabled(true);
+        }
+
     }
-    if (location.getAccuracy() > LOCATION_ACCURACY || location.getAccuracy() == 0) {
-        // Accuracy reading is not within the limits - ignore reading.
-        return;
-    }
-
-    // Location reading is with accuracy limits - add point to list and update map.
-
-    // Add the Location objects LatLng values to a new object
-    double latitude, longitude;
-    LatLng latLngPoint;
-    latitude = location.getLatitude();
-    longitude = location.getLongitude();
-    latLngPoint = new LatLng(latitude, longitude);
-
-    // Add each new point detected to the LatLng array
-    latLngGPSTrackingPoints.add(latLngPoint);
-
-    // Create a PolylineOptions object to plot the run on the map
-    PolylineOptions polylineOptions = new PolylineOptions().width(8).color(Color.RED);
-    for (int i = 0; i < latLngGPSTrackingPoints.size(); i++) {
-        polylineOptions.add(latLngGPSTrackingPoints.get(i));
-    }
-    line = mMap.addPolyline(polylineOptions);
-
-    // Update the camera to where the device has been detected
-    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngPoint, 20);
-    mMap.animateCamera(cameraUpdate);
-
-    updateUI();
-
-    // Start the timer.
-    startTimer();
-    // New location has been detected so allow the user to save or send the run.
-    if (intentName.equals("MyRunsFragment")) {
-        mSaveRunButton.setEnabled(true);
-    } else {
-        mSendRunButton.setEnabled(true);
-    }
-
-}
 
     public void startTimer() {
         if (latLngGPSTrackingPoints.size() < 2) {

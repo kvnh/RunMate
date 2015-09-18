@@ -107,17 +107,14 @@ public class DirectionsUtility {
             for (int i = 0; i < jsonRoutes.length(); i++) {
                 jsonLegs = ((JSONObject) jsonRoutes.get(i)).getJSONArray("legs");
                 List route = new ArrayList<HashMap<String, String>>();
-
                 // Iterate through legs array to get steps
                 for (int j = 0; j < jsonLegs.length(); j++) {
                     jsonSteps = ((JSONObject) jsonLegs.get(j)).getJSONArray("steps");
-
                     // Iterate through steps array to get each of the points value
                     for (int k = 0; k < jsonSteps.length(); k++) {
                         String polyline = "";
                         polyline = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("polyline")).get("points");
                         List<LatLng> points = decodePoly(polyline);
-
                         // Iterate through points array
                         for (int l = 0; l < points.size(); l++) {
                             HashMap<String, String> pointsHashMap = new HashMap<String, String>();
