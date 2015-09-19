@@ -49,8 +49,15 @@ public class RunHistoryFragment extends ListFragment {
         // View then attached to the parent - the ViewPager object from MainActivity.
         View rootView = inflater.inflate(R.layout.fragment_run_history, container, false);
 
+        // Return the view of the whole fragment
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
         // Set SwipeRefreshLayout component
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         // Set the onRefreshListener
         mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
         mSwipeRefreshLayout.setColorSchemeResources(
@@ -59,12 +66,6 @@ public class RunHistoryFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
-        // Return the view of the whole fragment
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
         // Retrieve the routes from the Parse backend
         retrieveCompletedRuns();
     }

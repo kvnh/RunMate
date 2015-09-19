@@ -56,5 +56,4 @@ public class TabFragmentContainer extends Fragment {
         // Return the created View
         return view;
     }
-
 }
