@@ -153,7 +153,6 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
         holder.routeNameLabel.setText(route.getString(ParseConstants.KEY_ROUTE_NAME));
 
-
         // Create an instance of SimpleDateFormat used for formatting
         // the string representation of date (month/day/year)
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");

@@ -57,16 +57,6 @@ public class MyRunsFragment extends ListFragment {
 
         View rootView = inflater.inflate(R.layout.fragment_my_runs, container, false);
 
-        // Set SwipeRefreshLayout component
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-        // Set the onRefreshListener
-        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
-        mSwipeRefreshLayout.setColorSchemeResources(
-                R.color.swipeRefresh1,
-                R.color.swipeRefresh2,
-                R.color.swipeRefresh3,
-                R.color.swipeRefresh4);
-
         // Return the View object - this is the view of the whole fragment
         return rootView;
     }
@@ -74,6 +64,16 @@ public class MyRunsFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Set SwipeRefreshLayout component
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        // Set the onRefreshListener
+        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                R.color.swipeRefresh1,
+                R.color.swipeRefresh2,
+                R.color.swipeRefresh3,
+                R.color.swipeRefresh4);
 
 //        if (view == null) {
 //            Log.i(TAG, "No list view to display for MyRunsFragment");
@@ -139,10 +139,7 @@ public class MyRunsFragment extends ListFragment {
             // When the retrieval is done from the Parse query, the done() callback method is called
             @Override
             public void done(List<ParseObject> routes, ParseException e) {
-                // dismiss the progress indicator here
-                // getActivity().setProgressBarIndeterminateVisibility(false);
 
-                // End refreshing once routes are retrieved
                 // done() is called from onResume() and the OnRefreshListener
                 // Need to check that its called from the the OnRefreshListener before ending it
                 if (mSwipeRefreshLayout.isRefreshing()) {

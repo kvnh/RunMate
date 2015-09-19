@@ -26,7 +26,6 @@ import java.util.List;
 
 public class InboxRouteFragment extends ListFragment {
 
-
     protected SwipeRefreshLayout mSwipeRefreshLayout;
 
     // member variable to store the list of routes received by the user
@@ -47,8 +46,16 @@ public class InboxRouteFragment extends ListFragment {
         // View then attached to the parent - the ViewPager object from MainActivity.
         View rootView = inflater.inflate(R.layout.fragment_inbox_route, container, false);
 
+        // Return the view of the whole fragment
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         // Set SwipeRefreshLayout component
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         // Set the onRefreshListener
         mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
         mSwipeRefreshLayout.setColorSchemeResources(
@@ -57,13 +64,6 @@ public class InboxRouteFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
-        // Return the view of the whole fragment
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         // Retrieve the routes from the Parse backend
         retrieveRoutes();
     }
