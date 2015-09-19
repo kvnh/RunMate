@@ -239,4 +239,3 @@ public class EditFriendsActivity extends Activity {
         }
     };
 }
-

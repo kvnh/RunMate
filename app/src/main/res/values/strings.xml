@@ -44,6 +44,11 @@
 
     <string name="edit_friends_progress_dialog_title">Please wait</string>
     <string name="edit_friends_progress_dialog_message">Updating your friends list</string>
+    <string name="my_runs_progress_dialog_title">Please wait</string>
+    <string name="my_runs_progress_dialog_message">Updating Runs</string>
+    <string name="inbox_progress_dialog_title">Please wait</string>
+    <string name="inbox_progress_dialog_message">Updating your inbox</string>
+
     <string name="log_in_progress_dialog_title">Please wait</string>
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>

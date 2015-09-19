@@ -112,11 +112,11 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                                         // Set a listener so user has to interact with dialog to dismiss it.
                                 .setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // Finish ForgotPasswordActivity and return to previous activity.
-                                        finish();
-                                    }
-                                });
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                // Finish ForgotPasswordActivity and return to previous activity.
+                                                finish();
+                                            }
+                                        });
                         // Create a dialog from the builder object and show it.
                         AlertDialog dialog = builder.create();
                         dialog.show();

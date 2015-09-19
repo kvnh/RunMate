@@ -1,5 +1,6 @@
 package com.khackett.runmate.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -105,6 +106,7 @@ public class InboxRouteFragment extends ListFragment {
     }
 
     private void retrieveRoutes() {
+
         // query the routes class/table in parse
         // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
         // querying the message class is similar to how we have been querying users
@@ -118,8 +120,6 @@ public class InboxRouteFragment extends ListFragment {
             // When the retrieval is done from the Parse query, the done() callback method is called
             @Override
             public void done(List<ParseObject> routes, ParseException e) {
-                // dismiss the progress indicator here
-                // getActivity().setProgressBarIndeterminateVisibility(false);
 
                 // End refreshing once routes are retrieved
                 // done() is called from onResume() and the OnRefreshListener

@@ -68,12 +68,6 @@ public class FriendsFragment extends Fragment {
         // for the relation, from this user we want to call a method called getRelation()
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
-        // start the progress indicator before we run our query
-        // use the getActivity() to get a reference to the activity in which the fragment is running (as setProgressBarIndeterminateVisibility() is an Activity method)
-        // note: Window provided Progress Bars are now deprecated with Toolbar.
-        // see: http://stackoverflow.com/questions/27788195/setprogressbarindeterminatevisibilitytrue-not-working
-        // getActivity().setProgressBarIndeterminateVisibility(true);
-
         // the first thing we need is a list of the users friends
         // we have the friend relation, but this doesn't give us a list of users to work with
         // the list itself is still on the back end, we need to use the ParseRelation to retrieve it

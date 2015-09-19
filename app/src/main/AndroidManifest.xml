@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.khackett.runmate" >
+          package="com.khackett.runmate" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -43,7 +43,6 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme" >
             <intent-filter>

@@ -126,6 +126,13 @@ public class MyRunsFragment extends ListFragment {
     }
 
     private void retrieveAcceptedRoutes() {
+
+        // Set up a dialog progress indicator box
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle(R.string.my_runs_progress_dialog_title);
+        progressDialog.setMessage(getActivity().getString(R.string.my_runs_progress_dialog_message));
+        progressDialog.show();
+
         // query the routes class/table in parse
         // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
         // querying the message class is similar to how we have been querying users
@@ -139,6 +146,9 @@ public class MyRunsFragment extends ListFragment {
             // When the retrieval is done from the Parse query, the done() callback method is called
             @Override
             public void done(List<ParseObject> routes, ParseException e) {
+
+                // Dismiss progress dialog once result returned from backend
+                progressDialog.dismiss();
 
                 // done() is called from onResume() and the OnRefreshListener
                 // Need to check that its called from the the OnRefreshListener before ending it
