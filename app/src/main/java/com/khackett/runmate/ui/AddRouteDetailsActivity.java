@@ -95,10 +95,10 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
     public void proposeDate() {
         // Process to get and set the Current Date when the dialog is launched
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
+        final Calendar calendar = Calendar.getInstance();
+        mYear = calendar.get(Calendar.YEAR);
+        mMonth = calendar.get(Calendar.MONTH);
+        mDay = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Launch Date Picker Dialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
@@ -210,8 +210,6 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         currentHour = currentDateTime.get(Calendar.HOUR_OF_DAY);
         currentMinute = currentDateTime.get(Calendar.MINUTE);
         currentDateTime.set(currentYear, currentMonth, currentDay, currentHour, currentMinute);
-
-        Log.i(TAG, "Current time: " + currentDateTime.toString());
 
         // Check current time against proposed time
         if (proposedDateTime.compareTo(currentDateTime) < 0) {

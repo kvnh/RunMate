@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class Route {
 
+    // Declare member variables
     private double mLatitudeMax;
     private double mLongitudeMax;
     private double mLatitudeMin;
@@ -238,6 +239,12 @@ public class Route {
         return latLngBounds;
     }
 
+    /**
+     * Calculates the straight line distance between two locations on a map
+     *
+     * @param latLngPoints
+     * @return - straight line distance between two locations on a map
+     */
     public double calculateDistanceBetweenLocations(ArrayList<LatLng> latLngPoints) {
 
         Location locationA = new Location("locationA");
