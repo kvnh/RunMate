@@ -19,12 +19,10 @@ public class Route {
     private double mLongitudeMax;
     private double mLatitudeMin;
     private double mLongitudeMin;
-
     private ArrayList<Double> totalDistanceArray;
     private ArrayList<LatLng> markerPoints;
     private ArrayList<LatLng> minMaxLatLngArrayList;
     private ArrayList<ArrayList<LatLng>> minMaxLatLngSectionArrayList;
-    private ArrayList<Polyline> polylines;
 
     /**
      * Default constructor

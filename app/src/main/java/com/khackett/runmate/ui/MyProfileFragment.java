@@ -43,6 +43,12 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
 
     protected ImageView mProfilePicture;
 
+    // member variable to store the media type as a URI, that can be stored in multiple places
+    // Uri = uniform resource identifier
+    private Uri mMediaUri;
+
+    private Bitmap bitmapPicture;
+
     /**
      * Default constructor
      */
@@ -112,9 +118,6 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
     public static final int TAKE_PHOTO_REQUEST = 1889;
     public static final int PICK_PHOTO_REQUEST = 1888;
 
-    // member variable to store the media type as a URI, that can be stored in multiple places
-    // Uri = uniform resource identifier
-    private Uri mMediaUri;
 
     public void takeCameraPicture() {
         // Take picture
@@ -205,8 +208,6 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    private Bitmap bitmapPicture;
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -273,7 +274,6 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
                 }
             }
         });
-
     }
 
     public void updateProfilePic() {

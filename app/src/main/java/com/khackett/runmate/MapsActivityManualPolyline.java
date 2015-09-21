@@ -40,7 +40,7 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     // and creates a series of line segments that connect those locations in an ordered sequence.
     // create a PolylineOptions object first and add points to it
     // instantiate a new polyline object
-    PolylineOptions polylineOptions;
+    private PolylineOptions polylineOptions;
 
     // Member variable for the UI buttons
     protected ImageButton mButtonSend;

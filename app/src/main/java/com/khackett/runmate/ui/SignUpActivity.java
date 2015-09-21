@@ -24,13 +24,13 @@ import com.parse.SignUpCallback;
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Member variables that correspond to items in the layout.
-    protected EditText mFullName;
-    protected EditText mUserName;
-    protected EditText mEmail;
-    protected EditText mPassword;
-    protected EditText mPasswordConfirm;
-    protected Button mSignUpButton;
-    protected Button mCancelSignUpButton;
+    private EditText mFullName;
+    private EditText mUserName;
+    private EditText mEmail;
+    private EditText mPassword;
+    private EditText mPasswordConfirm;
+    private Button mSignUpButton;
+    private Button mCancelSignUpButton;
 
     // Declare the context of the activity.
     protected Context mContext;

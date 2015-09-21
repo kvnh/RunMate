@@ -27,11 +27,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static final String TAG = LoginActivity.class.getSimpleName();
 
     // Member variables that correspond to items in the layout.
-    protected EditText mUserName;
-    protected EditText mPassword;
-    protected Button mLoginButton;
-    protected TextView mSignUpTextView;
-    protected TextView mForgotPasswordTextView;
+    private EditText mUserName;
+    private EditText mPassword;
+    private Button mLoginButton;
+    private TextView mSignUpTextView;
+    private TextView mForgotPasswordTextView;
 
     // Declare the context of the activity.
     protected Context mContext;

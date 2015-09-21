@@ -46,17 +46,8 @@ public class EditFriendsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // set up progress bar
-        // requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
         // Set the GridView layout
         setContentView(R.layout.user_grid);
-
-        // line to ensure the action bar displays in the layout
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Show the Up button in the action bar.
-        // setupActionBar();
 
         // Set the GridView in the layout
         mGridView = (GridView) findViewById(R.id.friendsGrid);

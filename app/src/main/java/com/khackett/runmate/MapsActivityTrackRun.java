@@ -346,7 +346,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 // send these values to the getDirectionsUrl() method and assign returned value to string variable url
                 String url = directionsUtility.getDirectionsUrl(point1, point2);
                 // create a DownloadTask object - see nested class below
-                DownloadTask downloadTask = new DownloadTask();
+                DownloadURLTask downloadTask = new DownloadURLTask();
                 // Start downloading json data from Google Directions API
                 downloadTask.execute(url);
             }
@@ -402,7 +402,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     // Fetches data from url passed
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+    private class DownloadURLTask extends AsyncTask<String, Void, String> {
 
         // Downloading data in non-ui thread
         @Override
@@ -425,7 +425,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ParserTask parserTask = new ParserTask();
+            ParseLatLngValuesTask parserTask = new ParseLatLngValuesTask();
 
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
@@ -435,7 +435,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     /**
      * A class to parse the Google Places in JSON format
      */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
         @Override
