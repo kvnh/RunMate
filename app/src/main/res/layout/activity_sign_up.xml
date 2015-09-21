@@ -66,33 +66,33 @@
         android:src="@mipmap/button_divider"/>
 
     <Button
-        android:id="@+id/signUpButton"
+        android:id="@+id/cancelSignUpButton"
         style="@style/AuthenticationButton"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/editTextLayout"
         android:layout_marginRight="0dp"
         android:layout_toLeftOf="@id/buttonDivider"
-        android:text="@string/sign_up_button_label"/>
+        android:text="@string/cancel_sign_up_button_label"/>
 
     <Button
-        android:id="@+id/cancelSignUpButton"
+        android:id="@+id/signUpButton"
         style="@style/AuthenticationButton"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editTextLayout"
         android:layout_marginLeft="0dp"
         android:layout_toRightOf="@id/buttonDivider"
-        android:text="@string/cancel_sign_up_button_label"/>
+        android:text="@string/sign_up_button_label"/>
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/password_validation_error_message"
-        android:id="@+id/textView"
-        android:textColor="#ffffff"
-        android:layout_marginLeft="@dimen/password_instructions_vertical_padding"
-        android:layout_marginRight="@dimen/password_instructions_vertical_padding"
         android:layout_below="@+id/buttonDivider"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginLeft="@dimen/password_instructions_vertical_padding"
+        android:layout_marginRight="@dimen/password_instructions_vertical_padding"
+        android:layout_marginTop="20dp"
+        android:text="@string/password_validation_error_message"
+        android:textColor="#ffffff"/>
 
 </RelativeLayout>

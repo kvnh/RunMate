@@ -81,7 +81,7 @@
             android:label="@string/title_activity_edit_friends"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme" >
+            android:theme="@style/Theme.MyAppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />

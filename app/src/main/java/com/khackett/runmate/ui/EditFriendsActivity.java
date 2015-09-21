@@ -6,8 +6,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -38,7 +40,6 @@ public class EditFriendsActivity extends Activity {
     protected ParseRelation<ParseUser> mFriendsRelation;
     // Create a variable for the GridView
     protected GridView mGridView;
-
     // Declare the context of the activity.
     protected Context mContext;
 
@@ -48,6 +49,8 @@ public class EditFriendsActivity extends Activity {
 
         // Set the GridView layout
         setContentView(R.layout.user_grid);
+
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Set the GridView in the layout
         mGridView = (GridView) findViewById(R.id.friendsGrid);
