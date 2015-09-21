@@ -56,20 +56,20 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     // Member variable for the UI buttons
-    protected Button mButtonAccept;
-    protected Button mButtonDecline;
-    protected Button mButtonAnimate;
+    private Button mButtonAccept;
+    private Button mButtonDecline;
+    private Button mButtonAnimate;
 
     // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
-    protected ArrayList<LatLng> markerPoints;
+    private ArrayList<LatLng> markerPoints;
 
     // member variable to represent an array of ParseGeoPoint values, retrieved from the parse cloud
-    protected ArrayList<ParseGeoPoint> parseList;
+    private ArrayList<ParseGeoPoint> parseList;
 
     // All returned LatLng points from the Directions API - used for animation
-    protected ArrayList<LatLng> allNonDuplicateLatLng;
+    private ArrayList<LatLng> allNonDuplicateLatLng;
 
-    protected DirectionsUtility directionsUtility;
+    private DirectionsUtility directionsUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -341,25 +341,33 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_decline_route, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Method to zoom to the boundary extremes of a plotted route.
+     */
     public void zoomToViewRoute() {
-        // assign the JSON String value from the passed in intent to a new String variable
-        String jsonArray = getIntent().getStringExtra("parseLatLngBoundsList");
-        JSONArray array = null;
+        // Assign the JSON String value from the passed in intent to a new String variable
+        String jsonArrayString = getIntent().getStringExtra("parseLatLngBoundsList");
+        // Create JSONArray object.
+        JSONArray jsonArray = null;
 
         try {
-            // convert String to a JSONArray
-            array = new JSONArray(jsonArray);
+            // Convert String to a JSONArray object
+            jsonArray = new JSONArray(jsonArrayString);
         } catch (JSONException e) {
+            // Otherwise, print exception
             e.printStackTrace();
         }
 
-        JSONArray arrayPoints = array;
+        // Create a new JSONArray
+        JSONArray arrayPoints = jsonArray;
 
+        // Get LatLng values for the extreme southWest and northEast corners of the route
         LatLng southWest = new LatLng(arrayPoints.optJSONObject(0).optDouble("latitude"),
                 arrayPoints.optJSONObject(0).optDouble("longitude"));
         LatLng northEast = new LatLng(arrayPoints.optJSONObject(1).optDouble("latitude"),
                 arrayPoints.optJSONObject(1).optDouble("longitude"));
 
+        // Set these values to LatLngBounds and animate camera to view
         LatLngBounds latLngBounds = new LatLngBounds(southWest, northEast);
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 60));
     }
@@ -533,38 +541,45 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
     public void animateRoute() {
         // Keep the screen on while the user is animating the route
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        animator.startAnimation();
+        mRunMateAnimator.startAnimation();
     }
 
-    private Animator animator = new Animator();
+    private RunMateAnimator mRunMateAnimator = new RunMateAnimator();
+    // Handler objects to
     private final Handler mHandler = new Handler();
 
-    private float cameraZoomLevel = 0.1f;
+    // private float cameraZoomLevel = 0.1f;
 
-    public class Animator implements Runnable {
+    public class RunMateAnimator implements Runnable {
 
         // Set the speed of the camera between points to 1.5 second
         private static final int CAMERA_SPEED = 1500;
         private static final int CAMERA_SPEED_TURN = 1000;
+        private static final int INITIAL_CAMERA_ZOOM_VALUE = 16;
+        private static final float CAMERA_TILT_VALUE = 90;
+        private static final long MARKER_FRAME_RATE = 16;
 
-        // Linear interpolator to define the rate of change of animation.
+        // Linear interpolator to define the rate of change of the animation.
         private final Interpolator interpolator = new LinearInterpolator();
 
         // Set the currentLatLngCheck to the first index of the array.
         private int currentLatLngIndex = 0;
 
-        private float tilt = 90;
-
+        // Time in milliseconds since the system booted up
         private long startTime = SystemClock.uptimeMillis();
 
+        //
         private LatLng beginLatLng = null;
         private LatLng endLatLng = null;
 
-        private Marker trackingMarker;
+        private Marker runnerMarker;
 
+        /**
+         * Start animation when there are more the 2 points to animate through
+         */
         public void startAnimation() {
             if (allNonDuplicateLatLng.size() > 2) {
-                animator.initialize();
+                mRunMateAnimator.initialize();
             }
         }
 
@@ -587,20 +602,27 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             setupCameraPositionForMovement(firstPoint, secondPoint);
         }
 
+        /**
+         * Sets up the camera's initial position and adds the Runner icon to the Map
+         *
+         * @param firstPoint
+         * @param secondPoint
+         */
         private void setupCameraPositionForMovement(LatLng firstPoint, LatLng secondPoint) {
 
             float cameraBearingStart = bearingBetweenLatLngPoints(firstPoint, secondPoint);
 
-            trackingMarker = mMap.addMarker(new MarkerOptions()
+            runnerMarker = mMap.addMarker(new MarkerOptions()
                     .position(firstPoint)
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_directions_run_black_24dp)));
 
             // Set up camera position for the start point.
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(firstPoint) // Set the initial view for the camera.
-                    .tilt(tilt)
+                    .tilt(CAMERA_TILT_VALUE)
                     .bearing(cameraBearingStart)  // Set the camera orientation angle for th first point.
-                    .zoom(mMap.getCameraPosition().zoom >= 16 ? mMap.getCameraPosition().zoom : 16) // Set the zoom value.
+                    .zoom(mMap.getCameraPosition().zoom >= INITIAL_CAMERA_ZOOM_VALUE
+                            ? mMap.getCameraPosition().zoom : INITIAL_CAMERA_ZOOM_VALUE) // Set the initial zoom value.
                     .build();   // Create a CameraPosition from the builder.
 
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
@@ -610,9 +632,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                         @Override
                         public void onFinish() {
                             Log.i(TAG, "Camera finished");
-                            animator.reset();
+                            mRunMateAnimator.reset();
                             Handler handler = new Handler();
-                            handler.post(animator);
+                            handler.post(mRunMateAnimator);
                         }
 
                         @Override
@@ -625,86 +647,119 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         @Override
         public void run() {
 
+            // Start the timer for the Runnable thread.
             long elapsedTime = SystemClock.uptimeMillis() - startTime;
-            double timeInterpolator = interpolator.getInterpolation((float) elapsedTime / CAMERA_SPEED);
 
-            double lat = timeInterpolator * endLatLng.latitude + (1 - timeInterpolator) * beginLatLng.latitude;
-            double lng = timeInterpolator * endLatLng.longitude + (1 - timeInterpolator) * beginLatLng.longitude;
+            // Map a value representing the elapsed fraction of an animation to a value that represents the interpolated fraction.
+            double interpolatedFraction = interpolator.getInterpolation((float) elapsedTime / CAMERA_SPEED);
+
+            //
+            double lat = (interpolatedFraction * endLatLng.latitude) + ((1 - interpolatedFraction) * beginLatLng.latitude);
+            double lng = (interpolatedFraction * endLatLng.longitude) + ((1 - interpolatedFraction) * beginLatLng.longitude);
             LatLng newPosition = new LatLng(lat, lng);
 
-            trackingMarker.setPosition(newPosition);
+            runnerMarker.setPosition(newPosition);
 
-            if (timeInterpolator < 1) {
-                mHandler.postDelayed(this, 16);
+            // If the interpolator fraction is less than 1:
+            if (interpolatedFraction < 1) {
+                // Add Runnable to the message queue to display the marker moving.
+                mHandler.postDelayed(this, MARKER_FRAME_RATE);
+                // otherwise move to the next point in the ArrayList
             } else {
-
+                // If there are still points in the list
                 if (currentLatLngIndex < allNonDuplicateLatLng.size() - 2) {
 
+                    // Increment to the next point in the ArrayList
                     currentLatLngIndex++;
 
+                    // Get point A and point B LatLng values
                     endLatLng = getEndLatLng();
                     beginLatLng = getBeginLatLng();
 
+                    // Reset time to the time since system reboot
                     startTime = SystemClock.uptimeMillis();
 
                     LatLng firstPoint = getBeginLatLng();
                     LatLng nextPoint = getEndLatLng();
 
+                    // Get the camera bearing value between the next two point in the route
                     float cameraBearing = bearingBetweenLatLngPoints(firstPoint, nextPoint);
 
+                    // Set the camera position to the next 2 points in the route
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(nextPoint)
                             .bearing(cameraBearing)
-                            .tilt(tilt)
+                            .tilt(CAMERA_TILT_VALUE)
                             .zoom(mMap.getCameraPosition().zoom)
                             .build();
 
+                    // Log the camera position and other relevant values.
                     Log.i(TAG, (currentLatLngIndex + 1) + " of " + allNonDuplicateLatLng.size() + " - bearing: " + cameraBearing + " / " + nextPoint);
 
+                    // Animate the camera to the next point
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
                             CAMERA_SPEED_TURN,
                             null);
 
-                    startTime = SystemClock.uptimeMillis();
-                    mHandler.postDelayed(animator, 16);
+                    // Begin the Runnable thread again
+                    mHandler.postDelayed(mRunMateAnimator, MARKER_FRAME_RATE);
 
                 } else {
                     currentLatLngIndex++;
                     // Zoom out to view route once the camera finishes animating.
                     zoomToViewRoute();
                     // Remove the runner icon
-                    trackingMarker.remove();
-                    // Remove any callbacks to the Handler object
-                    mHandler.removeCallbacks(animator);
+                    runnerMarker.remove();
+                    // Remove any callbacks to the Handler object and stop the thread
+                    mHandler.removeCallbacks(mRunMateAnimator);
                 }
             }
         }
 
+        /**
+         * Method to get the end LatLng value
+         *
+         * @return the end LatLng value
+         */
         private LatLng getEndLatLng() {
             return allNonDuplicateLatLng.get(currentLatLngIndex + 1);
         }
 
+        /**
+         * Method to get the beginning LatLng value
+         *
+         * @return the beginning LatLng value
+         */
         private LatLng getBeginLatLng() {
             return allNonDuplicateLatLng.get(currentLatLngIndex);
         }
 
         /**
-         * Method to
+         * Method to find the optimum bearing point between to LatLng values
          *
-         * @param latLng
-         * @return
+         * @param start - the start LatLng point
+         * @param end   - the end LatLng point
+         * @return the bearing point between the two LatLng values
          */
-        private Location convertLatLngToLocation(LatLng latLng) {
-            Location location = new Location("someLocation");
-            location.setLatitude(latLng.latitude);
-            location.setLongitude(latLng.longitude);
-            return location;
-        }
-
         private float bearingBetweenLatLngPoints(LatLng start, LatLng end) {
             Location startLocation = convertLatLngToLocation(start);
             Location endLocation = convertLatLngToLocation(end);
             return startLocation.bearingTo(endLocation);
+        }
+
+        /**
+         * Method to convert LatLng values to Location objects
+         *
+         * @param latLng - the LatLng value to be converted to a Location object
+         * @return
+         */
+        private Location convertLatLngToLocation(LatLng latLng) {
+            // Create a new Location object
+            Location location = new Location("someLocation");
+            // Set its latitude and longitude values based on the supplied LatLng value
+            location.setLatitude(latLng.latitude);
+            location.setLongitude(latLng.longitude);
+            return location;
         }
 
     }

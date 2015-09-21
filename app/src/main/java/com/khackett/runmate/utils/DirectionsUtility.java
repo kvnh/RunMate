@@ -24,7 +24,7 @@ import java.util.List;
 public class DirectionsUtility {
 
     /**
-     * Creates a url containing the origin and destination points and other parameters.
+     * Method to create a url containing the origin and destination points and other parameters.
      * These are then sent as a HTTP request to the Google Directions API to create route data in JSON format.
      *
      * @param origin - the origin of the route
