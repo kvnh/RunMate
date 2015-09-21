@@ -321,71 +321,62 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     }
 
     /**
-     * A class to parse the Google Places in JSON format
+     * A class to parse the LatLng values from the Directions API JSON data.
+     * LatLng values will then be used to plot a line on the map.
      */
-    private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<LatLng>> {
         // Parsing the data in non-ui thread
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+        protected List<LatLng> doInBackground(String... jsonData) {
             JSONObject jObject;
-            List<List<HashMap<String, String>>> routes = null;
+            List<LatLng> routePoints = null;
             try {
                 jObject = new JSONObject(jsonData[0]);
-
                 // Start parsing data
-                routes = directionsUtility.parseJSONObject(jObject);
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jObject);
             } catch (Exception e) {
                 Log.d("Background task error: ", e.toString());
             }
-            return routes;
+            return routePoints;
         }
 
         // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
+        protected void onPostExecute(List<LatLng> routePoints) {
 
-            ArrayList<LatLng> sectionLatLng = null;
-            PolylineOptions lineOptions = null;
-            // Traversing through all the routes
-            for (int i = 0; i < routes.size(); i++) {
-                lineOptions = new PolylineOptions();
-                sectionLatLng = new ArrayList<LatLng>();
+            ArrayList<LatLng> points = new ArrayList<LatLng>();
+            PolylineOptions lineOptions = new PolylineOptions();
+            ArrayList<LatLng> sectionLatLng = new ArrayList<LatLng>();
 
-                // Get the value of the routes object and assign to route
-                List<HashMap<String, String>> route = routes.get(i);
-                // Get the lat and lng values from each point in the route
-                for (int j = 0; j < route.size(); j++) {
-                    HashMap<String, String> point = route.get(j);
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    // Create a LatLng object and assign the extracted values
-                    LatLng position = new LatLng(lat, lng);
-
-                    // Add to th sections array
-                    sectionLatLng.add(position);
-                    // Set the min/max lat/lng values for the Route object
-                    mRoute.setMinMaxLatLng(position);
-                    // Add all the points in the route to the PolylineOptions object
-                    lineOptions.add(position).width(6).color(Color.BLUE);
-                }
-
-                // Set the min/max lat/lng values for the Route object
-                mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
-
-                // Iterate through the section array list and add to member variable allLatLngPoints
-                for (LatLng enhancedPoint : sectionLatLng) {
-                    allLatLngPoints.add(enhancedPoint);
-                }
-                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLngPoints.toString());
-
-                // Add Polyline to list and draw on map
-                polylines.add(mMap.addPolyline(lineOptions));
+            // Fetching all the points in i-th route
+            for (int i = 0; i < routePoints.size(); i++) {
+                points.add(routePoints.get(i));
+                mRoute.setMinMaxLatLng(routePoints.get(i));
+                sectionLatLng.add(routePoints.get(i));
             }
+
+            mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
+
+            // Iterate through the section array list and add to member variable allLatLngPoints
+            for (LatLng enhancedPoint : sectionLatLng) {
+                allLatLngPoints.add(enhancedPoint);
+            }
+            Log.i(TAG, "Enhanced for loop with all LatLng points: " + allLatLngPoints.toString());
+
+            // Adding all the points in the route to LineOptions
+            lineOptions.addAll(points);
+            lineOptions.width(6);
+            lineOptions.color(Color.BLUE);
+
+            // Drawing polyline in the Google Map for the i-th route
+            mMap.addPolyline(lineOptions);
+
         }
     }
 
     /**
-     * A class to parse the Google Places in JSON format
+     * A class to parse the distance value between 2 points - extracted from the
+     * Directions API.
      */
     private class ParseDistanceTask extends AsyncTask<String, Integer, Double> {
         // Parsing the data in the non-ui thread

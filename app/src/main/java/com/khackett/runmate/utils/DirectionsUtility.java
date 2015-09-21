@@ -126,12 +126,37 @@ public class DirectionsUtility {
                     routes.add(route);
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception e) {
         }
         return routes;
+    }
+
+    /**
+     * Method that receives a JSONObject and returns a list of LatLng points.
+     *
+     * @param jsonObject - the JSONObject to parse the LatLng values from
+     * @return a List of LatLng values
+     */
+    public List<LatLng> parseJSONObjectOverviewPolyline(JSONObject jsonObject) {
+        // Create a List to hold all LatLng points and initialise to null
+        List<LatLng> routePoints = null;
+
+        try {
+            // Get the 'routes' data from the JSON object
+            JSONObject jsonRouteObject = jsonObject.getJSONArray("routes").getJSONObject(0);
+            // Get the single points object from 'overview_polyline'
+            JSONObject poly = jsonRouteObject.getJSONObject("overview_polyline");
+            String polyline = poly.getString("points");
+            // Decode the polyline to get a List of LatLng values
+            routePoints = decodePoly(polyline);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+        }
+        return routePoints;
     }
 
     /**

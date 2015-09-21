@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.khackett.runmate.utils.DirectionsUtility;
 import com.khackett.runmate.utils.ParseConstants;
@@ -39,14 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MapsActivityDisplayRoute extends FragmentActivity implements View.OnClickListener {
@@ -212,9 +206,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                 // String url = getDirectionsUrl(point1, point2);
                 String url = directionsUtility.getDirectionsUrl(point1, point2);
                 // create a DownloadTask object - see nested class below
-                DownloadTask downloadTask = new DownloadTask();
+                DownloadURLTask downloadURLTask = new DownloadURLTask();
                 // Start downloading json data from Google Directions API
-                downloadTask.execute(url);
+                downloadURLTask.execute(url);
             }
 
             // Add a new marker to the map
@@ -224,6 +218,88 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         // Add the start and finish markers to the map
         addMarkersToMap(markerPoints);
+    }
+
+    // Fetches data from url passed
+    private class DownloadURLTask extends AsyncTask<String, Void, String> {
+
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+            String data = "";
+
+            try {
+                // Fetching the data from web service
+                data = directionsUtility.downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        // Executes in UI thread, after the execution of doInBackground()
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParseLatLngValuesTask parseLatLngValuesTask = new ParseLatLngValuesTask();
+
+            // Invokes the thread for parsing the JSON data
+            parseLatLngValuesTask.execute(result);
+        }
+    }
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<LatLng>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<LatLng> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<LatLng> routePoints = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                // Start parsing data
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routePoints;
+        }
+
+        // Executes in UI thread, after the parsing process
+        @Override
+        protected void onPostExecute(List<LatLng> routePoints) {
+
+            // Create a PolylineOptions object
+            PolylineOptions lineOptions = new PolylineOptions();
+
+            for (LatLng routePoint : routePoints) {
+                Log.i(TAG, "Enhanced for loop with each section LatLng point: " + routePoint.toString());
+                if (allNonDuplicateLatLng.size() == 0) {
+                    Log.i(TAG, "Adding first point: " + routePoint.toString());
+                    allNonDuplicateLatLng.add(routePoint);
+                } else if (!routePoint.toString().equals(allNonDuplicateLatLng.get(allNonDuplicateLatLng.size() - 1).toString())) {
+                    Log.i(TAG, "Adding non repeating points: " + routePoint.longitude + " " + routePoint.latitude);
+                    allNonDuplicateLatLng.add(routePoint);
+                }
+            }
+            Log.i(TAG, "Enhanced for loop with all LatLng points: " + allNonDuplicateLatLng.toString());
+
+            // Adding all the points in the route to LineOptions
+            lineOptions.addAll(routePoints);
+            lineOptions.width(6);
+            lineOptions.color(Color.BLUE);
+
+            // Drawing polyline on the map
+            mMap.addPolyline(lineOptions);
+        }
     }
 
     /**
@@ -393,110 +469,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     .title("Start")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                     .showInfoWindow();
-        }
-    }
-
-    // Fetches data from url passed
-    private class DownloadTask extends AsyncTask<String, Void, String> {
-
-        // Downloading data in non-ui thread
-        @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
-            String data = "";
-
-            try {
-                // Fetching the data from web service
-                data = directionsUtility.downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
-
-        // Executes in UI thread, after the execution of doInBackground()
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            ParserTask parserTask = new ParserTask();
-
-            // Invokes the thread for parsing the JSON data
-            parserTask.execute(result);
-        }
-    }
-
-    /**
-     * A class to parse the Google Places in JSON format
-     */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-
-        // Parsing the data in non-ui thread
-        @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
-
-            JSONObject jObject;
-            List<List<HashMap<String, String>>> routes = null;
-
-            try {
-                jObject = new JSONObject(jsonData[0]);
-
-                // Starts parsing data
-                routes = directionsUtility.parseJSONObject(jObject);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return routes;
-        }
-
-        // Executes in UI thread, after the parsing process
-        @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-            ArrayList<LatLng> points = null;
-            PolylineOptions lineOptions = null;
-
-            // Traversing through all the routes
-            for (int i = 0; i < result.size(); i++) {
-                points = new ArrayList<LatLng>();
-                lineOptions = new PolylineOptions();
-
-                // Fetching i-th route
-                List<HashMap<String, String>> path = result.get(i);
-
-                // Fetching all the points in i-th route
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
-
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    LatLng position = new LatLng(lat, lng);
-
-                    points.add(position);
-                }
-
-                for (LatLng point : points) {
-                    Log.i(TAG, "Enhanced for loop with each section LatLng point: " + point.toString());
-                    if (allNonDuplicateLatLng.size() == 0) {
-                        Log.i(TAG, "Adding first point: " + point.toString());
-                        allNonDuplicateLatLng.add(point);
-                    } else if (!point.toString().equals(allNonDuplicateLatLng.get(allNonDuplicateLatLng.size() - 1).toString())) {
-                        Log.i(TAG, "Adding non repeating points: " + point.longitude + " " + point.latitude);
-                        allNonDuplicateLatLng.add(point);
-                    } else {
-                        // not adding point
-                    }
-                }
-                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allNonDuplicateLatLng.toString());
-
-                // Adding all the points in the route to LineOptions
-                lineOptions.addAll(points);
-                lineOptions.width(6);
-                lineOptions.color(Color.BLUE);
-            }
-
-            // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
         }
     }
 
