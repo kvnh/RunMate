@@ -52,7 +52,7 @@
     <string name="log_in_progress_dialog_title">Please wait</string>
     <string name="log_in_progress_dialog_message">Logging you in to RunMate</string>
     <string name="password_validation_error_title">Sorry, there was a problem</string>
-    <string name="password_validation_error_message">Your password should be at least 6 characters, contain at least 1 lower case letter, one upper case letter and at least 1 digit</string>
+    <string name="password_validation_error_message">Your password should be at least 6 characters long, contain at least 1 lower case letter, one upper case letter and at least 1 digit.</string>
     <string name="send_route_error_title">Sorry, there was a problem</string>
     <string name="send_route_error_message">Please make sure all of the fields are completed</string>
     <string name="send_route_time_error_title">Check your watch...</string>
@@ -159,6 +159,7 @@
     <string name="nav_item_home">Home</string>
     <string name="nav_item_run_history">Run History</string>
     <string name="nav_item_my_profile">My Profile</string>
+    <string name="nav_item_my_friends">My Friends</string>
     <string name="nav_item_settings">Settings</string>
     <string name="nav_item_help">Help</string>
     <string name="nav_item_log_out">Log out</string>

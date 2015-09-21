@@ -17,14 +17,15 @@ import java.util.Locale;
  * Created by KHackett on 06/08/15.
  * FragmentPagerAdapter class that returns a fragment that corresponds to the chosen tabs.
  * This component adapts fragments for a ViewPager in TabFragmentContainer class.
- * FragmentPagerAdapter is best used when navigating between sibling screens that represent a fixed, small number of pages.
+ * FragmentPagerAdapter is best used when navigating between sibling screens that represent a fixed,
+ * small number of pages.
  */
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     // The context to be passed in when the adapter is created.
     private Context mContext;
     // The number of tabs in the layout.
-    public static int numberOfTabs = 3;
+    public static int numberOfTabs = 2;
 
     /**
      * Default constructor that accepts a FragmentManager parameter to add or remove fragments.
@@ -47,8 +48,6 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
                 return new MyRunsFragment();
             case 1:
                 return new InboxRouteFragment();
-            case 2:
-                return new FriendsFragment();
         }
         return null;
     }
@@ -74,8 +73,8 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
                 return mContext.getString(R.string.title_section1).toUpperCase(locale);
             case 1:
                 return mContext.getString(R.string.title_section2).toUpperCase(locale);
-            case 2:
-                return mContext.getString(R.string.title_section3).toUpperCase(locale);
+//            case 2:
+//                return mContext.getString(R.string.title_section3).toUpperCase(locale);
         }
         return null;
     }

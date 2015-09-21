@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction myProfileFragment = mFragmentManager.beginTransaction();
                     myProfileFragment.replace(R.id.containerView, new MyProfileFragment()).commit();
                 }
+                if (menuItem.getItemId() == R.id.navItemMyFriends) {
+                    FragmentTransaction friendsFragment = mFragmentManager.beginTransaction();
+                    friendsFragment.replace(R.id.containerView, new FriendsFragment()).commit();
+                }
                 if (menuItem.getItemId() == R.id.navItemLogOut) {
                     // User has selected log out option. Log user out and return to login screen.
                     ParseUser.logOut();

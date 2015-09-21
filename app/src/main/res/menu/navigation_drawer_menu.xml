@@ -16,6 +16,11 @@
         android:icon="@mipmap/ic_person_outline_black_24dp"
         android:title="@string/nav_item_my_profile"/>
 
+    <item
+        android:id="@+id/navItemMyFriends"
+        android:icon="@mipmap/ic_group_black_24dp"
+        android:title="@string/nav_item_my_friends"/>
+
 
     <item android:title="Extras">
         <menu>
