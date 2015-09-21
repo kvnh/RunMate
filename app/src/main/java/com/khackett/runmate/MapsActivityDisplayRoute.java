@@ -260,13 +260,13 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         @Override
         protected List<LatLng> doInBackground(String... jsonData) {
 
-            JSONObject jObject;
+            JSONObject jsonObject;
             List<LatLng> routePoints = null;
 
             try {
-                jObject = new JSONObject(jsonData[0]);
+                jsonObject = new JSONObject(jsonData[0]);
                 // Start parsing data
-                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jObject);
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jsonObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -276,7 +276,6 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(List<LatLng> routePoints) {
-
             // Create a PolylineOptions object
             PolylineOptions lineOptions = new PolylineOptions();
 

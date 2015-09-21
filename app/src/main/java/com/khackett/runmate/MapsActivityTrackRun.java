@@ -395,13 +395,13 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // Parsing the data in non-ui thread
         @Override
         protected List<LatLng> doInBackground(String... jsonData) {
-            JSONObject jObject;
+            JSONObject jsonObject;
             List<LatLng> routePoints = null;
             try {
-                jObject = new JSONObject(jsonData[0]);
+                jsonObject = new JSONObject(jsonData[0]);
 
                 // Starts parsing data
-                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jObject);
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jsonObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }

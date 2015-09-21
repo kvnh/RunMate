@@ -414,72 +414,50 @@ public class MapsActivityRunHistory extends FragmentActivity implements View.OnC
     /**
      * A class to parse the Google Places in JSON format
      */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParserTask extends AsyncTask<String, Integer, List<LatLng>> {
 
         // Parsing the data in non-ui thread
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+        protected List<LatLng> doInBackground(String... jsonData) {
 
-            JSONObject jObject;
-            List<List<HashMap<String, String>>> routes = null;
+            JSONObject jsonObject;
+            List<LatLng> routePoints = null;
 
             try {
-                jObject = new JSONObject(jsonData[0]);
+                jsonObject = new JSONObject(jsonData[0]);
 
                 // Starts parsing data
-                routes = directionsUtility.parseJSONObject(jObject);
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jsonObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return routes;
+            return routePoints;
         }
 
         // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-            ArrayList<LatLng> points = null;
-            PolylineOptions lineOptions = null;
+        protected void onPostExecute(List<LatLng> routePoints) {
+            // Create a PolylineOptions object
+            PolylineOptions lineOptions = new PolylineOptions();
 
-            // Traversing through all the routes
-            for (int i = 0; i < result.size(); i++) {
-                points = new ArrayList<LatLng>();
-                lineOptions = new PolylineOptions();
-
-                // Fetching i-th route
-                List<HashMap<String, String>> path = result.get(i);
-
-                // Fetching all the points in i-th route
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
-
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    LatLng position = new LatLng(lat, lng);
-
-                    points.add(position);
+            for (LatLng routePoint : routePoints) {
+                Log.i(TAG, "Enhanced for loop with each section LatLng point: " + routePoint.toString());
+                if (allNonDuplicateLatLng.size() == 0) {
+                    Log.i(TAG, "Adding first point: " + routePoint.toString());
+                    allNonDuplicateLatLng.add(routePoint);
+                } else if (!routePoint.toString().equals(allNonDuplicateLatLng.get(allNonDuplicateLatLng.size() - 1).toString())) {
+                    Log.i(TAG, "Adding non repeating points: " + routePoint.longitude + " " + routePoint.latitude);
+                    allNonDuplicateLatLng.add(routePoint);
                 }
-
-                for (LatLng point : points) {
-                    Log.i(TAG, "Enhanced for loop with each section LatLng point: " + point.toString());
-                    if (allNonDuplicateLatLng.size() == 0) {
-                        Log.i(TAG, "Adding first point: " + point.toString());
-                        allNonDuplicateLatLng.add(point);
-                    } else if (!point.toString().equals(allNonDuplicateLatLng.get(allNonDuplicateLatLng.size() - 1).toString())) {
-                        Log.i(TAG, "Adding non repeating points: " + point.longitude + " " + point.latitude);
-                        allNonDuplicateLatLng.add(point);
-                    } else {
-                        // not adding point
-                    }
-                }
-                Log.i(TAG, "Enhanced for loop with all LatLng points: " + allNonDuplicateLatLng.toString());
-
-                // Adding all the points in the route to LineOptions
-                lineOptions.addAll(points);
-                lineOptions.width(6);
-                lineOptions.color(Color.BLUE);
             }
+            Log.i(TAG, "Enhanced for loop with all LatLng points: " + allNonDuplicateLatLng.toString());
 
-            // Drawing polyline in the Google Map for the i-th route
+            // Adding all the points in the route to LineOptions
+            lineOptions.addAll(routePoints);
+            lineOptions.width(6);
+            lineOptions.color(Color.BLUE);
+
+            // Drawing polyline on the map
             mMap.addPolyline(lineOptions);
         }
     }

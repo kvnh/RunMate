@@ -328,12 +328,12 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Parsing the data in non-ui thread
         @Override
         protected List<LatLng> doInBackground(String... jsonData) {
-            JSONObject jObject;
+            JSONObject jsonObject;
             List<LatLng> routePoints = null;
             try {
-                jObject = new JSONObject(jsonData[0]);
+                jsonObject = new JSONObject(jsonData[0]);
                 // Start parsing data
-                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jObject);
+                routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jsonObject);
             } catch (Exception e) {
                 Log.d("Background task error: ", e.toString());
             }
@@ -344,15 +344,13 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         @Override
         protected void onPostExecute(List<LatLng> routePoints) {
 
-            ArrayList<LatLng> points = new ArrayList<LatLng>();
+            ArrayList<LatLng> points = new ArrayList<LatLng>(routePoints);
+            ArrayList<LatLng> sectionLatLng = new ArrayList<LatLng>(routePoints);
             PolylineOptions lineOptions = new PolylineOptions();
-            ArrayList<LatLng> sectionLatLng = new ArrayList<LatLng>();
 
             // Fetching all the points in i-th route
             for (int i = 0; i < routePoints.size(); i++) {
-                points.add(routePoints.get(i));
                 mRoute.setMinMaxLatLng(routePoints.get(i));
-                sectionLatLng.add(routePoints.get(i));
             }
 
             mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
