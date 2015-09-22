@@ -6,10 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.khackett.runmate.R;
-import com.khackett.runmate.ui.FriendsFragment;
 import com.khackett.runmate.ui.InboxRouteFragment;
 import com.khackett.runmate.ui.MyRunsFragment;
-import com.khackett.runmate.ui.SettingsFragment;
 
 import java.util.Locale;
 
@@ -73,8 +71,6 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
                 return mContext.getString(R.string.title_section1).toUpperCase(locale);
             case 1:
                 return mContext.getString(R.string.title_section2).toUpperCase(locale);
-//            case 2:
-//                return mContext.getString(R.string.title_section3).toUpperCase(locale);
         }
         return null;
     }

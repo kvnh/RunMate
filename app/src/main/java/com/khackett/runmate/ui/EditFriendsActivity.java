@@ -43,6 +43,8 @@ public class EditFriendsActivity extends Activity {
     // Declare the context of the activity.
     protected Context mContext;
 
+    private static final int PARSE_USER_QUERY_LIMIT = 500;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +75,7 @@ public class EditFriendsActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        // Get the current user using the getCurrentUser() method
+        // Get the current logged in user
         mCurrentUser = ParseUser.getCurrentUser();
         // For the relation, from this user, call the getRelation() method
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
@@ -89,9 +91,9 @@ public class EditFriendsActivity extends Activity {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         // Sort the results of the query in ascending order by username.
         query.orderByAscending(ParseConstants.KEY_USERNAME);
-        // Set query limits to 1000 users.
-        query.setLimit(1000);
-        // Execute the query.
+        // Set query limits to 500 users.
+        query.setLimit(PARSE_USER_QUERY_LIMIT);
+        // Execute the query in the background thread.
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
@@ -102,7 +104,7 @@ public class EditFriendsActivity extends Activity {
                 if (e == null) {
                     // Successful query - display ParseUsers
                     mUsers = users;
-                    // Create an array of strings to store the usernames
+                    // Create an array of strings to store the ParseUsers
                     // and set the size equal to that of the list returned.
                     String[] usernames = new String[mUsers.size()];
                     // Enhanced for loop to go through the list of ParseUsers and extract usernames

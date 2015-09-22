@@ -400,12 +400,15 @@ public class RouteRecipientsActivity extends Activity {
         }
     };
 
+    /**
+     * Method to send a push notification to a user in the Route recipient list
+     */
     protected void sendPushNotifications() {
-        // Add the ParseQuery and attach specific targeting data
+        // Add the ParseQuery and attach specific targeting data.
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        // Match with the user ID's in the recipients list
-        // getRecipientIds() returns an array list of Strings
-        // Notify users where the ID is equal to one of the recipients ID's
+        // Match with the user ID's in the recipients list.
+        // getRecipientIds() returns an array list of Strings.
+        // Notify users where the ID is equal to one of the recipients ID's.
         query.whereContainedIn(ParseConstants.KEY_USER_ID, getRecipientIds());
 
         // Send a push notification

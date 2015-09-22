@@ -45,6 +45,7 @@ import java.util.List;
 
 public class MapsActivityDisplayRoute extends FragmentActivity implements View.OnClickListener {
 
+    // Simple class TAG for logcat output
     public static final String TAG = MapsActivityDisplayRoute.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -602,7 +603,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
                         @Override
                         public void onFinish() {
-                            Log.i(TAG, "Camera finished");
+                            Log.i(TAG, "Camera animation finished");
                             mRunMateAnimator.reset();
                             Handler handler = new Handler();
                             handler.post(mRunMateAnimator);
@@ -610,7 +611,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
                         @Override
                         public void onCancel() {
-                            Log.i(TAG, "Cancelling camera animation");
+                            Log.i(TAG, "Camera animation cancelled");
                         }
                     });
         }

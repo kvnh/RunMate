@@ -28,32 +28,36 @@ import java.util.List;
 /**
  * Custom adapter that uses the message_item.xml layout file
  * Adapter has two parts:
- * Define a custom layout that will be used for each item in the list;
- * Then create a custom class that adapts one item/message of the parse objects into the layout.
+ * A custom layout that will be used for each item in the list;
+ * A custom subclass, ViewHolder, that adapts each item of the ParseObject into the layout.
+ * The common ViewHolder pattern is applied to enable an efficient ListView performance
  * Created by KHackett on 31/07/15.
  */
 public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
-
+    
+    // Simple class TAG for logcat output
     public static final String TAG = RouteMessageAdapter.class.getSimpleName();
 
-    protected Context mContext;
-    protected List<ParseObject> mRoutes;
+    // Declare Context and Route List variables
+    private Context mContext;
+    private List<ParseObject> mRoutes;
 
-    // pass the list of activities to the RouteMessageAdapter
-
-    // create a constructor
+    // Create a constructor
     public RouteMessageAdapter(Context context, List<ParseObject> routes) {
         super(context, R.layout.message_item, routes);
         mContext = context;
         mRoutes = routes;
     }
 
-    // class that contains the data that is going to be displayed in the custom layout for each item
+    /**
+     * ViewHolder class that contains the data to be displayed in the custom layout for each Route item
+     */
     private static class ViewHolder {
         // The image to be displayed
         ImageView profilePicView;
-        // The users name
-        TextView nameLabel;
+        // The senders name
+        TextView senderNameLabel;
+        // The name of the route
         TextView routeNameLabel;
         // The time the message was sent
         TextView timeLabel;
@@ -63,76 +67,74 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
         TextView timeAndDateLabel;
     }
 
-    // in fragments, the adapter called an appropriate method to get a fragment, then it adapter it and then put in the view
-    // ...the same thing is happening here - this adapter (which is going to be attached to a list view) is going to call a
-    // method called getView(), its going to create the view, inflate it into a layout and then attach it into the list view
-    // override getView() to use a custom list adapter
+    /**
+     * Method to create the View, inflate it into the layout, and attach it onto the ListView.
+     *
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // we want to create a method that is efficient for the list view
-        // the more efficient we are in this method, the better our list view will perform
-        // - this affects things like scrolling or tapping on items
-        // a common pattern that help with this is the ViewHolder PATTERN!!!
-        final ViewHolder holder; // we need to create this ViewHolder class
 
-        // when doing a custom list adapter, the convention is to create a private static class that we can reference - see below
+        // Create an instance of the ViewHolder class
+        final ViewHolder viewHolder;
 
-        // this method is called in such a way that the views are recycled for the list view
-        // the android system recycles the views if they already exist
+        // Check if the view is null
         if (convertView == null) {
-            // we want to inflate the view (convertView) from the layout file, using the context, and then return it to the list
-            // Done by using the LayoutInflater - an Android object that takes XML layouts and turns them into views in code that we can use
+            // If so, inflate the view (convertView) from the layout file, using the context, and then return it to the list
+            // Use the LayoutInflater - Android object that takes XML layouts and turns them into views
             convertView = LayoutInflater.from(mContext).inflate(R.layout.message_item, null);
 
-            // initialise holder as a new ViewHolder - and initialise the image view and text view inside it
-            holder = new ViewHolder();
-            // findViewById() is an activity method, but we can call it from the convert view
-            holder.profilePicView = (ImageView) convertView.findViewById(R.id.profilePic);
-            holder.nameLabel = (TextView) convertView.findViewById(R.id.senderLabel);
-            holder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
-            holder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
-            holder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
-            holder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
-            convertView.setTag(holder);
+            // Initialise a new ViewHolder - then initialise the data inside it.
+            viewHolder = new ViewHolder();
+            // findViewById() is an Activity method - can be called from the View.
+            viewHolder.profilePicView = (ImageView) convertView.findViewById(R.id.profilePic);
+            viewHolder.senderNameLabel = (TextView) convertView.findViewById(R.id.senderLabel);
+            viewHolder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
+            viewHolder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
+            viewHolder.distanceLabel = (TextView) convertView.findViewById(R.id.distanceLabel);
+            viewHolder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
+            convertView.setTag(viewHolder);
         } else {
-            // then it already exists and we can reuse the components - they are already there in memory - we just need to change the data
-            // so instead of creating the holder from scratch, do the following. getTag() gets us the ViewHolder that was already created - this is part of the ViewHolder pattern
-            holder = (ViewHolder) convertView.getTag();
+            // View already exists - reuse the components already in memory - just need to change the data.
+            // Instead of creating the holder from scratch, call getTag() to get the ViewHolder that is already created.
+            // Views are recycled for the ListView - ViewHolder pattern in action.
+            // Android system recycles the views if they already exist.
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // set the data in the view - picture icon and name
-        // get the parse object that corresponds to position, because getView() is going to be called for each position in the list
+        // Get the ParseObject that corresponds to the List position.
+        // getView() is going to be called for each position in the List.
         ParseObject route = mRoutes.get(position);
 
-        // Declare a new Java Date variable to contain the date the route was sent
+        // Declare a new Date variable to contain the date the route was sent.
         Date sentAt = route.getCreatedAt();
-        // Convert Date object into a String object to be used in the text view
+        // Convert Date object into a String object.
         long timeNow = new Date().getTime();
         String stringDate = DateUtils.getRelativeTimeSpanString(
                 sentAt.getTime(),
                 timeNow,
                 DateUtils.SECOND_IN_MILLIS).toString();
+        // Use newly created String Date in the TextView.
+        viewHolder.timeLabel.setText(stringDate);
 
-        // Use newly created String Date in the Text View
-        holder.timeLabel.setText(stringDate);
-
-        // Get the objectId of the route sender
+        // Get the objectId of the Route sender
         String senderId = route.getString(ParseConstants.KEY_SENDER_IDS);
-        // Query Parse to get the matching user in the User table
+        // Query Parse to get the matching user in the User table.
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("objectId", senderId);
         query.getFirstInBackground(new GetCallback<ParseUser>() {
             public void done(ParseUser user, ParseException e) {
                 if (e == null) {
                     // If no exception
-                    Log.d(TAG, "Checking sender name: " + user.get("username").toString());
                     ParseFile image = (ParseFile) user.getParseFile("profilePic");
-
                     if (image == null) {
-                        // Assign the empty avatar image
-                        holder.profilePicView.setImageResource(R.mipmap.avatar_empty);
+                        // Assign the empty avatar image in the ViewHolder
+                        viewHolder.profilePicView.setImageResource(R.mipmap.avatar_empty);
                     } else {
-                        // Assign the users profile image
+                        // Assign the users profile image in the ViewHolder
                         Picasso.with(mContext)
                                 // Load the URL
                                 .load(image.getUrl())
@@ -140,7 +142,7 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
                                 .placeholder(R.mipmap.avatar_empty)
                                 .resize(180, 180)
                                         // Load into user image view
-                                .into(holder.profilePicView);
+                                .into(viewHolder.profilePicView);
                     }
 
                 } else {
@@ -149,30 +151,37 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
             }
         });
 
-        holder.nameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
-
-        holder.routeNameLabel.setText(route.getString(ParseConstants.KEY_ROUTE_NAME));
+        // Set the name of the sender
+        viewHolder.senderNameLabel.setText(route.getString(ParseConstants.KEY_SENDER_NAME));
+        // Set the name of the Route
+        viewHolder.routeNameLabel.setText(route.getString(ParseConstants.KEY_ROUTE_NAME));
 
         // Create an instance of SimpleDateFormat used for formatting
-        // the string representation of date (month/day/year)
+        // the String representation of date (day/month/year Hours:Minutes)
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         Date proposedTimeParse = route.getDate(ParseConstants.KEY_ROUTE_PROPOSED_TIME);
         String proposedTimeString = dateFormat.format(proposedTimeParse);
-        holder.timeAndDateLabel.setText(proposedTimeString);
+        viewHolder.timeAndDateLabel.setText(proposedTimeString);
 
+        // Set the distance of the Route
         double routeDistance = route.getDouble(ParseConstants.KEY_ROUTE_DISTANCE);
-        holder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));
+        viewHolder.distanceLabel.setText(String.format("%.2f km", routeDistance / 1000));
 
+        // Return the View
         return convertView;
     }
 
-    // method to refill the list with ParseObject data if it is not null
-    public void refill(List<ParseObject> messages) {
-        // clear the current data
+    /**
+     * Method to refill the list with ParseObject data if it is not null
+     *
+     * @param routes - the Route items in Parse
+     */
+    public void refill(List<ParseObject> routes) {
+        // Clear the current data
         mRoutes.clear();
-        // add all the new ones
-        mRoutes.addAll(messages);
-        //  need to call notifyDataSetChanged() on the adapter after changing its contents
+        // Add all the new ones
+        mRoutes.addAll(routes);
+        //  Call notifyDataSetChanged() on the adapter after changing its contents
         notifyDataSetChanged();
     }
 }

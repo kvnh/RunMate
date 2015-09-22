@@ -147,10 +147,10 @@ public class DirectionsUtility {
             // Get the 'routes' data from the JSON object
             JSONObject jsonRouteObject = jsonObject.getJSONArray("routes").getJSONObject(0);
             // Get the single points object from 'overview_polyline'
-            JSONObject poly = jsonRouteObject.getJSONObject("overview_polyline");
-            String polyline = poly.getString("points");
+            JSONObject overviewPolyline = jsonRouteObject.getJSONObject("overview_polyline");
+            String points = overviewPolyline.getString("points");
             // Decode the polyline to get a List of LatLng values
-            routePoints = decodePoly(polyline);
+            routePoints = decodePoly(points);
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -41,6 +41,7 @@ import java.util.List;
 
 public class MapsActivityDirectionsMultiple extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
 
+    // Simple class TAG for logcat output
     public static final String TAG = MapsActivityDirectionsMultiple.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -344,15 +345,18 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         @Override
         protected void onPostExecute(List<LatLng> routePoints) {
 
+            // Create and declare Arraylists
             ArrayList<LatLng> points = new ArrayList<LatLng>(routePoints);
             ArrayList<LatLng> sectionLatLng = new ArrayList<LatLng>(routePoints);
+            // Create a new PolylineOptions object to draw the route
             PolylineOptions lineOptions = new PolylineOptions();
 
-            // Fetching all the points in i-th route
+            // Get all the points in routePoints to determine MinMaxLatLng
             for (int i = 0; i < routePoints.size(); i++) {
                 mRoute.setMinMaxLatLng(routePoints.get(i));
             }
 
+            // Add the sectionLatLng value to the Route
             mRoute.setMinMaxLatLngSectionArrayList(sectionLatLng);
 
             // Iterate through the section array list and add to member variable allLatLngPoints
@@ -368,7 +372,6 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Drawing polyline in the Google Map for the i-th route
             mMap.addPolyline(lineOptions);
-
         }
     }
 
