@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by KHackett on 29/07/15.
+ * Class to handle requests and data related to interaction with the Google Maps Directions API
  */
 public class DirectionsUtility {
 
@@ -85,61 +85,13 @@ public class DirectionsUtility {
     }
 
     /**
-     * Method that receives a JSONObject and returns a list of lists
-     * containing latitude and longitude values of the JSONObject.
-     *
-     * @param jObject
-     * @return
-     */
-    public List<List<HashMap<String, String>>> parseJSONObject(JSONObject jObject) {
-
-        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
-        JSONArray jsonRoutes = null;
-        JSONArray jsonLegs = null;
-        JSONArray jsonSteps = null;
-
-        try {
-
-            // Get all values in the routes array from the JSONObject
-            jsonRoutes = jObject.getJSONArray("routes");
-
-            // Iterate through routes array to get legs
-            for (int i = 0; i < jsonRoutes.length(); i++) {
-                jsonLegs = ((JSONObject) jsonRoutes.get(i)).getJSONArray("legs");
-                List route = new ArrayList<HashMap<String, String>>();
-                // Iterate through legs array to get steps
-                for (int j = 0; j < jsonLegs.length(); j++) {
-                    jsonSteps = ((JSONObject) jsonLegs.get(j)).getJSONArray("steps");
-                    // Iterate through steps array to get each of the points value
-                    for (int k = 0; k < jsonSteps.length(); k++) {
-                        String polyline = "";
-                        polyline = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("polyline")).get("points");
-                        List<LatLng> points = decodePoly(polyline);
-                        // Iterate through points array
-                        for (int l = 0; l < points.size(); l++) {
-                            HashMap<String, String> pointsHashMap = new HashMap<String, String>();
-                            pointsHashMap.put("lat", Double.toString(((LatLng) points.get(l)).latitude));
-                            pointsHashMap.put("lng", Double.toString(((LatLng) points.get(l)).longitude));
-                            route.add(pointsHashMap);
-                        }
-                    }
-                    routes.add(route);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-        }
-        return routes;
-    }
-
-    /**
      * Method that receives a JSONObject and returns a list of LatLng points.
      *
      * @param jsonObject - the JSONObject to parse the LatLng values from
      * @return a List of LatLng values
      */
     public List<LatLng> parseJSONObjectOverviewPolyline(JSONObject jsonObject) {
+
         // Create a List to hold all LatLng points and initialise to null
         List<LatLng> routePoints = null;
 
