@@ -24,67 +24,59 @@ import com.khackett.runmate.ui.AddRouteDetailsActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to plot a Route on a map manually
+ */
 public class MapsActivityManualPolyline extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
 
+    // Simple class TAG for logcat output
     public static final String TAG = MapsActivityManualPolyline.class.getSimpleName();
 
+    // Member variables for Map and Route components
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
-    // create an array list to contain all of the points tapped on the map.
-    // These points will contain latitude and longitude points
+    // An array list to contain all of the points tapped on the map.
     private ArrayList<LatLng> allLatLngPoints;
-
     private List<Polyline> polylines;
-
-    // A Polyline object consists of a set of LatLng locations,
-    // and creates a series of line segments that connect those locations in an ordered sequence.
-    // create a PolylineOptions object first and add points to it
-    // instantiate a new polyline object
     private PolylineOptions polylineOptions;
-
-    // Member variable for the UI buttons
-    protected ImageButton mButtonSend;
-    protected ImageButton mButtonUndo;
-    protected ImageButton mButtonCompleteLoop;
-    protected TextView mDistanceCount;
-
     private Route mManualRoute;
+
+    // Member variables for the UI components
+    private ImageButton mButtonSend;
+    private ImageButton mButtonUndo;
+    private ImageButton mButtonCompleteLoop;
+    private TextView mDistanceCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        // Set the layout file for this fragment activity
         setContentView(R.layout.activity_maps_activity_directions_multiple);
-
         setUpMapIfNeeded();
 
-        mManualRoute = new Route();
-
-        // instantiate ArrayList LatLng object
+        // Instantiate ArrayLists
         allLatLngPoints = new ArrayList<LatLng>();
-
-        // Initialising array lists
         polylines = new ArrayList<Polyline>();
+
+        // Instantiate Route object
+        mManualRoute = new Route();
 
         // Getting reference to the SupportMapFragment of activity_maps.xml
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
-        // setting the GoogleMap object to the fragment
+        // Setting the GoogleMap object to the fragment
         mMap = fm.getMap();
 
         if (mMap != null) {
-
             // Enable MyLocation Button in the Map - Sets a blue marker to the users location
             mMap.setMyLocationEnabled(true);
             // Set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
-
             // Setting onClick event listener for the map
             mMap.setOnMapClickListener(this);
             // Setting onClickLong event listener for the map
             mMap.setOnMapLongClickListener(this);
-
         }
+
         // Set up member variables for each UI component
         mButtonSend = (ImageButton) findViewById(R.id.btn_send);
         mButtonUndo = (ImageButton) findViewById(R.id.btn_undo);
@@ -162,8 +154,8 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
 //    }
 
     /**
-     * Called when the user makes a tap gesture on the map, but only if none of the overlays of the map handled the gesture.
-     * Implementations of this method are always invoked on the main thread.
+     * Called when the user makes a tap gesture on the map, but only if none of the overlays of
+     * the map handled the gesture.  Implementations of this method are always invoked on the main thread.
      *
      * @param point
      */
@@ -175,6 +167,7 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
 
     /**
      * Method to plot a point on the map
+     *
      * @param point
      */
     public void plotPoint(LatLng point) {
@@ -216,13 +209,14 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         // Add Polyline to list and draw on map
         polylines.add(mMap.addPolyline(polylineOptions));
 
+        // Output the calculated distance to the UI
         double routeDistance = mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints);
         String routeDistanceString = String.format("%.3f km", routeDistance / 1000);
         mDistanceCount.setText(routeDistanceString);
     }
 
     /**
-     * after long clicking the map, all markers are cleared
+     * After long clicking the map, all markers are cleared
      *
      * @param point
      */
@@ -242,32 +236,36 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
         mDistanceCount.setText(routeDistance / 1000 + "km");
     }
 
+    /**
+     * Method to send a Route to a user
+     */
     public void sendRoute() {
         // First ensure that there are at least 2 points in the ArrayList
         if (!markerCountValidCheck()) {
-            // alert user to add more points
+            // If not, alert user to add more points
         } else {
-            // Declare intent to capture a route
+            // Declare intent
             Intent createRouteIntent = new Intent(MapsActivityManualPolyline.this, AddRouteDetailsActivity.class);
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", mManualRoute.getMarkerPoints());
-
+            // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
-
             // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", mManualRoute.getLatLngBounds());
-
             // Add the total distance of the route to the intent object
             createRouteIntent.putExtra("routeDistance", mManualRoute.calculateDistanceBetweenLocations(allLatLngPoints));
-
             // Add the creation type of the route to the intent object
             createRouteIntent.putExtra("routeCreationMethod", "MANUAL");
-
-            // Start RouteRecipientsActivity in order to choose recipients
+            // Start AddRouteDetailsActivity in order to add extra Route details
             startActivity(createRouteIntent);
         }
     }
 
+    /**
+     * Method to check that the user has added at least two points to the Route before they can send.
+     *
+     * @return false if there are less than 2 points plotted; true if there are 2 or more points plotted.
+     */
     private boolean markerCountValidCheck() {
         // Ensure that there are at least 2 points in the ArrayList
         if (mManualRoute.getMarkerPoints().size() <= 1) {
@@ -296,8 +294,8 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     }
 
     /**
-     * checks if a map fragment has already been created
-     * if not, then it creates one and calls the setUpMap() method
+     * Checks if a map fragment has already been created.
+     * If not, then it creates one and calls the setUpMap() method.
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -306,14 +304,13 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                // addLines();
                 setUpMap();
             }
         }
     }
 
     private void setUpMap() {
-        // set the app to locate the users current location
+        // Set the app to locate the users current location
         mMap.setMyLocationEnabled(true);
     }
 

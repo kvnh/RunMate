@@ -66,7 +66,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Set the layout file for this fragment activity
         setContentView(R.layout.activity_maps_activity_directions_multiple);
 
-        // Instantiate ArrayList
+        // Instantiate ArrayLists
         polylines = new ArrayList<Polyline>();
         allLatLngPoints = new ArrayList<LatLng>();
 
@@ -170,7 +170,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             createRouteIntent.putExtra("routeDistance", mRoute.getTotalDistance());
             // Add the creation type of the route to the intent object
             createRouteIntent.putExtra("routeCreationMethod", "DIRECTIONS_API");
-            // Start RouteRecipientsActivity in order to add extra Route details
+            // Start AddRouteDetailsActivity in order to add extra Route details
             startActivity(createRouteIntent);
         }
     }
