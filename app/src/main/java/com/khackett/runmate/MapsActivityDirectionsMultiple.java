@@ -39,22 +39,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class to plot a Route on a map with assistance from Google Maps Directions API
+ */
 public class MapsActivityDirectionsMultiple extends FragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, View.OnClickListener {
 
     // Simple class TAG for logcat output
     public static final String TAG = MapsActivityDirectionsMultiple.class.getSimpleName();
 
+    // Member variables for Map and Route components
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     private List<Polyline> polylines;
-
     private Route mRoute;
-
     private ArrayList<LatLng> allLatLngPoints;
-
     private DirectionsUtility directionsUtility;
 
-    // Member variable for the UI buttons
+    // Member variables for the UI components
     private ImageButton mButtonSend;
     private ImageButton mButtonUndo;
     private ImageButton mButtonCompleteLoop;
@@ -66,12 +66,12 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Set the layout file for this fragment activity
         setContentView(R.layout.activity_maps_activity_directions_multiple);
 
-        // Instantiate array lists
+        // Instantiate ArrayList
         polylines = new ArrayList<Polyline>();
         allLatLngPoints = new ArrayList<LatLng>();
-
+        // Instantiate Route object
         mRoute = new Route();
-
+        // Instantiate DirectionsUtility object
         directionsUtility = new DirectionsUtility();
 
         // Getting reference to SupportMapFragment of the activity_maps
@@ -148,32 +148,35 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         }
     }
 
+    /**
+     * Method to send a Route to a user
+     */
     public void sendRoute() {
         // First ensure that there are at least 2 points in the ArrayList
         if (!markerCountValidCheck()) {
-            // alert user to add more points
+            // Alert user to add more points
         } else {
-            // Declare intent to capture a route
+            // Declare intent
             Intent createRouteIntent = new Intent(MapsActivityDirectionsMultiple.this, AddRouteDetailsActivity.class);
             // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", mRoute.getMarkerPoints());
-
+            // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
-
             // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", mRoute.getLatLngBounds());
-
             // Add the total distance of the route to the intent object
             createRouteIntent.putExtra("routeDistance", mRoute.getTotalDistance());
-
             // Add the creation type of the route to the intent object
             createRouteIntent.putExtra("routeCreationMethod", "DIRECTIONS_API");
-
-            // Start RouteRecipientsActivity in order to choose recipients
+            // Start RouteRecipientsActivity in order to add extra Route details
             startActivity(createRouteIntent);
         }
     }
 
+    /**
+     * Method to replicate an undo action when plotting a Route.
+     * Visibly removes the last plotted section and updates the Route object to remove the last point.
+     */
     public void undoClick() {
         if (mRoute.getMarkerPoints().size() <= 1) {
             // Alert user that they cannot trigger the undo action any more
@@ -216,6 +219,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         }
     }
 
+    /**
+     * Method to complete the Route back to the starting point
+     */
     public void completeLoop() {
         // Check that the minimum number of points have been selected
         if (!markerCountValidCheck()) {
@@ -223,15 +229,26 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         } else {
             // Complete loop by plotting the first point plotted
             plotPoint(mRoute.getMarkerPoints().get(0));
+            // Zoom out to view the entire Route
             zoomToArea();
         }
     }
 
+    /**
+     * Method to zoom the camera out to view the entire Route
+     */
     private void zoomToArea() {
+        // Get the LatLngBounds value from the Route object
         LatLngBounds latLngBounds = mRoute.getLatLngBounds();
+        // Animate the camera using these values
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 60));
     }
 
+    /**
+     * Method to check that the user has added at least two points to the Route before they can send.
+     *
+     * @return false if there are less than 2 points plotted; true if there are 2 or more points plotted.
+     */
     private boolean markerCountValidCheck() {
         // Ensure that there are at least 2 points in the ArrayList
         if (mRoute.getMarkerPoints().size() <= 1) {
@@ -252,6 +269,11 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         }
     }
 
+    /**
+     * Method to plot a point on the map.
+     *
+     * @param point the point plotted by the user
+     */
     private void plotPoint(LatLng point) {
         // Animate camera to centre on touched position
         mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
@@ -262,7 +284,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Creating MarkerOptions object
         MarkerOptions marker = new MarkerOptions();
 
-        // Sets the location for the marker to the touched point
+        // Set the location for the marker to the touched point
         marker.position(point);
 
         // For the start location, the colour of the marker is GREEN
@@ -271,6 +293,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         }
 
+        // Once the second point is plotted, begin calls to the Directions API
         if (mRoute.getMarkerPoints().size() >= 2) {
             LatLng point1 = mRoute.getMarkerPoint1();
             LatLng point2 = mRoute.getMarkerPoint2();
@@ -280,9 +303,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
             // Creating URL to send to the Google Directions API.
             String url = directionsUtility.getDirectionsUrl(point1, point2);
-            // Create a DownloadTask object - see nested class below
+            // Create a DownloadURLTask object - see nested class below
             DownloadURLTask downloadURLTask = new DownloadURLTask();
-            // Start downloading json data from Google Directions API
+            // Start downloading JSON data from Google Directions API
             downloadURLTask.execute(url);
         }
 
@@ -290,7 +313,9 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         mMap.addMarker(marker);
     }
 
-    // Asynchronous task to fetch JSON data via the passed in URL
+    /**
+     * Asynchronous task to fetch JSON data via the passed in URL
+     */
     private class DownloadURLTask extends AsyncTask<String, Void, String> {
         // Downloading data in non-ui thread
         @Override
@@ -322,14 +347,16 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
     }
 
     /**
-     * A class to parse the LatLng values from the Directions API JSON data.
+     * An AsyncTask class to parse the LatLng values from the Directions API JSON data.
      * LatLng values will then be used to plot a line on the map.
      */
     private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<LatLng>> {
         // Parsing the data in non-ui thread
         @Override
         protected List<LatLng> doInBackground(String... jsonData) {
+            // Create a JSONObject to store the returned JSON data
             JSONObject jsonObject;
+            // List to hold all of the route points in the returned JSON data
             List<LatLng> routePoints = null;
             try {
                 jsonObject = new JSONObject(jsonData[0]);
@@ -338,6 +365,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             } catch (Exception e) {
                 Log.d("Background task error: ", e.toString());
             }
+            // Return the routePoints to the onPostExecute()
             return routePoints;
         }
 
@@ -348,6 +376,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             // Create and declare Arraylists
             ArrayList<LatLng> points = new ArrayList<LatLng>(routePoints);
             ArrayList<LatLng> sectionLatLng = new ArrayList<LatLng>(routePoints);
+
             // Create a new PolylineOptions object to draw the route
             PolylineOptions lineOptions = new PolylineOptions();
 
@@ -370,30 +399,33 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
             lineOptions.width(6);
             lineOptions.color(Color.BLUE);
 
-            // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
+            // Add Polyline to list and draw on map
+            polylines.add(mMap.addPolyline(lineOptions));
         }
     }
 
     /**
-     * A class to parse the distance value between 2 points - extracted from the
+     * An AsyncTask class to parse the distance value between 2 points - extracted from the
      * Directions API.
      */
     private class ParseDistanceTask extends AsyncTask<String, Integer, Double> {
         // Parsing the data in the non-ui thread
         @Override
         protected Double doInBackground(String... jsonData) {
+            // Create a JSONObject to store the returned JSON data
             JSONObject jsonObject;
+            // Double value to hold the distance between the 2 points
             Double distance = null;
             try {
+                // Assign the returned JSON String to the JSONObject
                 jsonObject = new JSONObject(jsonData[0]);
-                // Get all routes from the routes array
+                // Get all routes from the 'routes' array
                 JSONArray array = jsonObject.getJSONArray("routes");
                 // Get the first route in the JSON object
                 JSONObject routes = array.getJSONObject(0);
-                // Get all of the legs from the route and add to legs array
+                // Get all of the 'legs' from the 'route' and add to legs array
                 JSONArray legs = routes.getJSONArray("legs");
-                // Get the first leg in the JSON object
+                // Get the first 'leg' in the JSON object
                 JSONObject steps = legs.getJSONObject(0);
                 // Get the distance element
                 JSONObject distanceJSON = steps.getJSONObject("distance");
@@ -408,6 +440,7 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Executes in UI thread, after the parsing process.
         @Override
         protected void onPostExecute(Double distance) {
+            // Update the UI with the extracted distance value
             mRoute.setTotalDistance(distance);
             double routeDistance = mRoute.getTotalDistance();
             Log.i(TAG, "Total Distance calculated in AsyncTask in m = " + routeDistance);
