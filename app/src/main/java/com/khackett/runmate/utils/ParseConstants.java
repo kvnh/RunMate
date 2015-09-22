@@ -1,8 +1,8 @@
 package com.khackett.runmate.utils;
 
 /**
- * Created by KHackett on 24/07/15.
- * This class will hold two different types of data - class names and field names
+ * Class to hold key names used in the Parse backend.
+ * Two different types of data will be held in this class - class names and field names
  */
 public final class ParseConstants {
 

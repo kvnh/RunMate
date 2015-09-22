@@ -7,7 +7,6 @@ import com.khackett.runmate.ui.MainActivity;
 import com.parse.ParsePushBroadcastReceiver;
 
 /**
- * Created by KHackett on 28/08/15.
  * Receiver class to handle messages sent to users
  */
 public class ParseReceiver extends ParsePushBroadcastReceiver {
@@ -15,6 +14,7 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
     /**
      * Called whenever a push message is selected.
      * Opens MainActivity when the push notification is selected.
+     *
      * @param context
      * @param intent
      */
