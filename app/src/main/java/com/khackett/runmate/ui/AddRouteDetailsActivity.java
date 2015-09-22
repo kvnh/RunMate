@@ -39,7 +39,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     private double routeDistance;
     private String creationType;
 
-    // Member variable for the UI buttons
+    // Member variable for the UI components
     private TextView mButtonDatePicker;
     private TextView mButtonTimePicker;
     private EditText mRouteName;
@@ -64,10 +64,10 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         // Set up member variables for each UI component
         mButtonDatePicker = (TextView) findViewById(R.id.proposeDateButton);
         mButtonTimePicker = (TextView) findViewById(R.id.proposeTimeButton);
-        mRouteName = (EditText) findViewById(R.id.routeNameButton);
+        mRouteName = (EditText) findViewById(R.id.routeName);
         mChooseFriends = (Button) findViewById(R.id.chooseFriendsButton);
 
-        // Register buttons with the listener
+        // Register components with the listener
         mButtonDatePicker.setOnClickListener(this);
         mButtonTimePicker.setOnClickListener(this);
         mRouteName.setOnClickListener(this);
@@ -81,8 +81,9 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
      */
     @Override
     public void onClick(View v) {
+        // Switch statement to select which action to take depending on component pressed.
         switch (v.getId()) {
-            case R.id.routeNameButton:
+            case R.id.routeName:
                 //
                 break;
             case R.id.proposeDateButton:
@@ -280,7 +281,6 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

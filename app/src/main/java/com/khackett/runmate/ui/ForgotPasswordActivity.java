@@ -17,33 +17,36 @@ import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 
 /**
- * Class to reset a users RunMate password.
+ * Activity to reset a users password.
  */
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // Member variables that correspond to items in the layout.
-    protected EditText mEmail;
-    protected Button mResetPasswordButton;
-    protected Button mCancelResetPasswordButton;
+    // Simple class TAG for logcat output
+    public static final String TAG = ForgotPasswordActivity.class.getSimpleName();
 
-    // Declare the context of the activity.
-    protected Context mContext;
+    // Member variable for the UI components
+    private EditText mEmail;
+    private Button mResetPasswordButton;
+    private Button mCancelResetPasswordButton;
+
+    // Declare the context of the application.
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        // Set each member variable for the ui components
+        // Set up member variables for each UI component
         mEmail = (EditText) findViewById(R.id.emailField);
         mResetPasswordButton = (Button) findViewById(R.id.resetPasswordButton);
         mCancelResetPasswordButton = (Button) findViewById(R.id.cancelResetPasswordButton);
 
-        // Register buttons with the listener
+        // Register components with the listener
         mResetPasswordButton.setOnClickListener(this);
         mCancelResetPasswordButton.setOnClickListener(this);
 
-        // Initialise the Context to the LoginActivity.
+        // Initialise the Context to the ForgotPasswordActivity.
         mContext = ForgotPasswordActivity.this;
     }
 
@@ -54,7 +57,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
      */
     @Override
     public void onClick(View v) {
-        // Switch statement to select which action to take depending on button/text pressed.
+        // Switch statement to select which action to take depending on component pressed.
         switch (v.getId()) {
             case R.id.resetPasswordButton:
                 resetPassword();
@@ -67,9 +70,8 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         }
     }
 
-
     /**
-     * Method to reset the users password
+     * Method to reset the users password.
      */
     public void resetPassword() {
         // Get value from the edit text field.
@@ -77,7 +79,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         // - special type of String value that needs to be converted to a regular String.
         String email = mEmail.getText().toString();
 
-        // Trim whitespaces in case the user accidentally hits a space.
+        // Trim whitespaces in case user accidentally hits a space.
         email = email.trim();
 
         // Ensure that the email field is not blank.
@@ -100,6 +102,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     // Dismiss progress dialog once connection with backend has been made.
                     progressDialog.dismiss();
 
+                    // If no exception
                     if (e == null) {
                         // An email was successfully sent with reset instructions - alert the user.
                         AlertDialog.Builder builder = new AlertDialog.
@@ -169,16 +172,14 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

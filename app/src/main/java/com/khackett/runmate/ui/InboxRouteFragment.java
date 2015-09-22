@@ -25,29 +25,36 @@ import org.json.JSONArray;
 
 import java.util.List;
 
+/**
+ * Fragment to display the List of Routes in the users inbox
+ */
 public class InboxRouteFragment extends ListFragment {
 
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    // TAG to represent the FriendsFragment class
+    public static final String TAG = InboxRouteFragment.class.getSimpleName();
 
-    // member variable to store the list of routes received by the user
-    protected List<ParseObject> mRoutes;
+    // Swipe to refresh member variable
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private int MY_STATUS_CODE = 1111;
+    // Member variable to store the list of Routes received by the user
+    private List<ParseObject> mRoutes;
 
-    // Default constructor for InboxRouteFragment
+    /**
+     * Default constructor for InboxRouteFragment
+     */
     public InboxRouteFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 1st parameter is the layout id used for this fragment.
-        // 2nd parameter is the container where the fragment will be displayed (this will be the ViewPager from MainActivity)
-        // 3rd parameter should be false whenever a fragment is added to an activity in code.
-        // Inflater object used to create a new view using the layout provided.
-        // View then attached to the parent - the ViewPager object from MainActivity.
+        // 1st parameter: layout id used in this fragment.
+        // 2nd parameter: container where the fragment will be displayed (the ViewPager from TabFragmentContainer).
+        // 3rd parameter: false whenever a fragment is added to an activity.
+        // Inflater object used to create a new View using the layout provided.
+        // View is then attached to a parent - the ViewPager object from TabFragmentContainer.
         View rootView = inflater.inflate(R.layout.fragment_inbox_route, container, false);
 
-        // Return the view of the whole fragment
+        // Return the view of the fragment
         return rootView;
     }
 
@@ -86,69 +93,62 @@ public class InboxRouteFragment extends ListFragment {
         String objectId = route.getObjectId();
         String creationType = route.getString(ParseConstants.KEY_ROUTE_CREATION_TYPE);
 
-        // Create an intent to display the route.
+        // Create an intent to display the route and add relevant item data.
         Intent intent = new Intent(getActivity(), MapsActivityDisplayRoute.class);
         intent.putExtra("parseLatLngList", parseList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
         intent.putExtra("myObjectId", objectId);
         intent.putExtra("creationType", creationType);
 
-        // Start the MapsActivityDisplayRoute activity.
-        startActivityForResult(intent, MY_STATUS_CODE);
+        // Start the MapsActivityDisplayRoute with the item data.
+        startActivity(intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == MY_STATUS_CODE) {
-//            // Refresh the fragment.
-//            retrieveRoutes();
-//        }
-    }
-
+    /**
+     * Method to retrieve a List of Route items from Parse
+     */
     private void retrieveRoutes() {
 
-        // query the routes class/table in parse
-        // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
-        // querying the message class is similar to how we have been querying users
+        // Query the Routes table in Parse.
+        // Get Routes where the logged in user ID is in the list of the recipient ID's.
         ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_ROUTES);
-        // use the 'where' clause to search through the messages to find where our user ID is one of the recipients
+        // Use the 'where' clause to find where the user ID is one of the recipients.
         queryRoute.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
-        // order results so that most recent message are at the top of the inbox
+        // Order results so that most recent Routes are at the top of the inbox.
         queryRoute.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
-        // query is ready - run it
+        // Query is ready - run it on a background thread.
         queryRoute.findInBackground(new FindCallback<ParseObject>() {
-            // When the retrieval is done from the Parse query, the done() callback method is called
             @Override
             public void done(List<ParseObject> routes, ParseException e) {
 
-                // End refreshing once routes are retrieved
-                // done() is called from onResume() and the OnRefreshListener
-                // Need to check that its called from the the OnRefreshListener before ending it
+                // End refreshing once routes are retrieved.
+                // done() is called from onResume() and the OnRefreshListener.
+                // Check it is called from the the OnRefreshListener before ending it.
                 if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
-                // the list being returned is a list of routes
+                // If no exception
                 if (e == null) {
-                    // successful - routes found.  They are stored as a list in messages
+
+                    // Store the returned List
                     mRoutes = routes;
 
-                    // adapt this data for the list view, showing the senders name
-
-                    // Create an array of strings to store usernames.
-                    // Set the size equal to that of the list returned.
-                    String[] usernames = new String[mRoutes.size()];
-                    // Enhanced for loop to go through the list of users and create an array of usernames
+                    // Use returned List as the data source for the List view in the fragment.
+                    // Create an array of strings to store the routeItems and set the size equal to that of the returned List
+                    String[] routeItems = new String[mRoutes.size()];
+                    // Enhanced for loop to go through the list of Routes and create an array of routeItems
                     int i = 0;
-                    for (ParseObject message : mRoutes) {
+                    for (ParseObject route : mRoutes) {
                         // Get the specific key
-                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                        routeItems[i] = route.getString(ParseConstants.KEY_SENDER_NAME);
                         i++;
                     }
 
+                    // Create an adapter and set it as the list adapter.
                     // Create the adapter once and update its state on each refresh.
                     if (getListView().getAdapter() == null) {
-                        // the above adapter code is now replaced with the following line
+                        // Use the custom RouteMessageAdapter to display the Route data in the inbox.
                         RouteMessageAdapter adapter = new RouteMessageAdapter(getListView().getContext(), mRoutes);
 
                         // Force a refresh of the list once data has changed.
@@ -157,8 +157,7 @@ public class InboxRouteFragment extends ListFragment {
                         // Call setListAdapter (from ListActivity class) for this activity.
                         setListAdapter(adapter);
                     } else {
-                        // Refill the adapter.
-                        // Cast it to RouteMessageAdapter.
+                        // Adapter is not available - refill with the List of Routes.
                         ((RouteMessageAdapter) getListView().getAdapter()).refill(mRoutes);
                     }
                 }
@@ -166,10 +165,11 @@ public class InboxRouteFragment extends ListFragment {
         });
     }
 
+    // Swipe to refresh listener.
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            // When list is swiped down to refresh, retrieve the latest routes from the backend.
+            // When list is swiped down to refresh, retrieve the latest List of Routes from the backend.
             retrieveRoutes();
         }
     };

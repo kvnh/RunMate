@@ -29,7 +29,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/editTextLayout"
+        android:id="@+id/routeNameText"
         style="@style/AuthenticationFieldContainer"
         android:layout_below="@id/proposeTime">
 

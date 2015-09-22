@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity$PlaceholderFragment">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/background_fill"
+        android:contentDescription="@string/content_description_background"/>
+
     <GridView
         android:id="@+id/friendsGrid"
         android:layout_width="match_parent"
@@ -21,6 +28,10 @@
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/empty_friends_label"/>
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:text="@string/empty_friends_label"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
 </RelativeLayout>
