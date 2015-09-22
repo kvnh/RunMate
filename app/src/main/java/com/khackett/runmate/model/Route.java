@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class to represent a Route object in the system
  * Created by KHackett on 24/08/15.
  */
 public class Route {
@@ -25,7 +26,7 @@ public class Route {
     private ArrayList<ArrayList<LatLng>> minMaxLatLngSectionArrayList;
 
     /**
-     * Default constructor
+     * Constructor to initialise the member variables
      */
     public Route() {
         markerPoints = new ArrayList<LatLng>();
@@ -245,17 +246,21 @@ public class Route {
      */
     public double calculateDistanceBetweenLocations(ArrayList<LatLng> latLngPoints) {
 
+        // Create two Location objects
         Location locationA = new Location("locationA");
         Location locationB = new Location("locationB");
 
-        float totalDistance = locationA.distanceTo(locationB);
+        // Create float to represent the total distance between Locations
+        float totalDistance = 0;
 
+        // Iterate through the ArrayList to get the latitude and longitude values.
         for (int i = 0; i < latLngPoints.size() - 1; i++) {
             locationA.setLatitude(latLngPoints.get(i).latitude);
             locationA.setLongitude(latLngPoints.get(i).longitude);
             locationB.setLatitude(latLngPoints.get(i + 1).latitude);
             locationB.setLongitude(latLngPoints.get(i + 1).longitude);
 
+            // Calculate teh distance between the two Location objects
             float distance = locationA.distanceTo(locationB);
             totalDistance += distance;
         }

@@ -15,8 +15,6 @@
             android:id="@+id/proposeDateButton"
             style="@style/AddRouteDetailsTextView"
             android:hint="@string/route_date_hint"/>
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -28,7 +26,6 @@
             android:id="@+id/proposeTimeButton"
             style="@style/AddRouteDetailsTextView"
             android:hint="@string/route_time_hint"/>
-
     </LinearLayout>
 
     <LinearLayout
@@ -40,15 +37,14 @@
             android:id="@+id/routeName"
             style="@style/AuthenticationEditText"
             android:hint="@string/route_name_hint"/>
-
     </LinearLayout>
 
     <Button
         android:id="@+id/chooseFriendsButton"
-        android:layout_marginTop="40dp"
         style="@style/AuthenticationButton"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/editTextLayout"
+        android:layout_marginTop="40dp"
         android:text="@string/choose_friends_button_label"/>
 
 </RelativeLayout>

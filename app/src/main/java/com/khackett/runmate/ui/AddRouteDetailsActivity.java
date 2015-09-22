@@ -24,47 +24,53 @@ import com.khackett.runmate.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Activity to add date, time and name details to a recently created route.
+ */
 public class AddRouteDetailsActivity extends Activity implements View.OnClickListener {
 
+    // Simple class TAG for logcat output
     public static final String TAG = AddRouteDetailsActivity.class.getSimpleName();
 
-    // member variable to represent the array of LatLng values plotted my the user and passed into this activity via the intent that started it
-    protected ArrayList<LatLng> markerPoints;
-    protected ArrayList<LatLng> allLatLngPoints;
-    protected LatLngBounds latLngBounds;
-    protected double routeDistance;
-    protected String creationType;
+    // Member variables
+    private ArrayList<LatLng> markerPoints;
+    private ArrayList<LatLng> allLatLngPoints;
+    private LatLngBounds latLngBounds;
+    private double routeDistance;
+    private String creationType;
 
-    protected EditText mRouteName;
-    protected TextView mButtonDatePicker;
-    protected TextView mButtonTimePicker;
-    protected Button mChooseFriends;
+    // Member variable for the UI buttons
+    private TextView mButtonDatePicker;
+    private TextView mButtonTimePicker;
+    private EditText mRouteName;
+    private Button mChooseFriends;
 
-    // Variable for storing current date and time
+    // Member variables for storing current date and time
     private int mYear, mMonth, mDay, mHour, mMinute;
-
-    protected Calendar proposedDateTime;
+    private Calendar proposedDateTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_route_details);
 
-        // get the array of LatLng points passed in from the map intent
+        // Get the data passed in from the map intent and assign to member variables
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
         allLatLngPoints = getIntent().getParcelableArrayListExtra("allLatLngPoints");
         latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
         routeDistance = getIntent().getDoubleExtra("routeDistance", routeDistance);
         creationType = getIntent().getStringExtra("routeCreationMethod");
 
-        mRouteName = (EditText) findViewById(R.id.routeName);
-        mChooseFriends = (Button) findViewById(R.id.chooseFriendsButton);
+        // Set up member variables for each UI component
         mButtonDatePicker = (TextView) findViewById(R.id.proposeDateButton);
         mButtonTimePicker = (TextView) findViewById(R.id.proposeTimeButton);
+        mRouteName = (EditText) findViewById(R.id.routeNameButton);
+        mChooseFriends = (Button) findViewById(R.id.chooseFriendsButton);
 
-        mRouteName.setOnClickListener(this);
+        // Register buttons with the listener
         mButtonDatePicker.setOnClickListener(this);
         mButtonTimePicker.setOnClickListener(this);
+        mRouteName.setOnClickListener(this);
         mChooseFriends.setOnClickListener(this);
     }
 
@@ -76,7 +82,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.routeName:
+            case R.id.routeNameButton:
                 //
                 break;
             case R.id.proposeDateButton:
@@ -93,6 +99,9 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
         }
     }
 
+    /**
+     * Method to add a proposed date to the run.
+     */
     public void proposeDate() {
         // Process to get and set the Current Date when the dialog is launched
         final Calendar calendar = Calendar.getInstance();
@@ -106,15 +115,19 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 // Display selected date
                 mButtonDatePicker.setText(dayOfMonth + " / " + (monthOfYear + 1) + " / " + year);
-                // Set the member variable to the returned values form the picker
+                // Set the member variable to the returned values from the picker
                 mYear = year;
                 mMonth = monthOfYear;
                 mDay = dayOfMonth;
             }
         }, mYear, mMonth, mDay);
+        // Show the DatePickerDialog
         datePickerDialog.show();
     }
 
+    /**
+     * Method to add a proposed time to the run.
+     */
     public void proposeTime() {
         // Process to get and set Current Time when the dialog is launched
         final Calendar calendar = Calendar.getInstance();
@@ -134,56 +147,60 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
                 mMinute = minute;
             }
         }, mHour, mMinute, false);
+        // Show the DatePickerDialog
         timePickerDialog.show();
     }
 
+    /**
+     * Method to send on the details of the run to the RouteRecipientsActivity.
+     */
     public void sendRouteDetails() {
-        // Check that each of the fields have a value
-        String routeName = mRouteName.getText().toString();
 
-        // Create a calendar object and add the proposed date and time values set by the user
+        // Assign the name of the route.
+        String routeName = mRouteName.getText().toString();
+        // Create a Calendar object and add the proposed date and time values set by the user.
         proposedDateTime = Calendar.getInstance();
         proposedDateTime.set(mYear, mMonth, mDay, mHour, mMinute);
-        Log.i(TAG, "Proposed date: " + proposedDateTime.toString());
 
-
-        // First ensure that all of the fields are filled in correctly
+        // Ensure that all of the fields are filled in correctly / have a value
         if (checkForEmptyFields(routeName, mButtonDatePicker, mButtonTimePicker)) {
             // Alert user to fill in all of the fields
             showErrorDialog(R.string.send_route_error_title, R.string.send_route_error_message);
+            // Check that the time is greater than the current
         } else if (!routeTimeDateValidCheck()) {
             // Alert the user to propose a time that is greater than the current
             showErrorDialog(R.string.send_route_time_error_title, R.string.send_route_time_error_message);
         } else {
-
-            // Declare intent to send on route details
+            // All fields so send the route.
+            // Declare an intent to send on route details to RouteRecipientsActivity.
             Intent createRouteIntent = new Intent(AddRouteDetailsActivity.this, RouteRecipientsActivity.class);
-
-            // Using android.location to extend Parcelable in order to create and store the LatLng values in an arrayList
+            // Use android.location to extend Parcelable in order to create and store plotted LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("markerPoints", markerPoints);
-
+            // Use android.location to extend Parcelable in order to create and store all LatLng values in an arrayList
             createRouteIntent.putParcelableArrayListExtra("allLatLngPoints", allLatLngPoints);
-
             // Add the min and max lat and long points to the intent object
             createRouteIntent.putExtra("boundaryPoints", latLngBounds);
-
             // Add the total distance of the route to the intent object
             createRouteIntent.putExtra("routeDistance", routeDistance);
-
             // Add the name of the route to Parse
             createRouteIntent.putExtra("routeName", routeName);
-
             // Add the creation type of the route to Parse
             createRouteIntent.putExtra("routeCreationMethod", creationType);
-
-            // Add the proposed date and time for the run
+            // Add the proposed date and time for the route
             createRouteIntent.putExtra("proposedTime", proposedDateTime);
-
             // Start RouteRecipientsActivity in order to choose recipients
             startActivity(createRouteIntent);
         }
     }
 
+    /**
+     * Method to check for empty fields in AddRouteDetailsActivity
+     *
+     * @param routeName    the name of the run
+     * @param proposedDate the proposed Date of the run
+     * @param proposedTime the proposed Time of the run
+     * @return a boolean value
+     */
     public boolean checkForEmptyFields(String routeName, TextView proposedDate, TextView proposedTime) {
         if (routeName.isEmpty() ||
                 proposedDate.getText().equals("") ||
@@ -196,7 +213,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     /**
      * Method to check that the proposed time is greater than the current time
      *
-     * @return
+     * @return a boolean value
      */
     public boolean routeTimeDateValidCheck() {
         // Variables for storing current date and time
@@ -255,12 +272,11 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
