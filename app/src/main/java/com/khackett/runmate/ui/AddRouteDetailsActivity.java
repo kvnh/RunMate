@@ -32,7 +32,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     // Simple class TAG for logcat output
     public static final String TAG = AddRouteDetailsActivity.class.getSimpleName();
 
-    // Member variables
+    // Member variables for the Route object
     private ArrayList<LatLng> markerPoints;
     private ArrayList<LatLng> allLatLngPoints;
     private LatLngBounds latLngBounds;

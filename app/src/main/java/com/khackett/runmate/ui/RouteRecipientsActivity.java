@@ -39,66 +39,62 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Activity to choose the recipients for the Route
+ */
 public class RouteRecipientsActivity extends Activity {
 
+    // TAG to represent the MyRunsFragment class
     public static final String TAG = RouteRecipientsActivity.class.getSimpleName();
 
-    // set up a reference to the current user
-    protected ParseUser mCurrentUser;
-    // set up a member variable to store a list of friends for the current user returned from the parse user query
-    protected List<ParseUser> mFriends;
-    // set up a ParseRelation member to hold ParseUsers
-    protected ParseRelation<ParseUser> mFriendsRelation;
+    // Set up a reference to the current user
+    private ParseUser mCurrentUser;
+    // Set up a member variable to store a list of friends for the current user returned from the parse user query
+    private List<ParseUser> mFriends;
+    // Set up a ParseRelation member to hold ParseUsers
+    private ParseRelation<ParseUser> mFriendsRelation;
 
-    // create a menu item member variable so that it can be referenced below (it is a send button to be set on and off depending on if a user is selected)
-    // set this variable in the onCreateOptionsMenu
-    protected MenuItem mSendMenuItem;
+    // Member variable for the send button - to be set on and off depending on whether a user is selected or not
+    // Set this variable in the onCreateOptionsMenu.
+    private MenuItem mSendMenuItem;
 
-    // member variable to represent the array of LatLng values plotted my the user and passed into this activity via the intent that started it
-    protected ArrayList<LatLng> markerPoints;
+    // Member variables for the Route object.
+    private ArrayList<LatLng> markerPoints;
+    private ArrayList<LatLng> allLatLngPoints;
+    private LatLngBounds mLatLngBounds;
+    private double mRouteDistance;
+    private String mRouteName;
+    private String mCreationType;
+    private Calendar mProposedDateTime;
 
-    protected ArrayList<LatLng> allLatLngPoints;
+    // Member variables to represent an array of ParseGeoPoint values to be stored in Parse.
+    // Values are those points clicked on the map.
+    private ArrayList<ParseGeoPoint> parseLatLngList;
+    // Values are the southwest and northeast LatLng points at the bounds of the route.
+    private ArrayList<ParseGeoPoint> parseLatLngBoundsList;
 
-    protected LatLngBounds latLngBounds;
+    // Member variable for the GridView layout
+    private GridView mGridView;
 
-    protected double mRouteDistance;
-
-    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
-    // Values are those points clicked on the map
-    protected ArrayList<ParseGeoPoint> parseLatLngList;
-
-    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
-    // Values are the southwest and northeast LatLng points at the bounds of the route
-    protected ArrayList<ParseGeoPoint> parseLatLngBoundsList;
-
-    // member variable for the GridView
-    protected GridView mGridView;
-
-    protected String mRouteName;
-
-    protected String mCreationType;
-
-    protected Calendar mProposedDateTime;
-
-    // Declare the context of the activity.
-    protected Context mContext;
+    // Declare the context of the application.
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
+        // Set the layout view
         setContentView(R.layout.user_grid);
 
+        // Set up the action bar
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Set the GridView fragment
         mGridView = (GridView) findViewById(R.id.friendsGrid);
-
-        // mGridView keeps track of items that are selected (this is the check property on each item)
-        // loop through the grid to see who is checked - do this when ready to send
-        // get the default grid view associated with this activity
-        mGridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);  // we can now check and uncheck multiple friends
-
+        // mGridView keeps track of items that are selected (the check property on each item)
+        // Set it to the default grid view and allow items to be checked
+        mGridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         // Set an OnItemClickListener
         mGridView.setOnItemClickListener(mOnItemClickListener);
 
@@ -107,29 +103,19 @@ public class RouteRecipientsActivity extends Activity {
         // Attach this as the empty text view for the GridView
         mGridView.setEmptyView(emptyFriendsList);
 
-        // get the array of LatLng points from the passed in intent
+        // Get all of the Route data from the passed in intent
         markerPoints = getIntent().getParcelableArrayListExtra("markerPoints");
-
         allLatLngPoints = getIntent().getParcelableArrayListExtra("allLatLngPoints");
-
-        latLngBounds = getIntent().getParcelableExtra("boundaryPoints");
-
-        // mRouteDistance = getIntent().getParcelableExtra("routeDistance");
+        mLatLngBounds = getIntent().getParcelableExtra("boundaryPoints");
         mRouteDistance = getIntent().getDoubleExtra("routeDistance", mRouteDistance);
-
-        // Get the name of the route from the passed in intent
         mRouteName = getIntent().getStringExtra("routeName");
-
         mCreationType = getIntent().getStringExtra("routeCreationMethod");
-
-        // Get the proposed date and time from the passed in intent
         mProposedDateTime = (Calendar) getIntent().getSerializableExtra("proposedTime");
-        Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is: " + mProposedDateTime);
+
         Log.i(TAG, "Proposed date and time in RouteRecipientsActivity is (getTime()): " + mProposedDateTime.getTime());
 
-        // Initialise the Context to the EditFriendsActivity.
+        // Initialise the Context to RouteRecipientsActivity.
         mContext = RouteRecipientsActivity.this;
-
     }
 
     // get a list of all your friends - this code is copied from the onResume() method in the FriendsFragment with some additions
@@ -137,9 +123,9 @@ public class RouteRecipientsActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        // get the current user using the getCurrentUser() method
+        // Get the current user using getCurrentUser()
         mCurrentUser = ParseUser.getCurrentUser();
-        // for the relation, from this user we want to call a method called getRelation()
+        // For the FriendsRelation for current user, call getRelation()
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         // Set up a dialog progress indicator box - start it before the query to backend is run
@@ -148,60 +134,43 @@ public class RouteRecipientsActivity extends Activity {
         progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
         progressDialog.show();
 
-        // the first thing we need is a list of the users friends...
-        // we have the friend relation, but this doesn't give us a list of users to work with
-        // the list itself is still on the back end, we need to use the ParseRelation to retrieve it
-        // use the build in query to retrieve it - this gets us the query associated with this ParseRelation
-        ParseQuery<ParseUser> query = mFriendsRelation.getQuery();
+        // Get a list of the users friends.
+        // Use ParseQuery to retrieve a list of the ParseUsers associated with this user.
+        ParseQuery<ParseUser> friendsQuery = mFriendsRelation.getQuery();
 
-        // sort the list by username before calling it
-        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
+        // Sort the list by username before calling it
+        friendsQuery.addAscendingOrder(ParseConstants.KEY_USERNAME);
 
-        query.findInBackground(new FindCallback<ParseUser>() {
+        // Run the query in a background thread to get the List
+        friendsQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
 
                 // Dismiss progress dialog once result returned from backend
                 progressDialog.dismiss();
 
-                // include an if statement to check the exception
+                // If no exception returned
                 if (e == null) {
 
                     // set the mFriends variable based on the list of friends that is returned
                     mFriends = friends;
 
-                    // now we need to use mFriends as the data source for the list view in our fragments
-                    // we need to create an adapter and set it as the list adapter, just like we do for lost activities
-                    // this is very similar to what we are ding for all users in the EditFriends activity, so copy and paste that code
-
-                    // create an array of strings to store the usernames and set the size equal to that of the list returned
-                    String[] usernames = new String[mFriends.size()];
-                    // enhanced for loop to go through the list of parse users and create an array of usernames
-                    int i = 0;
-                    for (ParseUser user : mFriends) {
-                        usernames[i] = user.getUsername();
-                        i++;
-                    }
-
-                    // Use the custom user adapter
-                    // Get the adapter associated with the GridView and check to see if it is null
+                    // Create an adapter and set it as the list adapter.
+                    // Get the adapter associated with the GridView and check to see if it is null.
                     if (mGridView.getAdapter() == null) {
-                        // Use the custom UserAdapter to display the users in the GridView
+                        // Use the custom UserAdapter to display the user data in the GridView.
                         UserAdapter adapter = new UserAdapter(RouteRecipientsActivity.this, mFriends);
-                        // Call setAdapter for this activity to set the items in the GridView
+                        // Call setAdapter for this activity to set the items in the GridView.
                         mGridView.setAdapter(adapter);
                     } else {
-                        // GridView is not available - refill with the list of friends
+                        // Adapter is not available - refill with the List of friends.
                         ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
                     }
                 } else {
-                    // display a message to the user (copied from EditFriendsActivity)
-                    // there was an error - log the message
+                    // Log error and display a message to the user informing them of the error
                     Log.e(TAG, e.getMessage());
-                    // display an alert to the user
-                    // if there is a parse exception then...
                     AlertDialog.Builder builder = new AlertDialog.Builder(RouteRecipientsActivity.this);
-                    // set the message from the exception
+                    // Set the message from the exception
                     builder.setMessage(e.getMessage())
                             .setTitle(R.string.error_title)
                             .setPositiveButton(android.R.string.ok, null);
@@ -209,8 +178,7 @@ public class RouteRecipientsActivity extends Activity {
                     dialog.show();
                 }
             }
-        });
-
+        });// Set the message from the exception
     }
 
     @Override
@@ -218,29 +186,28 @@ public class RouteRecipientsActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_route_recipients, menu);
 
-        // once the menu is inflated, we can can get a menu item object using the getItem() method of the menu that is passed in
-        // use the int parameter to specify its position in the menu - since we only have 1 item, it will be at position 0
+        // Once the menu is inflated, get a menu item object using the getItem() method of the menu that is passed in.
+        // Since only one item, get position 0
         mSendMenuItem = menu.getItem(0);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will automatically handle clicks on the Home/Up button,
-        // so long as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_send) {
-            // create a parse object for the route
+            // It user selects the send button, create a parse object for the route
             ParseObject route = createRoute();
 
-            // the message variable will be null if something goes wrong
-            // so we only want to call the send() method if it is not null
+            // The Route will be null if there is an error
             if (route == null) {
-                // display error message
+                // Display error message to the user
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(R.string.error_selecting_recipient_message)
                         .setTitle(R.string.error_selecting_recipient_title)
@@ -248,11 +215,11 @@ public class RouteRecipientsActivity extends Activity {
                 AlertDialog dialog = builder.create();
                 dialog.show();
             } else {
-                // create a send message that will accept the route as a parameter
+                // Send the created Route
                 sendRoute(route);
 
-                // Send the user back to the main activity right after the message is sent.
-                // Use finish() to close the current activity and start a new main activity intent
+                // Send the user back to the MainActivity right after the route is sent.
+                // Use finish() to close the current activity and start a new MainActivity intent.
                 finish();
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
@@ -262,69 +229,74 @@ public class RouteRecipientsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected ParseObject createRoute() {
-        // create a new parse object called route
-        // (we can create a whole new class of parse objects in the back end by simply using a new name)
+    /**
+     * Method to create a Route object with the generated data
+     *
+     * @return the Route object
+     */
+    public ParseObject createRoute() {
+
+        // Create a ParseObject and add the relevant data using the key-value pairs
         ParseObject route = new ParseObject(ParseConstants.CLASS_ROUTES);
 
-        // add the LatLng points from the plotted map to the ParseObject route
+        // Add the LatLng points plotted on the map
         route.addAll(ParseConstants.KEY_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(markerPoints)));
-
+        // Add al of the LatLng points generated by the Directions API
         route.addAll(ParseConstants.KEY_ALL_LATLNG_POINTS, (convertLatLngToParseGeoPointArray(allLatLngPoints)));
-
-        // add the max and min lat and long points from the plotted map to the ParseObject route
-        route.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(latLngBounds)));
-
-        // now that we have an object, we can start adding data, using the key-value pairs...
-        // first, get a String representation of the ID
+        // Add the max and min lat and long points
+        route.addAll(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS, (convertLatLngBoundsToParseGeoPointArray(mLatLngBounds)));
+        // Add the senders Id
         route.put(ParseConstants.KEY_SENDER_IDS, ParseUser.getCurrentUser().getObjectId());
-        // put the senders name
+        // Add the senders name
         route.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
-        // put the recipient ID's
-        // get the selected friends from the list through the helper method getRecipientIds()
+        // Add the recipients ID's - use the getRecipientIds() method
         route.put(ParseConstants.KEY_RECIPIENT_IDS, getRecipientIds());
-
+        // Add the Route distance
         route.put(ParseConstants.KEY_ROUTE_DISTANCE, mRouteDistance);
-
+        // Add the Route name
         route.put(ParseConstants.KEY_ROUTE_NAME, mRouteName);
-
+        // Add the creation type of the Route
         route.put(ParseConstants.KEY_ROUTE_CREATION_TYPE, mCreationType);
-
+        // Add the proposed date and time of the Route
         route.put(ParseConstants.KEY_ROUTE_PROPOSED_TIME, mProposedDateTime.getTime());
 
-        // return a successful route
+        // Return the Route
         return route;
     }
 
     /**
-     * method to return a collection of ID's
+     * Method to return a collection of ID's of the intended recipients
      *
-     * @return
+     * @return an ArrayList of the intended recipients
      */
-    protected ArrayList<String> getRecipientIds() {
+    public ArrayList<String> getRecipientIds() {
         ArrayList<String> recipientIds = new ArrayList<String>();
-        // iterate though each user in the list
+        // Iterate though each user in the list
         for (int i = 0; i < mGridView.getCount(); i++) {
-            // if the user is checked on the recipients list
             if (mGridView.isItemChecked(i)) {
-                // add their ID to the array list
+                // If the user is checked on the recipients list add their ID to the array list
                 recipientIds.add(mFriends.get(i).getObjectId());
             }
         }
         return recipientIds;
     }
 
-    // method that uploads a file to the backend where recipients will be able to check for it
-    protected void sendRoute(ParseObject route) {
+    /**
+     * Method to upload a created Route to Parse.
+     *
+     * @param route the Route object to upload to Parse
+     */
+    public void sendRoute(ParseObject route) {
         route.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    // successful
+                    // If no exception
                     Toast.makeText(RouteRecipientsActivity.this, R.string.success_route, Toast.LENGTH_LONG).show();
+                    // Send a push notification to the intended recipients
                     sendPushNotifications();
                 } else {
-                    // there is an error - notify the user so they don't miss it
+                    // There was an error - notify the user
                     AlertDialog.Builder builder = new AlertDialog.Builder(RouteRecipientsActivity.this);
                     builder.setMessage(R.string.error_sending_route_message)
                             .setTitle(R.string.error_sending_title)
@@ -337,13 +309,15 @@ public class RouteRecipientsActivity extends Activity {
     }
 
     /**
-     * method to convert an array of LatLng elements to an array of ParseGeoPoint elements
+     * Method to convert an array of LatLng elements to an array of ParseGeoPoint elements
      *
-     * @param list
-     * @return
+     * @param list an ArrayList of LatLng values
+     * @return an ArrayList of ParseGeoPoints
      */
-    protected ArrayList<ParseGeoPoint> convertLatLngToParseGeoPointArray(ArrayList<LatLng> list) {
+    public ArrayList<ParseGeoPoint> convertLatLngToParseGeoPointArray(ArrayList<LatLng> list) {
+        // Instantiate the ParseGeoPoint ArrayList
         parseLatLngList = new ArrayList<ParseGeoPoint>();
+        // Iterate through the LatLng list and add the latitude and longitude values to the ParseGeoPoint ArrayList
         for (LatLng item : list) {
             ParseGeoPoint parseGeoPoint = new ParseGeoPoint(item.latitude, item.longitude);
             parseLatLngList.add(parseGeoPoint);
@@ -351,39 +325,46 @@ public class RouteRecipientsActivity extends Activity {
         return parseLatLngList;
     }
 
-    protected ArrayList<ParseGeoPoint> convertLatLngBoundsToParseGeoPointArray(LatLngBounds latLngBounds) {
 
+    /**
+     * Method to convert an array of LatLng elements to an array of ParseGeoPoint elements
+     *
+     * @param latLngBounds
+     * @return
+     */
+    public ArrayList<ParseGeoPoint> convertLatLngBoundsToParseGeoPointArray(LatLngBounds latLngBounds) {
+        // Instantiate the ParseGeoPoint ArrayList
         parseLatLngBoundsList = new ArrayList<ParseGeoPoint>();
 
+        // Create LatLng variables to hold southWest and northEast values
         LatLng southWest = latLngBounds.southwest;
         LatLng northEast = latLngBounds.northeast;
 
+        // Convert these to ParseGeoPoint values
         ParseGeoPoint geoPointSouthWest = new ParseGeoPoint(southWest.latitude, southWest.longitude);
         ParseGeoPoint geoPointNorthEast = new ParseGeoPoint(northEast.latitude, northEast.longitude);
 
-        // Add the ParseGeoPoints to the ArrayList
+        // Add the ParseGeoPoints to the ArrayList and return
         parseLatLngBoundsList.add(0, geoPointSouthWest);
         parseLatLngBoundsList.add(1, geoPointNorthEast);
 
-        // return list
         return parseLatLngBoundsList;
     }
-
 
     // Show or hide the image for the check mark overlay
     // The item that is tapped on, gets passed in as the view parameter
     // The view parameter is the relative layout of the user_item.xml
-    protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
+    private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // Change the visibility of the send button (set in menu_route_recipients.xml) whenever a friend is selected
             // Create the menu in onCreateOptionsMenu
             // Check the number of items that are checked on the grid view
             if (mGridView.getCheckedItemCount() > 0) {
-                // set the menuItem to visible if an item is clicked
+                // Set the menuItem to visible if an item is clicked
                 mSendMenuItem.setVisible(true);
             } else {
-                // otherwise, if it is 0, then hide the menu item
+                // Otherwise, if it is 0, hide the menu item
                 mSendMenuItem.setVisible(false);
             }
 

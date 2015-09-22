@@ -35,7 +35,7 @@ public class FriendsFragment extends Fragment {
     private List<ParseUser> mFriends;
     // Set up a ParseRelation member to hold ParseUsers related to the current user
     private ParseRelation<ParseUser> mFriendsRelation;
-    // Add a variable for the GridView layout
+    // Member variable for the GridView layout
     private GridView mGridView;
 
     @Override
@@ -111,7 +111,6 @@ public class FriendsFragment extends Fragment {
                 }
             }
         });
-
     }
 
 }
