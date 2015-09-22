@@ -13,13 +13,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-// https://github.com/treehouse/treehouse_android_utilities
+/**
+ * Class to manage image files.
+ * Courtesy of: https://github.com/treehouse/treehouse_android_utilities
+ */
 public class FileHelper {
 
     public static final String TAG = FileHelper.class.getSimpleName();
 
     public static final int SHORT_SIDE_TARGET = 1280;
 
+    /**
+     * Method to convert a file from a URI to a byte array. It accepts regular URIs as well as content URIs.
+     * @param context
+     * @param uri
+     * @return
+     */
     public static byte[] getByteArrayFromFile(Context context, Uri uri) {
         byte[] fileBytes = null;
         InputStream inStream = null;
@@ -61,6 +70,11 @@ public class FileHelper {
         return fileBytes;
     }
 
+    /**
+     * Method to reduce a byte array for an image file to a smaller PNG.
+     * @param imageData
+     * @return
+     */
     public static byte[] reduceImageForUpload(byte[] imageData) {
         Bitmap bitmap = ImageResizer.resizeImageMaintainAspectRatio(imageData, SHORT_SIDE_TARGET);
 
@@ -75,6 +89,13 @@ public class FileHelper {
         return reducedData;
     }
 
+    /**
+     * Method to create a file name using file type or the MIME type for both regular URIs and content URIs.
+     * @param context
+     * @param uri
+     * @param fileType
+     * @return
+     */
     public static String getFileName(Context context, Uri uri, String fileType) {
         String fileName = "uploaded_file.";
 

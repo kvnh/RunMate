@@ -39,7 +39,7 @@ public class AddRouteDetailsActivity extends Activity implements View.OnClickLis
     private double routeDistance;
     private String creationType;
 
-    // Member variable for UI components
+    // Member variables for UI components
     private TextView mButtonDatePicker;
     private TextView mButtonTimePicker;
     private EditText mRouteName;

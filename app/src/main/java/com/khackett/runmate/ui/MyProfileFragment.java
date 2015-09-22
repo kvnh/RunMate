@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.khackett.runmate.R;
 import com.khackett.runmate.utils.FileHelper;
+import com.khackett.runmate.utils.ParseConstants;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -32,22 +34,37 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created by KHackett on 01/09/15.
+ * Fragment to display and edit the users profile picture
  */
 public class MyProfileFragment extends Fragment implements View.OnClickListener {
 
+    // TAG to represent the FriendsFragment class
     public static final String TAG = MyProfileFragment.class.getSimpleName();
 
-    protected Button mTakePicture;
-    protected Button mChoosePicture;
+    // Member variables for UI components
+    private Button mTakePicture;
+    private Button mChoosePicture;
+    private ImageView mProfilePicture;
 
-    protected ImageView mProfilePicture;
-
-    // member variable to store the media type as a URI, that can be stored in multiple places
-    // Uri = uniform resource identifier
+    // Member variable to store the media type as a URI (uniform resource identifier)
     private Uri mMediaUri;
-
+    // Member variable to hold the users profile picture
     private Bitmap bitmapPicture;
+
+    // Request codes for taking a camera picture and choosing a gallery picture
+    private static final int TAKE_PHOTO_REQUEST = 1889;
+    private static final int PICK_PHOTO_REQUEST = 1888;
+
+    /**
+     * The image type of the chosen picture.
+     */
+    private static final String IMAGE_TYPE = ".jpg";
+
+    /**
+     * The date and time format of the images' timestamp.
+     */
+    private static final String SIMPLE_DATE_FORMAT = "yyyyMMdd_HHmmss";
+
 
     /**
      * Default constructor
@@ -60,39 +77,43 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
         // Save the user's current state
         if (mMediaUri != null) {
             savedInstanceState.putString("media_uri", mMediaUri.toString());
-            Log.d(TAG, "onSaveInstanceState() for mMediaUri: " + mMediaUri);
         }
-        // Always call the superclass so it can save the view hierarchy state
+        // Call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (savedInstanceState != null) {
             mMediaUri = Uri.parse(savedInstanceState.getString("media_uri"));
-            Log.d(TAG, "onCreate() for mMediaUri: " + mMediaUri);
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_my_profile, container, false);
 
-        mProfilePicture = (ImageView) rootView.findViewById(R.id.profilePicture);
+        // Return the view of the fragment
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Create the profile picture item and update it
+        mProfilePicture = (ImageView) view.findViewById(R.id.profilePicture);
         updateProfilePic();
 
-        mTakePicture = (Button) rootView.findViewById(R.id.takePictureButton);
-        mChoosePicture = (Button) rootView.findViewById(R.id.choosePictureButton);
+        // Set up member variables for each UI component
+        mTakePicture = (Button) view.findViewById(R.id.takePictureButton);
+        mChoosePicture = (Button) view.findViewById(R.id.choosePictureButton);
 
+        // Register components with the listener
         mTakePicture.setOnClickListener(this);
         mChoosePicture.setOnClickListener(this);
-
-        return rootView;
-
     }
 
     /**
@@ -102,7 +123,7 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
      */
     @Override
     public void onClick(View v) {
-        // Switch statement to select which action to take depending on button/text pressed
+        // Switch statement to select which action to take depending on the component pressed
         switch (v.getId()) {
             case R.id.takePictureButton:
                 takeCameraPicture();
@@ -115,53 +136,58 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    public static final int TAKE_PHOTO_REQUEST = 1889;
-    public static final int PICK_PHOTO_REQUEST = 1888;
-
-
+    /**
+     * Method to take a picture with the devices camera
+     */
     public void takeCameraPicture() {
-        // Take picture
-        // use an existing camera app on the phone by starting an intent
+        // Use an existing camera app on the phone using ACTION_IMAGE_CAPTURE
         // declare intent to capture a photo using whatever camera app is available
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // after invoking the camera,
+        // Assign the output media uri
         mMediaUri = getOutputMediaFileUri();
 
-        // check that a null value is not returned
+        // Check that a null value is not returned
         if (mMediaUri == null) {
-            // display an error
+            // If it is, display an error toast
             Toast.makeText(getActivity(), R.string.error_external_storage, Toast.LENGTH_LONG).show();
         } else {
-
-            // start an activity for a result so that the activity exits and returns a result back for us
-            // ie, the main activity will wait for the result
+            // Otherwise, call startActivityForResult() so that the activity returns a result back
             startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
         }
     }
 
+    /**
+     * Method to choose a picture from the devices gallery
+     */
     public void chooseGalleryPicture() {
-        // Choose picture
+        // Create a new intent
         Intent choosePhotoIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        // need to specify which type of action we want to get - an image in this case
+        // Specify the type of data (image) the new intent wants
         choosePhotoIntent.setType("image/*");
+        // Start intent
         startActivityForResult(choosePhotoIntent, PICK_PHOTO_REQUEST);
     }
 
+    /**
+     * Method to create a File or Uri location for a media file.
+     * Can be used when invoking a device's camera with an Intent.
+     * See http://developer.android.com/guide/topics/media/camera.html#saving-media for the method used.
+     *
+     * @return a uri value
+     */
     private Uri getOutputMediaFileUri() {
-        // To be safe, you should check that the SD card / external storage is mounted
-        // using Environment.getExternalStorageState() before doing this.
-        // see method below...
+        // Check if SD card / external storage is mounted
         if (isExternalStorageAvailable()) {
+            // If so, create a String to contain the app name
             String appName = MyProfileFragment.this.getString(R.string.app_name);
-            // get the Uri
 
-            // Get the external storage directory - we want to return a file object
-            File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), appName);
+            // Get the external storage directory and return a file object
+            File externalMediaDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), appName);
 
-            // Create our subdirectory
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdir()) {
+            // Create a subdirectory
+            if (!externalMediaDirectory.exists()) {
+                if (!externalMediaDirectory.mkdir()) {
                     Log.e(TAG, "Failed to create directory");
                     return null;
                 }
@@ -169,21 +195,19 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
 
             // Create a file to hold the image
             File mediaFile;
-            // get the current date and time
-            Date now = new Date();
-            // convert the date and time into a String datetimestamp
-            // see http://developer.android.com/guide/topics/media/camera.html#saving-media for the methods used
-            // need to append a timestamp to make it unique - otherwise it will overwrite the previous photo
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(now);
+            // Get the current date and time
+            Date currentDate = new Date();
+            // Convert the date and time into a String.
+            // Append a timestamp to make image unique so that it doesn't overwrite previous photos.
+            String dateTimeStamp = new SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.ENGLISH).format(currentDate);
 
-            String path = mediaStorageDir.getPath() + File.separator;
+            // Create a String to represent the external media directory
+            String path = externalMediaDirectory.getPath() + File.separator;
 
-            // create a new file using the constructor that takes a name
-
-            mediaFile = new File(path + "IMG_" + timestamp + ".jpg");
+            // Create a new file using the constructor that takes a name of the directory and dateTimeStamp
+            mediaFile = new File(path + "IMG_" + dateTimeStamp + IMAGE_TYPE);
 
             Log.d(TAG, "File: " + Uri.fromFile(mediaFile));
-
             // Return the files URI
             Log.d(TAG, "Returning the files URI");
             return Uri.fromFile(mediaFile);
@@ -193,17 +217,19 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
     }
 
     /**
-     * check if external storage is available on the users device
+     * Check if external storage is available on the users device
      *
-     * @return
+     * @return a boolean value
      */
     private boolean isExternalStorageAvailable() {
-        // find out what state external storage is in
+        // Create a String to store state of the external storage
         String state = Environment.getExternalStorageState();
-        // if external storage is available, return true,
+
         if (state.equals(Environment.MEDIA_MOUNTED)) {
+            // If external storage is available, return true
             return true;
         } else {
+            // Otherwise return false
             return false;
         }
     }
@@ -211,58 +237,70 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        // On the result of either the takeCameraPicture() or chooseGalleryPicture()
         if (resultCode == Activity.RESULT_OK) {
+            // Image has been chosen from the devices gallery
             if (requestCode == PICK_PHOTO_REQUEST) {
                 if (data == null) {
                     Log.d(TAG, "Data is null");
                     Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_LONG).show();
                 } else {
-
-                    // the intent has data, so set the media uri
+                    // The intent has data - set the media uri
                     mMediaUri = data.getData();
                     Log.d(TAG, "Media Uri: " + mMediaUri);
                 }
 
+                // Save the image to Parse
                 saveImageToParse(PICK_PHOTO_REQUEST);
+                // Update profile picture in the Fragment
                 updateProfilePic();
 
             } else if (requestCode == TAKE_PHOTO_REQUEST) {
-
-//                mMediaUri = (Uri)data.getData();
-//                Log.d(TAG, "mMediaUri after data.getData(): " + mMediaUri);
-
+                // Image has been taken with the devices camera
+                // Assign the returned image data to a Bitmap object
                 bitmapPicture = (Bitmap) data.getExtras().get("data");
                 Log.d(TAG, "bitmapPicture picture: " + bitmapPicture);
 
+                // Save the image to Parse
                 saveImageToParse(TAKE_PHOTO_REQUEST);
+                // Update profile picture in the Fragment
                 updateProfilePic();
             }
         } else if (resultCode != Activity.RESULT_CANCELED) {
+            // Otherwise there was a problem - alert the user
             Log.d(TAG, "Problem getting the picture from gallery");
             Toast.makeText(getActivity(), R.string.general_error, Toast.LENGTH_LONG).show();
         }
     }
 
+    /**
+     * Method to save an image to Parse.
+     *
+     * @param requestCode
+     */
     public void saveImageToParse(int requestCode) {
         if (requestCode == PICK_PHOTO_REQUEST) {
+            // If user has chosen an image from the gallery:
+            // Convert the image to a byte array.
             byte[] fileBytes = FileHelper.getByteArrayFromFile(getActivity(), mMediaUri);
-
             fileBytes = FileHelper.reduceImageForUpload(fileBytes);
 
+            // Add the image to Parse
             String fileName = FileHelper.getFileName(getActivity(), mMediaUri, "file");
             ParseFile file = new ParseFile(fileName, fileBytes);
-            ParseUser.getCurrentUser().put("profilePic", file);
+            ParseUser.getCurrentUser().put(ParseConstants.KEY_PROFILE_PICTURE, file);
 
-        } else {
-
+        } else if (requestCode == TAKE_PHOTO_REQUEST) {
+            // If user has taken a picture with devices camera:
+            // Convert the image to a byte array.
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             bitmapPicture.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
             byte[] fileBytes = byteStream.toByteArray();
 
+            // Add the image to Parse
             String fileName = FileHelper.getFileName(getActivity(), mMediaUri, "file");
             ParseFile file = new ParseFile(fileName, fileBytes);
-            ParseUser.getCurrentUser().put("profilePic", file);
+            ParseUser.getCurrentUser().put(ParseConstants.KEY_PROFILE_PICTURE, file);
         }
 
         ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
@@ -276,15 +314,17 @@ public class MyProfileFragment extends Fragment implements View.OnClickListener 
         });
     }
 
+    /**
+     * Method to update a users profile picture in MyProfileFragment
+     */
     public void updateProfilePic() {
+        // Get the current users image file from Parse.
         ParseFile image = (ParseFile) ParseUser.getCurrentUser().getParseFile("profilePic");
-        // Email will be an empty String if the user didn't supply an email address
         if (image == null) {
-            // If image file is empty, set the default avatar
+            // If image file is empty, alert user.
             Log.d(TAG, "No profile picture for: " + ParseUser.getCurrentUser().getUsername());
-//            holder.userImageView.setImageResource(R.mipmap.avatar_empty);
         } else {
-
+            // Otherwise inject it using Picasso
             Picasso.with(getActivity())
                     // Load the URL
                     .load(image.getUrl())

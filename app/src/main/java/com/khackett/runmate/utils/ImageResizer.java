@@ -4,16 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Pair;
 
-// taken from
-// https://github.com/treehouse/treehouse_android_utilities
+/**
+ * Class to resize image files
+ * Courtesy of: https://github.com/treehouse/treehouse_android_utilities
+ */
 public class ImageResizer {
 
-    /*
-     * Call this static method to resize an image to a specified width and height.
+    /**
+     * Method to resize an image to a specified width and height.
      *
-     * @param targetWidth  The width to resize to.
-     * @param targetHeight The height to resize to.
-     * @returns 		   The resized image as a Bitmap.
+     * @param imageData
+     * @param targetWidth  the width to resize to
+     * @param targetHeight the height to resize to
+     * @return
      */
     public static Bitmap resizeImage(byte[] imageData, int targetWidth, int targetHeight) {
         // Use BitmapFactory to decode the image
@@ -31,6 +34,13 @@ public class ImageResizer {
         return resizedBitmap;
     }
 
+    /**
+     * Method to resize an image based on a size for the shorter side of the images (it maintains the aspect ratio).
+     *
+     * @param imageData
+     * @param shorterSideTarget
+     * @return
+     */
     public static Bitmap resizeImageMaintainAspectRatio(byte[] imageData, int shorterSideTarget) {
         Pair<Integer, Integer> dimensions = getDimensions(imageData);
 
@@ -47,8 +57,7 @@ public class ImageResizer {
             // Landscape image. ratio (width/height) is > 1
             targetHeight = shorterSideTarget;
             targetWidth = Math.round(shorterSideTarget * ratio);
-        }
-        else {
+        } else {
             // Portrait image. ratio (width/height) is < 1
             targetWidth = shorterSideTarget;
             targetHeight = Math.round(shorterSideTarget / ratio);
@@ -57,6 +66,12 @@ public class ImageResizer {
         return resizeImage(imageData, targetWidth, targetHeight);
     }
 
+    /**
+     * Helper method to get the dimensions of an image.
+     *
+     * @param imageData
+     * @return
+     */
     public static Pair<Integer, Integer> getDimensions(byte[] imageData) {
         // Use BitmapFactory to decode the image
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -68,6 +83,14 @@ public class ImageResizer {
         return new Pair<Integer, Integer>(options.outWidth, options.outHeight);
     }
 
+    /**
+     * Helper method to calculate the appropriate sample size to use for resizing an image.
+     *
+     * @param options
+     * @param reqWidth
+     * @param reqHeight
+     * @return
+     */
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
