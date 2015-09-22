@@ -43,39 +43,43 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to display a Route on a map.
+ */
 public class MapsActivityDisplayRoute extends FragmentActivity implements View.OnClickListener {
 
     // Simple class TAG for logcat output
     public static final String TAG = MapsActivityDisplayRoute.class.getSimpleName();
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    // GoogleMap object
+    // Might be null if Google Play services APK is not available.
+    private GoogleMap mMap;
+
+    // Member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
+    private ArrayList<LatLng> markerPoints;
+    // All returned LatLng points from the Directions API - used for animation
+    private ArrayList<LatLng> allNonDuplicateLatLng;
+
+    // Create a DirectionsUtility object
+    private DirectionsUtility directionsUtility;
 
     // Member variable for the UI buttons
     private Button mButtonAccept;
     private Button mButtonDecline;
     private Button mButtonAnimate;
 
-    // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
-    private ArrayList<LatLng> markerPoints;
-
-    // member variable to represent an array of ParseGeoPoint values, retrieved from the parse cloud
-    private ArrayList<ParseGeoPoint> parseList;
-
-    // All returned LatLng points from the Directions API - used for animation
-    private ArrayList<LatLng> allNonDuplicateLatLng;
-
-    private DirectionsUtility directionsUtility;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_activity_display_route);
 
+        // Instantiate markerPoints ArrayList
         markerPoints = new ArrayList<LatLng>();
 
         // Instantiate allNonDuplicateLatLng ArrayList
         allNonDuplicateLatLng = new ArrayList<LatLng>();
 
+        // Instantiate DirectionsUtility object
         directionsUtility = new DirectionsUtility();
 
         // Getting reference to SupportMapFragment of the activity_maps
@@ -85,10 +89,10 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         if (mMap != null) {
 
+            // Check whether the Route was created manually/GPS or with the Directions API
             String creationType = getIntent().getStringExtra("creationType");
             if (creationType.equals("MANUAL")) {
                 plotManualRoute();
-                Log.i(TAG, "Plotting manually");
             } else {
                 plotDirectionsRoute();
             }
@@ -103,7 +107,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
 
-            // set the zoom controls to visible
+            // Set the zoom controls to visible
             mMap.getUiSettings().setZoomControlsEnabled(true);
 
         }
@@ -119,8 +123,11 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mButtonDecline.setOnClickListener(this);
     }
 
+    /**
+     * Method to plot a Route that was created manually or via GPS tracking
+     */
     public void plotManualRoute() {
-        // assign the JSON String value from the passed in intent to a new String variable
+        // Assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;
         PolylineOptions polylineOptions = null;
@@ -134,7 +141,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         JSONArray arrayPoints = array;
 
+        // Iterate through the array and plot on the map
         for (int i = 0; i < arrayPoints.length(); i++) {
+            // Extract the latitude and longitude values for each point in the array
             LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
 
             // Adding new latlng point to the array list
@@ -150,7 +159,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         }
 
-        // Add the markerPoints to allNonDuplicateLatLng for animation feature
+        // Add the markerPoints to allNonDuplicateLatLng for the animation feature
         allNonDuplicateLatLng = new ArrayList<LatLng>(markerPoints);
 
         // Adding the polyline to the map
@@ -160,8 +169,11 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         addMarkersToMap(markerPoints);
     }
 
+    /**
+     * Method to plot a Route that was created via the Directions API
+     */
     public void plotDirectionsRoute() {
-        // assign the JSON String value from the passed in intent to a new String variable
+        // Assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;
 
@@ -174,7 +186,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         JSONArray arrayPoints = array;
 
+        // Iterate through the array and plot on the map via Directions requests
         for (int i = 0; i < arrayPoints.length(); i++) {
+            // Extract the latitude and longitude values for each point in the array
             LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
 
             // Adding new latlng point to the array list
@@ -186,82 +200,74 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
         for (int i = 0; i < markerPoints.size() - 1; i++) {
 
-            // For the start location, the colour of the marker is GREEN.
-            // For the end location, the colour of the marker is RED.
+            // For the start location, the colour of the marker is GREEN
             if (markerPoints.size() == 1) {
                 // Add a green marker for the start position.
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
 
+            // Once the second point is plotted, begin calls to the Directions API
             if (markerPoints.size() >= 2) {
 
+                // Assign values to LatLng objects
                 LatLng point1 = markerPoints.get(i);
                 LatLng point2 = markerPoints.get(i + 1);
 
-                // marker.position(point2).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                // marker.position(point2).visible(true);
+                // Hide the next marker for the next position selected
                 marker.position(point1).visible(false);
 
-                // Getting URL to the Google Directions API
-                // send these values to the getDirectionsUrl() method and assign returned value to string variable url
-                // String url = getDirectionsUrl(point1, point2);
+                // Creating URL to send to the Google Directions API.
                 String url = directionsUtility.getDirectionsUrl(point1, point2);
-                // create a DownloadTask object - see nested class below
+                // Create a DownloadURLTask object - see nested class below
                 DownloadURLTask downloadURLTask = new DownloadURLTask();
-                // Start downloading json data from Google Directions API
+                // Start downloading JSON data from Google Directions API
                 downloadURLTask.execute(url);
             }
-
-            // Add a new marker to the map
-            // mMap.addMarker(marker);
-
         }
-
         // Add the start and finish markers to the map
         addMarkersToMap(markerPoints);
     }
 
-    // Fetches data from url passed
+    /**
+     * Asynchronous task to fetch JSON data via the passed in URL
+     */
     private class DownloadURLTask extends AsyncTask<String, Void, String> {
-
         // Downloading data in non-ui thread
         @Override
         protected String doInBackground(String... url) {
-
             // For storing data from web service
-            String data = "";
-
+            String urlJSONData = "";
             try {
-                // Fetching the data from web service
-                data = directionsUtility.downloadUrl(url[0]);
+                // Fetch and process the web page content and return resultant String
+                urlJSONData = directionsUtility.downloadUrl(url[0]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
-            return data;
+            return urlJSONData;
         }
 
         // Executes in UI thread, after the execution of doInBackground()
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
+        protected void onPostExecute(String urlJSONData) {
+            super.onPostExecute(urlJSONData);
 
+            // Create a ParseLatLngValuesTask object and invoke thread for parsing JSON data
             ParseLatLngValuesTask parseLatLngValuesTask = new ParseLatLngValuesTask();
-
-            // Invokes the thread for parsing the JSON data
-            parseLatLngValuesTask.execute(result);
+            parseLatLngValuesTask.execute(urlJSONData);
         }
     }
 
     /**
-     * A class to parse the Google Places in JSON format
+     * An AsyncTask class to parse the LatLng values from the Directions API JSON data.
+     * LatLng values will then be used to plot a line on the map.
      */
     private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<LatLng>> {
-
         // Parsing the data in non-ui thread
         @Override
         protected List<LatLng> doInBackground(String... jsonData) {
-
+            // Create a JSONObject to store the returned JSON data
             JSONObject jsonObject;
+            // List to hold all of the route points in the returned JSON data
             List<LatLng> routePoints = null;
 
             try {
@@ -271,6 +277,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            // Return the routePoints to the onPostExecute()
             return routePoints;
         }
 
@@ -280,6 +287,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             // Create a PolylineOptions object
             PolylineOptions lineOptions = new PolylineOptions();
 
+            // Remove all duplicates from the list - this is to ensure a smooth animation
             for (LatLng routePoint : routePoints) {
                 Log.i(TAG, "Enhanced for loop with each section LatLng point: " + routePoint.toString());
                 if (allNonDuplicateLatLng.size() == 0) {
@@ -324,16 +332,22 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         }
     }
 
+    /**
+     * Method to accept a received route
+     */
     public void acceptRoute() {
+        // Get the objects ID from the intent
         String objectId = getIntent().getStringExtra("myObjectId");
+        // Create a query in relation to the Route class
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
-
+        // Get the object in a background thread
         query.getInBackground(objectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
+                    // If no exception - get the Route object and accept it
                     acceptUserRoute(object);
                 } else {
-                    // there is an error - notify the user
+                    // There was an error - notify the user
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityDisplayRoute.this);
                     builder.setMessage(R.string.error_accepting_route_message)
                             .setTitle(R.string.error_accepting_route_title)
@@ -343,18 +357,23 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                 }
             }
         });
-
-        // Send the user back to the main activity right after the message is deleted.
-        // Use finish() to close the current activity, returning to the main activity
+        // Send the user back to MainActivity after the message is accepted.
         finish();
     }
 
+    /**
+     * Method to decline a received route
+     */
     public void declineRoute() {
+        // Get the objects ID from the intent
         String objectId = getIntent().getStringExtra("myObjectId");
+        // Create a query in relation to the Route class
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
+        // Get the object in a background thread
         query.getInBackground(objectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
+                    // If no exception - get the Route object and delete the current user from it
                     deleteUserRoute(object);
                 } else {
                     // there is an error - notify the user
@@ -367,51 +386,63 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                 }
             }
         });
-
         // Send the user back to the main activity right after the message is deleted.
-        // Use finish() to close the current activity, returning to the main activity
         finish();
     }
 
+    /**
+     * Method to add the accepted recipient to the Route object
+     *
+     * @param object
+     */
     public void acceptUserRoute(ParseObject object) {
+        // Create a new ParseObject
         ParseObject route = object;
-        // Add the current user to the accepted list
+        // Add the current user to the accepted list and update the Route object
         ArrayList<String> acceptedRecipientIds = new ArrayList<String>();
         acceptedRecipientIds.add(ParseUser.getCurrentUser().getObjectId());
         route.put(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, acceptedRecipientIds);
 
-        List<String> ids = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
-        if (ids.size() == 1) {
-            // Last recipient - delete the route object
+        // Get the list of recipients
+        List<String> recipientList = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
+        if (recipientList.size() == 1) {
+            // If it is the last recipient - delete the Route object
             route.deleteInBackground();
         } else {
-            // Remove the recipient and save.
-            ids.remove(ParseUser.getCurrentUser().getObjectId());
+            // Remove the current user from the recipient list and save.
+            recipientList.remove(ParseUser.getCurrentUser().getObjectId());
 
-            ArrayList<String> idsToRemove = new ArrayList<String>();
-            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+            ArrayList<String> recipientsToRemove = new ArrayList<String>();
+            recipientsToRemove.add(ParseUser.getCurrentUser().getObjectId());
 
-            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
+            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, recipientsToRemove);
             route.saveInBackground();
         }
         Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_accept_route, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * * Method to remove the recipient from the Route object
+     *
+     * @param object
+     */
     public void deleteUserRoute(ParseObject object) {
+        // Create a new ParseObject
         ParseObject route = object;
-        List<String> ids = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
+        // Create a list and assign the recipients list to it
+        List<String> recipientList = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
 
-        if (ids.size() == 1) {
-            // last recipient - delete the route object
+        if (recipientList.size() == 1) {
+            // Last recipient - delete the route object
             route.deleteInBackground();
         } else {
-            // remove the recipient and save
-            ids.remove(ParseUser.getCurrentUser().getObjectId());
+            // Remove the recipient and save
+            recipientList.remove(ParseUser.getCurrentUser().getObjectId());
 
-            ArrayList<String> idsToRemove = new ArrayList<String>();
-            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+            ArrayList<String> recipientsToRemove = new ArrayList<String>();
+            recipientsToRemove.add(ParseUser.getCurrentUser().getObjectId());
 
-            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
+            route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, recipientsToRemove);
             route.saveInBackground();
         }
         Toast.makeText(MapsActivityDisplayRoute.this, R.string.success_decline_route, Toast.LENGTH_LONG).show();
@@ -452,6 +483,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
      * Method to add start and finish markers to the route.
      */
     public void addMarkersToMap(List<LatLng> latLngs) {
+        // If start and finish points are the same display a single marker
         if (latLngs.get(0).toString().equals(latLngs.get(latLngs.size() - 1).toString())) {
             mMap.addMarker(new MarkerOptions()
                     .position(latLngs.get(0))
@@ -459,6 +491,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                     .showInfoWindow();
         } else {
+            // Otherwise start and finish points are different - display 2 markers
             mMap.addMarker(new MarkerOptions()
                     .position(latLngs.get(latLngs.size() - 1))
                     .title("Finish")
@@ -510,26 +543,51 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
+
+    /**
+     * Method to begin the animation of the camera along the route
+     */
     public void animateRoute() {
         // Keep the screen on while the user is animating the route
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // Start the animation
         mRunMateAnimator.startAnimation();
     }
 
+    // Create a RunMateAnimator object
     private RunMateAnimator mRunMateAnimator = new RunMateAnimator();
-    // Handler objects to
+    // Handler object to process the Runnable object
     private final Handler mHandler = new Handler();
 
-    // private float cameraZoomLevel = 0.1f;
-
+    /**
+     * Class to handle the animation feature of the MapsActivityDisplayRoute class
+     */
     public class RunMateAnimator implements Runnable {
 
-        // Set the speed of the camera between points to 1.5 second
+        /**
+         * The speed of the camera during animation
+         */
         private static final int CAMERA_SPEED = 1500;
-        private static final int CAMERA_SPEED_TURN = 1000;
+
+        /**
+         * The duration of an animation between 2 points
+         */
+        private static final int ANIMATION_DURATION = 1000;
+
+        /**
+         * The initial zoom value of the camera
+         */
         private static final int INITIAL_CAMERA_ZOOM_VALUE = 16;
+
+        /**
+         * The title angle of the camera
+         */
         private static final float CAMERA_TILT_VALUE = 90;
-        private static final long MARKER_FRAME_RATE = 16;
+
+        /**
+         * The frame rate of the runner icon during animation
+         */
+        private static final long MARKER_FRAME_RATE_MILLISECONDS = 16;
 
         // Linear interpolator to define the rate of change of the animation.
         private final Interpolator interpolator = new LinearInterpolator();
@@ -540,14 +598,15 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Time in milliseconds since the system booted up
         private long startTime = SystemClock.uptimeMillis();
 
-        //
+        // LatLng variable for the beginning and end points in each animation sequence
         private LatLng beginLatLng = null;
         private LatLng endLatLng = null;
 
+        // The marker represented by a runner icon
         private Marker runnerMarker;
 
         /**
-         * Start animation when there are more the 2 points to animate through
+         * Method to start animation when there are more the 2 points to animate through
          */
         public void startAnimation() {
             if (allNonDuplicateLatLng.size() > 2) {
@@ -555,6 +614,9 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             }
         }
 
+        /**
+         * Method to reset the animation values at the end of each sequence
+         */
         public void reset() {
             startTime = SystemClock.uptimeMillis();
             currentLatLngIndex = 0;
@@ -566,24 +628,29 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
          * Method to set the initial position of the camera based on the first and second LatLng points
          */
         public void initialize() {
+
+            // Reset the animation values
             reset();
 
+            // Get the LatLng values of the first and second points
             LatLng firstPoint = allNonDuplicateLatLng.get(0);
             LatLng secondPoint = allNonDuplicateLatLng.get(1);
 
+            // Set the camera to its first position
             setupCameraPositionForMovement(firstPoint, secondPoint);
         }
 
         /**
-         * Sets up the camera's initial position and adds the Runner icon to the Map
+         * Method to set up the camera's initial position and to add the Runner icon to the Map
          *
-         * @param firstPoint
-         * @param secondPoint
+         * @param firstPoint  the first point in the animation sequence
+         * @param secondPoint the second point in the animation sequence
          */
         private void setupCameraPositionForMovement(LatLng firstPoint, LatLng secondPoint) {
-
+            // Set the initial camera bearing to a value based on the first 2 points
             float cameraBearingStart = bearingBetweenLatLngPoints(firstPoint, secondPoint);
 
+            // Create the runner icon
             runnerMarker = mMap.addMarker(new MarkerOptions()
                     .position(firstPoint)
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_directions_run_black_24dp)));
@@ -597,14 +664,18 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                             ? mMap.getCameraPosition().zoom : INITIAL_CAMERA_ZOOM_VALUE) // Set the initial zoom value.
                     .build();   // Create a CameraPosition from the builder.
 
+            // Animate the camera to the new position
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                    CAMERA_SPEED_TURN,
+                    ANIMATION_DURATION,
                     new GoogleMap.CancelableCallback() {
 
                         @Override
                         public void onFinish() {
                             Log.i(TAG, "Camera animation finished");
+                            // Reset the animation values
                             mRunMateAnimator.reset();
+                            // The Handler’s post() method posts the Runnable object to the message queue
+                            // which kicks off the run() method to begin the next stage of the animation sequence.
                             Handler handler = new Handler();
                             handler.post(mRunMateAnimator);
                         }
@@ -625,18 +696,19 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             // Map a value representing the elapsed fraction of an animation to a value that represents the interpolated fraction.
             double interpolatedFraction = interpolator.getInterpolation((float) elapsedTime / CAMERA_SPEED);
 
-            //
+            // Generate latitude and longitude values of the markers position on the path, based on the interpolated fraction.
             double lat = (interpolatedFraction * endLatLng.latitude) + ((1 - interpolatedFraction) * beginLatLng.latitude);
             double lng = (interpolatedFraction * endLatLng.longitude) + ((1 - interpolatedFraction) * beginLatLng.longitude);
             LatLng newPosition = new LatLng(lat, lng);
 
+            // Set the position of the marker to the calculated LatLng value
             runnerMarker.setPosition(newPosition);
 
-            // If the interpolator fraction is less than 1:
+            // If the interpolator fraction is less than 1
             if (interpolatedFraction < 1) {
                 // Add Runnable to the message queue to display the marker moving.
-                mHandler.postDelayed(this, MARKER_FRAME_RATE);
-                // otherwise move to the next point in the ArrayList
+                mHandler.postDelayed(this, MARKER_FRAME_RATE_MILLISECONDS);
+                // Otherwise move to the next point in the ArrayList
             } else {
                 // If there are still points in the list
                 if (currentLatLngIndex < allNonDuplicateLatLng.size() - 2) {
@@ -645,38 +717,33 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     currentLatLngIndex++;
 
                     // Get point A and point B LatLng values
-                    endLatLng = getEndLatLng();
                     beginLatLng = getBeginLatLng();
+                    endLatLng = getEndLatLng();
 
                     // Reset time to the time since system reboot
                     startTime = SystemClock.uptimeMillis();
 
-                    LatLng firstPoint = getBeginLatLng();
-                    LatLng nextPoint = getEndLatLng();
-
-                    // Get the camera bearing value between the next two point in the route
-                    float cameraBearing = bearingBetweenLatLngPoints(firstPoint, nextPoint);
+                    // Calculate the cameras bearing point based on the next 2 points in the route
+                    float cameraBearing = bearingBetweenLatLngPoints(beginLatLng, endLatLng);
 
                     // Set the camera position to the next 2 points in the route
                     CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(nextPoint)
+                            .target(endLatLng)
                             .bearing(cameraBearing)
                             .tilt(CAMERA_TILT_VALUE)
                             .zoom(mMap.getCameraPosition().zoom)
                             .build();
 
-                    // Log the camera position and other relevant values.
-                    Log.i(TAG, (currentLatLngIndex + 1) + " of " + allNonDuplicateLatLng.size() + " - bearing: " + cameraBearing + " / " + nextPoint);
-
                     // Animate the camera to the next point
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                            CAMERA_SPEED_TURN,
+                            ANIMATION_DURATION,
                             null);
 
                     // Begin the Runnable thread again
-                    mHandler.postDelayed(mRunMateAnimator, MARKER_FRAME_RATE);
+                    mHandler.postDelayed(mRunMateAnimator, MARKER_FRAME_RATE_MILLISECONDS);
 
                 } else {
+                    // Increment the current point on the route
                     currentLatLngIndex++;
                     // Zoom out to view route once the camera finishes animating.
                     zoomToViewRoute();

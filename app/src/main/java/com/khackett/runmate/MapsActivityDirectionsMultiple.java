@@ -69,8 +69,10 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
         // Instantiate ArrayList
         polylines = new ArrayList<Polyline>();
         allLatLngPoints = new ArrayList<LatLng>();
+
         // Instantiate Route object
         mRoute = new Route();
+
         // Instantiate DirectionsUtility object
         directionsUtility = new DirectionsUtility();
 
@@ -295,6 +297,8 @@ public class MapsActivityDirectionsMultiple extends FragmentActivity implements 
 
         // Once the second point is plotted, begin calls to the Directions API
         if (mRoute.getMarkerPoints().size() >= 2) {
+
+            // Assign values to LatLng objects
             LatLng point1 = mRoute.getMarkerPoint1();
             LatLng point2 = mRoute.getMarkerPoint2();
 
