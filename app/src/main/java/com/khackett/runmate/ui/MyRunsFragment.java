@@ -107,7 +107,7 @@ public class MyRunsFragment extends ListFragment {
         intent.putExtra("creationType", creationType);
         intent.putExtra("intentName", TAG);
 
-        // Start the MapsActivityDisplayRoute with the item data.
+        // Start MapsActivityDisplayRoute with the item data.
         startActivity(intent);
     }
 

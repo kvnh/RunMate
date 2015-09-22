@@ -101,7 +101,7 @@ public class InboxRouteFragment extends ListFragment {
         intent.putExtra("myObjectId", objectId);
         intent.putExtra("creationType", creationType);
 
-        // Start the MapsActivityDisplayRoute with the item data.
+        // Start MapsActivityDisplayRoute with the item data.
         startActivity(intent);
     }
 
