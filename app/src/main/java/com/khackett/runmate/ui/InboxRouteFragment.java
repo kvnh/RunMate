@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class InboxRouteFragment extends ListFragment {
 
-    // TAG to represent the FriendsFragment class
+    // TAG to represent the InboxRouteFragment class
     public static final String TAG = InboxRouteFragment.class.getSimpleName();
 
     // Swipe to refresh member variable

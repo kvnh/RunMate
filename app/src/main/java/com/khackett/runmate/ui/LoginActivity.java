@@ -24,10 +24,10 @@ import com.parse.ParseUser;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // TAG to represent the FriendsFragment class
+    // TAG to represent the LoginActivity class
     public static final String TAG = LoginActivity.class.getSimpleName();
 
-    // Member variables that correspond to components in the layout.
+    // Member variable for UI components
     private EditText mUserName;
     private EditText mPassword;
     private Button mLoginButton;

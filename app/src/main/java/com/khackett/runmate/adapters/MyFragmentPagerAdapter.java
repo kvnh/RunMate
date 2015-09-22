@@ -43,9 +43,9 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new MyRunsFragment();
-            case 1:
                 return new InboxRouteFragment();
+            case 1:
+                return new MyRunsFragment();
         }
         return null;
     }
@@ -68,9 +68,9 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
         Locale locale = Locale.getDefault();
         switch (position) {
             case 0:
-                return mContext.getString(R.string.title_section1).toUpperCase(locale);
-            case 1:
                 return mContext.getString(R.string.title_section2).toUpperCase(locale);
+            case 1:
+                return mContext.getString(R.string.title_section1).toUpperCase(locale);
         }
         return null;
     }

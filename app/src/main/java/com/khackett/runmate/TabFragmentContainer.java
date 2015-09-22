@@ -48,8 +48,7 @@ public class TabFragmentContainer extends Fragment {
             @Override
             public void run() {
                 tabLayout.setupWithViewPager(viewPager);
-                viewPager.setCurrentItem(1, false);
-                // tabLayout.getTabAt(1).select();
+                viewPager.setCurrentItem(0, false);
             }
         });
 
