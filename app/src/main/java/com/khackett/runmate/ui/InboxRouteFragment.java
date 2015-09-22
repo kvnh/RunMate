@@ -72,7 +72,7 @@ public class InboxRouteFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
-        // Retrieve the routes from the Parse backend
+        // Retrieve the routes from Parse
         retrieveRoutes();
     }
 
@@ -84,10 +84,11 @@ public class InboxRouteFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // to tell whether it is an image or a video, we need to access the type of the message
-        // create the message object which is set to the message at the current position
+
+        // Create a ParseObject which is set to the selected Route message
         ParseObject route = mRoutes.get(position);
 
+        // Assign data from the ParseObject to Route variables.
         JSONArray parseList = route.getJSONArray(ParseConstants.KEY_LATLNG_POINTS);
         JSONArray parseListBounds = route.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
         String objectId = route.getObjectId();
@@ -110,7 +111,7 @@ public class InboxRouteFragment extends ListFragment {
     private void retrieveRoutes() {
 
         // Query the Routes table in Parse.
-        // Get Routes where the logged in user ID is in the list of the recipient ID's.
+        // Get Routes where the logged in user ID is in the list of recipient ID's.
         ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_ROUTES);
         // Use the 'where' clause to find where the user ID is one of the recipients.
         queryRoute.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
@@ -128,22 +129,11 @@ public class InboxRouteFragment extends ListFragment {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
-                // If no exception
+                // If no exception returned
                 if (e == null) {
 
                     // Store the returned List
                     mRoutes = routes;
-
-                    // Use returned List as the data source for the List view in the fragment.
-                    // Create an array of strings to store the routeItems and set the size equal to that of the returned List
-                    String[] routeItems = new String[mRoutes.size()];
-                    // Enhanced for loop to go through the list of Routes and create an array of routeItems
-                    int i = 0;
-                    for (ParseObject route : mRoutes) {
-                        // Get the specific key
-                        routeItems[i] = route.getString(ParseConstants.KEY_SENDER_NAME);
-                        i++;
-                    }
 
                     // Create an adapter and set it as the list adapter.
                     // Create the adapter once and update its state on each refresh.
@@ -169,7 +159,7 @@ public class InboxRouteFragment extends ListFragment {
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            // When list is swiped down to refresh, retrieve the latest List of Routes from the backend.
+            // When list is swiped down to refresh, retrieve the latest List of Routes from Parse.
             retrieveRoutes();
         }
     };

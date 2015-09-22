@@ -29,35 +29,35 @@ import org.json.JSONArray;
 import java.util.List;
 
 /**
- * Created by KHackett on 03/09/15.
+ * Fragment to display the List of Routes a user has accepted
  */
 public class MyRunsFragment extends ListFragment {
 
-    // Tag for current Activity
+    // TAG to represent the MyRunsFragment class
     public static final String TAG = MyRunsFragment.class.getSimpleName();
 
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    // Swipe to refresh member variable
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    // member variable to store the list of routes the user has accepted
-    protected List<ParseObject> mAcceptedRoutes;
+    // Member variable to store the list of Routes accepted by the user
+    private List<ParseObject> mAcceptedRoutes;
 
-    private int MY_STATUS_CODE = 1111;
-
-    // Default constructor for MyRunsFragment
+    /**
+     * Default constructor for MyRunsFragment
+     */
     public MyRunsFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // the 1st parameter is the layout id that is used for this fragment,
-        // the 2nd is the container where the fragment will be displayed (this will be the ViewPager from main activity),
-        // the 3rd parameter should be false whenever we add a fragment to an activity in code, which is what we are going to do
-        // So this line of code uses an inflater object to create a new view using the layout we provide.
-        // It then attaches that view to a parent, which in this case is the ViewPager object from main activity
-
+        // 1st parameter: layout id used in this fragment.
+        // 2nd parameter: container where the fragment will be displayed (the ViewPager from TabFragmentContainer).
+        // 3rd parameter: false whenever a fragment is added to an activity.
+        // Inflater object used to create a new View using the layout provided.
+        // View is then attached to a parent - the ViewPager object from TabFragmentContainer.
         View rootView = inflater.inflate(R.layout.fragment_my_runs, container, false);
 
-        // Return the View object - this is the view of the whole fragment
+        // Return the view of the fragment
         return rootView;
     }
 
@@ -75,14 +75,7 @@ public class MyRunsFragment extends ListFragment {
                 R.color.swipeRefresh3,
                 R.color.swipeRefresh4);
 
-//        if (view == null) {
-//            Log.i(TAG, "No list view to display for MyRunsFragment");
-//        } else {
-//            // Retrieve the accepted routes from the Parse backend
-//            retrieveAcceptedRoutes();
-//        }
-
-        // Retrieve the accepted routes from the Parse backend
+        // Retrieve the accepted routes from Parse
         retrieveAcceptedRoutes();
     }
 
@@ -94,17 +87,18 @@ public class MyRunsFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // to tell whether it is an image or a video, we need to access the type of the message
-        // create the message object which is set to the message at the current position
+
+        // Create a ParseObject which is set to the selected Route message
         ParseObject route = mAcceptedRoutes.get(position);
 
+        // Assign data from the ParseObject to Route variables.
         JSONArray parseList = route.getJSONArray(ParseConstants.KEY_LATLNG_POINTS);
         JSONArray parseListBounds = route.getJSONArray(ParseConstants.KEY_LATLNG_BOUNDARY_POINTS);
         String objectId = route.getObjectId();
         String routeName = route.getString(ParseConstants.KEY_ROUTE_NAME);
         String creationType = route.getString(ParseConstants.KEY_ROUTE_CREATION_TYPE);
 
-        // Start a map activity to display the route
+        // Create an intent to display the route and add relevant item data.
         Intent intent = new Intent(getActivity(), MapsActivityTrackRun.class);
         intent.putExtra("parseLatLngList", parseList.toString());
         intent.putExtra("parseLatLngBoundsList", parseListBounds.toString());
@@ -113,18 +107,13 @@ public class MyRunsFragment extends ListFragment {
         intent.putExtra("creationType", creationType);
         intent.putExtra("intentName", TAG);
 
-        // Start the MapsActivityDisplayRoute activity
-        startActivityForResult(intent, MY_STATUS_CODE);
+        // Start the MapsActivityDisplayRoute with the item data.
+        startActivity(intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == MY_STATUS_CODE) {
-//            //Refresh the fragment here
-//            retrieveAcceptedRoutes();
-//        }
-    }
-
+    /**
+     * Method to retrieve a List of accepted Route items from Parse
+     */
     private void retrieveAcceptedRoutes() {
 
         // Set up a dialog progress indicator box
@@ -133,15 +122,14 @@ public class MyRunsFragment extends ListFragment {
         progressDialog.setMessage(getActivity().getString(R.string.my_runs_progress_dialog_message));
         progressDialog.show();
 
-        // query the routes class/table in parse
-        // get messages where the logged in user ID is in the list of the recipient ID's (we only want to retrieve the messages sent to us)
-        // querying the message class is similar to how we have been querying users
+        // Query the Routes table in Parse.
+        // Get Routes where the logged in user ID is in the list of accepted recipient ID's.
         ParseQuery<ParseObject> queryRoute = new ParseQuery<ParseObject>(ParseConstants.CLASS_ROUTES);
-        // use the 'where' clause to search through the messages to find where our user ID is one of the recipients
+        // Use the 'where' clause to find where the user ID is one of the recipients.
         queryRoute.whereEqualTo(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
-        // order results so that most recent message are at the top of the inbox
+        // Order results so that most forthcoming runs are at the top of the list.
         queryRoute.addAscendingOrder(ParseConstants.KEY_ROUTE_PROPOSED_TIME);
-        // query is ready - run it
+        // Query is ready - run it on a background thread.
         queryRoute.findInBackground(new FindCallback<ParseObject>() {
             // When the retrieval is done from the Parse query, the done() callback method is called
             @Override
@@ -150,42 +138,32 @@ public class MyRunsFragment extends ListFragment {
                 // Dismiss progress dialog once result returned from backend
                 progressDialog.dismiss();
 
-                // done() is called from onResume() and the OnRefreshListener
-                // Need to check that its called from the the OnRefreshListener before ending it
+                // End refreshing once routes are retrieved.
+                // done() is called from onResume() and the OnRefreshListener.
+                // Check it is called from the the OnRefreshListener before ending it.
                 if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
-                // the list being returned is a list of routes
+                // If no exception returned
                 if (e == null) {
-                    // successful - routes found.  They are stored as a list in messages
+
+                    // Store the returned List
                     mAcceptedRoutes = routes;
 
-                    // adapt this data for the list view, showing the senders name
-
-                    // create an array of strings to store the usernames and set the size equal to that of the list returned
-                    String[] usernames = new String[mAcceptedRoutes.size()];
-                    // enhanced for loop to go through the list of users and create an array of usernames
-                    int i = 0;
-                    for (ParseObject message : mAcceptedRoutes) {
-                        // get the specific key
-                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
-                        i++;
-                    }
-
-                    // Create the adapter once and update its state on each refresh
+                    // Create an adapter and set it as the list adapter.
+                    // Create the adapter once and update its state on each refresh.
                     if (getListView().getAdapter() == null) {
-                        // the above adapter code is now replaced with the following line
+                        // Use the custom RouteMessageAdapter to display the Route data in My Runs.
                         RouteMessageAdapter adapter = new RouteMessageAdapter(getListView().getContext(), mAcceptedRoutes);
 
-                        // Force a refresh of the list once data has changed
+                        // Force a refresh of the list once data has changed.
                         adapter.notifyDataSetChanged();
 
-                        // need to call setListAdapter for this activity.  This method is specifically from the ListActivity class
+                        // Call setListAdapter (from ListActivity class) for this activity.
                         setListAdapter(adapter);
                     } else {
-                        // refill the adapter
-                        // cast it to RouteMessageAdapter
+                        // Adapter is not available - refill with the List of Routes.
                         ((RouteMessageAdapter) getListView().getAdapter()).refill(mAcceptedRoutes);
                     }
                 }
@@ -193,10 +171,11 @@ public class MyRunsFragment extends ListFragment {
         });
     }
 
+    // Swipe to refresh listener.
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            // When list is swiped down to refresh, retrieve the users runs from the Parse backend
+            // When list is swiped down to refresh, retrieve the latest List of accepted Routes from Parse.
             retrieveAcceptedRoutes();
         }
     };

@@ -80,21 +80,11 @@ public class FriendsFragment extends Fragment {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
 
-                // If no exception
+                // If no exception returned
                 if (e == null) {
 
                     // Set the mFriends variable based on the List of returned ParseUsers
                     mFriends = friends;
-
-                    // Use returned List as the data source for the List view in the fragment.
-                    // Create an array of strings to store the usernames and set the size equal to that of the returned List
-                    String[] usernames = new String[mFriends.size()];
-                    // Enhanced for loop iterate through the List of ParseUsers and create an array of usernames
-                    int i = 0;
-                    for (ParseUser user : mFriends) {
-                        usernames[i] = user.getUsername();
-                        i++;
-                    }
 
                     // Create an adapter and set it as the list adapter.
                     // Get the adapter associated with the GridView and check to see if it is null.
