@@ -23,7 +23,10 @@ import com.parse.SignUpCallback;
  */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // Member variables that correspond to items in the layout.
+    // TAG to represent the SignUpActivity class
+    public static final String TAG = SignUpActivity.class.getSimpleName();
+
+    // Member variable for UI components
     private EditText mFullName;
     private EditText mUserName;
     private EditText mEmail;
@@ -32,7 +35,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private Button mSignUpButton;
     private Button mCancelSignUpButton;
 
-    // Declare the context of the activity.
+    // Declare the context of the application.
     protected Context mContext;
 
     @Override
@@ -40,7 +43,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        // Set each member variable for the ui components
+        // Set each member variable for the ui components.
         mFullName = (EditText) findViewById(R.id.fullNameField);
         mUserName = (EditText) findViewById(R.id.usernameField);
         mEmail = (EditText) findViewById(R.id.emailField);
@@ -86,7 +89,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      */
     public void signUpUser() {
 
-        // Get values from the edit text fields.
+        // Get values from the EditText fields.
         // Add the toString() method, as the return type in getText() is Editable.
         // - special type of String value that needs to be converted to a regular String.
         String fullName = mFullName.getText().toString();
@@ -171,7 +174,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * Checks for empty fields in the sign up activity.
+     * Checks for empty fields in SignUpActivity.
      *
      * @param fullName        the users full name
      * @param username        the users username
@@ -239,7 +242,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
      * (?=\\S+$) no whitespace allowed in the entire string
      * .{6,} at least 6 characters
      *
-     * @param password
+     * @param password the users password
      * @return true if the password passes the regex conditions; false if not.
      */
     public boolean isPasswordValid(String password) {
@@ -285,16 +288,14 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
