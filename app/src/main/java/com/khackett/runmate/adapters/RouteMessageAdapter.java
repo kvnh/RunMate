@@ -26,15 +26,15 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Custom adapter that uses the message_item.xml layout file
+ * Custom adapter that uses the message_item.xml layout file.
  * Adapter has two parts:
  * A custom layout that will be used for each item in the list;
  * A custom subclass, ViewHolder, that adapts each item of the ParseObject into the layout.
- * The common ViewHolder pattern is applied to enable an efficient ListView performance
+ * The common ViewHolder pattern is applied to enable an efficient ListView performance.
  * Created by KHackett on 31/07/15.
  */
 public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
-    
+
     // Simple class TAG for logcat output
     public static final String TAG = RouteMessageAdapter.class.getSimpleName();
 
@@ -42,7 +42,12 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
     private Context mContext;
     private List<ParseObject> mRoutes;
 
-    // Create a constructor
+    /**
+     * Constructor to pass the list of Routes to the RouteMessageAdapter
+     *
+     * @param context - the context of the application
+     * @param routes  - the list of Routes
+     */
     public RouteMessageAdapter(Context context, List<ParseObject> routes) {
         super(context, R.layout.message_item, routes);
         mContext = context;
@@ -50,7 +55,10 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
     }
 
     /**
-     * ViewHolder class that contains the data to be displayed in the custom layout for each Route item
+     * ViewHolder class that contains the data to be displayed in the
+     * custom layout for each Route item.
+     * Convention when creating a custom list adapter is to create a
+     * private static class that can be referenced in getView().
      */
     private static class ViewHolder {
         // The image to be displayed
@@ -83,12 +91,14 @@ public class RouteMessageAdapter extends ArrayAdapter<ParseObject> {
 
         // Check if the view is null
         if (convertView == null) {
-            // If so, inflate the view (convertView) from the layout file, using the context, and then return it to the list
+            // If so, inflate the View from the layout file, using the context,
+            // and then return it to the list.
             // Use the LayoutInflater - Android object that takes XML layouts and turns them into views
             convertView = LayoutInflater.from(mContext).inflate(R.layout.message_item, null);
 
             // Initialise a new ViewHolder - then initialise the data inside it.
             viewHolder = new ViewHolder();
+
             // findViewById() is an Activity method - can be called from the View.
             viewHolder.profilePicView = (ImageView) convertView.findViewById(R.id.profilePic);
             viewHolder.senderNameLabel = (TextView) convertView.findViewById(R.id.senderLabel);

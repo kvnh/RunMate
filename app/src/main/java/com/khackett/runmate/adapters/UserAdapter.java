@@ -17,77 +17,101 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-// Create a custom list view adapter - similar to the way it is done in fragments.
-// The adapter has two parts: a custom layout that will be used for each item in the list;
-// And a custom class that adapts one message of the parse object into the layout.
-
 /**
- * Custom adapter that uses the message_item.xml layout file
+ * Custom adapter that uses the message_item.xml layout file.
+ * Adapter has two parts:
+ * A custom layout that will be used for each item in the list;
+ * A custom subclass, ViewHolder, that adapts each item of the ParseObject into the layout.
+ * The common ViewHolder pattern is applied to enable an efficient ListView performance.
  * Created by KHackett on 31/07/15.
  */
 public class UserAdapter extends ArrayAdapter<ParseUser> {
 
+    // Simple class TAG for logcat output
     public static final String TAG = UserAdapter.class.getSimpleName();
 
+    // Declare Context and ParseUsers List variables
     protected Context mContext;
     protected List<ParseUser> mParseUsers;
 
-    // pass the list of activities to the RouteMessageAdapter
-
-    // create a constructor
+    /**
+     * Constructor to pass the list of activities to the UserAdapter
+     *
+     * @param context    - the context of the application
+     * @param parseUsers - the list of completed runs
+     */
     public UserAdapter(Context context, List<ParseUser> parseUsers) {
         super(context, R.layout.message_item, parseUsers);
         mContext = context;
         mParseUsers = parseUsers;
     }
 
-    // in fragments, the adapter called an appropriate method to get a fragment, then it adapter it and then put in the view
-    // ...the same thing is happening here - this adapter (which is going to be attached to a list view) is going to call a
-    // method called getView(), its going to create the view, inflate it into a layout and then attach it into the list view
-    // override getView() to use a custom list adapter
+    /**
+     * ViewHolder class that contains the data to be displayed in the
+     * custom layout for each ParseUser item.
+     * Convention when creating a custom list adapter is to create a
+     * private static class that can be referenced in getView().
+     */
+    private static class ViewHolder {
+        // The users image
+        ImageView userImageView;
+        // The image when a user is checked
+        ImageView checkUserImageView;
+        // The name of the user
+        TextView nameLabel;
+    }
+
+    /**
+     * * Method to create the View, inflate it into the layout, and attach it onto the ListView.
+     *
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // we want to create a method that is efficient for the list view
-        // the more efficient we are in this method, the better our list view will perform
-        // - this affects things like scrolling or tapping on items
-        // a common pattern that help with this is the ViewHolder PATTERN!!!
-        ViewHolder holder; // we need to create this ViewHolder class
 
-        // when doing a custom list adapter, the convention is to create a private static class that we can reference - see below
+        // Create an instance of the ViewHolder class
+        final ViewHolder viewHolder;
 
-        // this method is called in such a way that the views are recycled for the list view
-        // the android system recycles the views if they already exist
+        // Check if the view is null
         if (convertView == null) {
-            // we want to inflate the view (convertView) from the layout file, using the context, and then return it to the list
-            // Done by using the LayoutInflater - an Android object that takes XML layouts and turns them into views in code that we can use
+
+            // If so, inflate the View from the layout file, using the context,
+            // and then return it to the list.
+            // Use the LayoutInflater - Android object that takes XML layouts and turns them into views.
             convertView = LayoutInflater.from(mContext).inflate(R.layout.user_item, null);
 
-            // initialise holder as a new ViewHolder - and initialise the image view and text view inside it
-            holder = new ViewHolder();
-            // findViewById() is an activity method, but we can call it from the convert view
-            holder.userImageView = (ImageView) convertView.findViewById(R.id.userImageView);
-            holder.checkUserImageView = (ImageView) convertView.findViewById(R.id.checkFriendImageView);
-            holder.nameLabel = (TextView) convertView.findViewById(R.id.nameLabel);
+            // Initialise a new ViewHolder - then initialise the data inside it.
+            viewHolder = new ViewHolder();
 
-            convertView.setTag(holder);
+            // findViewById() is an Activity method - can be called from the View.
+            viewHolder.userImageView = (ImageView) convertView.findViewById(R.id.userImageView);
+            viewHolder.checkUserImageView = (ImageView) convertView.findViewById(R.id.checkFriendImageView);
+            viewHolder.nameLabel = (TextView) convertView.findViewById(R.id.nameLabel);
+            convertView.setTag(viewHolder);
         } else {
-            // then it already exists and we can reuse the components - they are already there in memory - we just need to change the data
-            // so instead of creating the holder from scratch, do the following. getTag() gets us the ViewHolder that was already created - this is part of the ViewHolder pattern
-            holder = (ViewHolder) convertView.getTag();
+            // View already exists - reuse the components already in memory - just need to change the data.
+            // Instead of creating the holder from scratch, call getTag() to get the ViewHolder that is already created.
+            // Views are recycled for the ListView - ViewHolder pattern in action.
+            // Android system recycles the views if they already exist.
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // set the data in the view - picture icon and name
-        // get the parse object that corresponds to position, because getView() is going to be called for each position in the list
+        // Get the ParseObject that corresponds to the List position.
+        // getView() is going to be called for each position in the List.
         ParseUser user = mParseUsers.get(position);
 
+        // Set the users image picture.
         ParseFile image = (ParseFile) user.getParseFile("profilePic");
-        // Email will be an empty String if the user didn't supply an email address
+        // image will be null if the user didn't supply one.
         if (image == null) {
-            // If image file is empty, set the default avatar
+            // If image file is empty, set the default avatar.
             Log.d(TAG, "No profile picture for: " + user.getUsername());
-            holder.userImageView.setImageResource(R.mipmap.avatar_empty);
+            viewHolder.userImageView.setImageResource(R.mipmap.avatar_empty);
         } else {
-
+            // Add image using Picasso
             Picasso.with(mContext)
                     // Load the URL
                     .load(image.getUrl())
@@ -95,42 +119,39 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
                     .placeholder(R.mipmap.avatar_empty)
                     .resize(250, 250)
                             // Load into user image view
-                    .into(holder.userImageView);
+                    .into(viewHolder.userImageView);
         }
 
-        // Get the name of the user from Parse
-        holder.nameLabel.setText(user.getUsername());
+        // Set the name of the user.
+        viewHolder.nameLabel.setText(user.getUsername());
 
-        // Get a reference to the GridView, the parent view of the individual item being tapped
-        // When the user taps on a GridView item, the getView() method is called
+        // Get a reference to the GridView, the parent view of the individual item being tapped.
+        // When a user taps on a GridView item, getView() method is called.
         GridView gridView = (GridView) parent;
-        // Check if the item being tapped on is checked or not
+        // Check if the item being tapped on is checked or not.
         if (gridView.isItemChecked(position)) {
-            // Set to visible if it is
-            holder.checkUserImageView.setVisibility(View.VISIBLE);
+            // Set to visible if it is.
+            viewHolder.checkUserImageView.setVisibility(View.VISIBLE);
         } else {
-            holder.checkUserImageView.setVisibility(View.INVISIBLE);
+            // Otherwise set to invisible.
+            viewHolder.checkUserImageView.setVisibility(View.INVISIBLE);
         }
 
+        // Return the View
         return convertView;
     }
 
-    // class that contains the data that we are adapting and that is
-    // going to be displayed in the custom layout for each item
-    private static class ViewHolder {
-        // There are 3 pieces of data - a text view, an image view and a check for the image view
-        ImageView userImageView;
-        ImageView checkUserImageView;
-        TextView nameLabel;
-    }
-
-    // method to refill the list with ParseObject data if it is not null
+    /**
+     * * Method to refill the list with ParseUser data if it is not null
+     *
+     * @param users
+     */
     public void refill(List<ParseUser> users) {
-        // clear the current data
+        // Clear the current data
         mParseUsers.clear();
-        // add all the new ones
+        // Add all the new users
         mParseUsers.addAll(users);
-        //  need to call notifyDataSetChanged() on the adapter after changing its contents
+        // Call notifyDataSetChanged() on the adapter after changing its contents.
         notifyDataSetChanged();
     }
 }

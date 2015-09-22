@@ -26,105 +26,113 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Custom list view adapter that uses the completed_run_item.xml layout file.
+ * Custom adapter that uses the completed_run_item.xml layout file.
  * Adapter has two parts:
  * A custom layout that will be used for each item in the list;
- * A custom class that adapts each item of the parse objects into the layout.
+ * A custom subclass, ViewHolder, that adapts each item of the ParseObject into the layout.
+ * The common ViewHolder pattern is applied to enable an efficient ListView performance.
  * Created by KHackett on 31/07/15.
  */
 public class RunHistoryAdapter extends ArrayAdapter<ParseObject> {
 
+    // Simple class TAG for logcat output
     public static final String TAG = RunHistoryAdapter.class.getSimpleName();
 
+    // Declare Context and CompletedRuns List variables
     protected Context mContext;
-    protected List<ParseObject> mCompletedRun;
+    protected List<ParseObject> mCompletedRuns;
 
     /**
      * Constructor to pass the list of activities to the RunHistoryAdapter
      *
-     * @param context
-     * @param completedRun - the list of completed runs
+     * @param context       - the context of the application
+     * @param completedRuns - the list of completed runs
      */
-    public RunHistoryAdapter(Context context, List<ParseObject> completedRun) {
-        super(context, R.layout.run_history_item, completedRun);
+    public RunHistoryAdapter(Context context, List<ParseObject> completedRuns) {
+        super(context, R.layout.run_history_item, completedRuns);
         mContext = context;
-        mCompletedRun = completedRun;
+        mCompletedRuns = completedRuns;
     }
 
     /**
-     * Custom class that contains the data to be displayed in the custom layout for each run_history_item.
-     * Convention when creating a custom list adapter is to create a private static class that can be referenced in getView().
+     * ViewHolder class that contains the data to be displayed in the
+     * custom layout for each RunHistory item.
+     * Convention when creating a custom list adapter is to create a
+     * private static class that can be referenced in getView().
      */
     private static class ViewHolder {
-        // The name of the route.
+        // The name of the Route.
         TextView routeNameLabel;
         // The time and date of the run.
         TextView timeAndDateLabel;
     }
 
-    // In fragments, the adapter calls an appropriate method to get a fragment, then it adapts it and put it in the view.
-    // Same thing happening here - this adapter (which is going to be attached to a list view) calls getView()
-    // It creates the view, inflates it into a layout and then attach it into the list view.
-    // Override getView() to use a custom list adapter.
+    /**
+     * Method to create the View, inflate it into the layout, and attach it onto the ListView.
+     *
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Create a method for the list view - the more efficient, the better the list view will perform.
-        // - this affects things like scrolling or tapping on items.
-        // Use the ViewHolder pattern to aid with this.
 
-        // Create a ViewHolder object.
-        final ViewHolder holder;
+        // Create an instance of the ViewHolder class
+        final ViewHolder viewHolder;
 
-        // When this method is called, the views are recycled for the list view.
-        // The android system recycles the views as if they already exist.
+        // Check if the view is null
         if (convertView == null) {
-            // Inflate the view (convertView) from the layout file, using the context, and then return it to the list.
-            // Done by using the LayoutInflater - an Android object that takes XML layouts and turns them into views in code that can be used.
+
+            // If so, inflate the View from the layout file, using the context,
+            // and then return it to the list.
+            // Use the LayoutInflater - Android object that takes XML layouts and turns them into views.
             convertView = LayoutInflater.from(mContext).inflate(R.layout.run_history_item, null);
 
-            // Initialise the ViewHolder - and initialise the necessary items inside it.
-            holder = new ViewHolder();
-            // findViewById() is an activity method, but can be called from the convertView object.
-            holder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
-            holder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
-            convertView.setTag(holder);
+            // Initialise a new ViewHolder - then initialise the data inside it.
+            viewHolder = new ViewHolder();
+
+            // findViewById() is an Activity method - can be called from the View.
+            viewHolder.routeNameLabel = (TextView) convertView.findViewById(R.id.routeNameLabel);
+            viewHolder.timeAndDateLabel = (TextView) convertView.findViewById(R.id.timeAndDateLabel);
+            convertView.setTag(viewHolder);
         } else {
-            // Otherwise it already exists and components can be reused.
-            // Components are already in memory - just need to change the values.
-            // Instead of creating the holder from scratch - getTag() gets the ViewHolder
-            // that was already created - part of the ViewHolder pattern in action.
-            holder = (ViewHolder) convertView.getTag();
+            // View already exists - reuse the components already in memory - just need to change the data.
+            // Instead of creating the holder from scratch, call getTag() to get the ViewHolder that is already created.
+            // Views are recycled for the ListView - ViewHolder pattern in action.
+            // Android system recycles the views if they already exist.
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // Set the data in the view.
-        // Get the parse object that corresponds to the selected position in the list.
-        // getView() will be called for each position in the list.
-        ParseObject completedRun = mCompletedRun.get(position);
+        // Get the ParseObject that corresponds to the List position.
+        // getView() is going to be called for each position in the List.
+        ParseObject completedRun = mCompletedRuns.get(position);
 
-        // Set the name of the run from the completed run.
-        holder.routeNameLabel.setText(completedRun.getString(ParseConstants.KEY_ROUTE_NAME));
+        // Set the name of the run.
+        viewHolder.routeNameLabel.setText(completedRun.getString(ParseConstants.KEY_ROUTE_NAME));
 
         // Create an instance of SimpleDateFormat used for formatting.
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        // Convert Date object into a String object to be used in the text view.
+        // Convert Date object into a String object.
         Date completedOn = completedRun.getCreatedAt();
         String completedOnString = dateFormat.format(completedOn);
         // Use newly created String Date in the Text View.
-        holder.timeAndDateLabel.setText(completedOnString);
+        viewHolder.timeAndDateLabel.setText(completedOnString);
 
+        // Return the View
         return convertView;
     }
 
     /**
      * Method to refill the list with ParseObject data if it is not null
      *
-     * @param runs
+     * @param completedRuns
      */
-    public void refill(List<ParseObject> runs) {
+    public void refill(List<ParseObject> completedRuns) {
         // Clear the current data.
-        mCompletedRun.clear();
+        mCompletedRuns.clear();
         // Add all the new runs.
-        mCompletedRun.addAll(runs);
+        mCompletedRuns.addAll(completedRuns);
         // Call notifyDataSetChanged() on the adapter after changing its contents.
         notifyDataSetChanged();
     }
