@@ -24,31 +24,32 @@ import com.parse.ParseUser;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
+    // TAG to represent the FriendsFragment class
     public static final String TAG = LoginActivity.class.getSimpleName();
 
-    // Member variables that correspond to items in the layout.
+    // Member variables that correspond to components in the layout.
     private EditText mUserName;
     private EditText mPassword;
     private Button mLoginButton;
     private TextView mSignUpTextView;
     private TextView mForgotPasswordTextView;
 
-    // Declare the context of the activity.
-    protected Context mContext;
+    // Declare the context of the application.
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Set each member variable for the ui components
+        // Set each member variable for the ui components.
         mUserName = (EditText) findViewById(R.id.usernameField);
         mPassword = (EditText) findViewById(R.id.passwordField);
         mLoginButton = (Button) findViewById(R.id.loginButton);
         mSignUpTextView = (TextView) findViewById(R.id.signUpText);
         mForgotPasswordTextView = (TextView) findViewById(R.id.forgotPasswordText);
 
-        // Register buttons with the listener
+        // Register components with the listener
         mLoginButton.setOnClickListener(this);
         mSignUpTextView.setOnClickListener(this);
         mForgotPasswordTextView.setOnClickListener(this);
@@ -64,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     @Override
     public void onClick(View v) {
-        // Switch statement to select which action to take depending on button/text pressed
+        // Switch statement to select which action to take depending on the component pressed
         switch (v.getId()) {
             case R.id.loginButton:
                 loginInUser();
@@ -84,10 +85,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * Method to log a user into RunMate.
      */
     public void loginInUser() {
-        // When the user taps the log in button, check the values for validation on the client side
+        // When the user taps the log in button, check the values for validation on the client side.
         // If they are ok, send them to Parse backend.  If not, display a message to the user
 
-        // Get values from the edit text fields.
+        // Get values from the EditText fields.
         // Add the toString() method, as the return type in getText() is Editable.
         // - special type of String value that needs to be converted to a regular String.
         String username = mUserName.getText().toString();
@@ -98,7 +99,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         password = password.trim();
 
         // Ensure that none of the fields are blank.
-
         if (checkForEmptyFields(username, password)) {
             // Alert user to fill in all of the fields.
             showErrorDialog(R.string.login_error_title, R.string.login_error_message);
@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             progressDialog.setMessage(mContext.getString(R.string.log_in_progress_dialog_message));
             progressDialog.show();
 
-            // Attempt to log user in using background thread
+            // Log user in using background thread
             ParseUser.logInInBackground(username, password, new LogInCallback() {
                 @Override
                 public void done(ParseUser parseUser, ParseException e) {
@@ -120,13 +120,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     // Dismiss progress dialog once connection with backend has been made.
                     progressDialog.dismiss();
 
-                    // done() method returns a ParseUser object.
+                    // If no exception
                     if (e == null) {
-                        // If login is successful and no ParseException, log user into RunMate
 
                         // Update the Parse Installation object with the users ID to be used for push notifications.
                         RunMateApplication.updateParseInstallationObject(parseUser);
 
+                        // Create and start a new intent for the MainActivity
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     * Switches to the SignUpActivity
+     * Method to switch to the SignUpActivity
      */
     public void signUpUser() {
         // Create a new intent for the SignUpActivity and start.
@@ -156,14 +156,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     * Switches to the ForgotPasswordActivity
+     * Method to switch to the ForgotPasswordActivity
      */
     public void forgotPassword() {
         // Create a new intent for the ForgotPasswordActivity and start.
         Intent intent = new Intent(this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
-
 
     /**
      * Checks for empty fields in the log in activity.
@@ -174,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     public boolean checkForEmptyFields(String username, String password) {
 
-        // Declare variables for text field checks
+        // Declare variables for TextField checks
         String usernameCheck, passwordCheck;
 
         // Initialise variables
@@ -214,16 +213,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

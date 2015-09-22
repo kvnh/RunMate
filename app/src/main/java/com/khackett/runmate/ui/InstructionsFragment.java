@@ -11,12 +11,7 @@ import android.view.ViewGroup;
 import com.khackett.runmate.R;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link //InstructionsFragment.//OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link InstructionsFragment#//newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment to display instructions to the user on operating RunMate
  */
 public class InstructionsFragment extends Fragment {
 
