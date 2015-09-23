@@ -139,17 +139,19 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
             e.printStackTrace();
         }
 
+        // Create JSONArray to hold points
         JSONArray arrayPoints = array;
 
         // Iterate through the array and plot on the map
         for (int i = 0; i < arrayPoints.length(); i++) {
             // Extract the latitude and longitude values for each point in the array
-            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"),
+                    arrayPoints.optJSONObject(i).optDouble("longitude"));
 
-            // Adding new latlng point to the array list
+            // Adding new LatLng point to the array list
             markerPoints.add(latLngObject);
 
-            // Initialising the polyline in the map and setting some values
+            // Initialising the polyline in the map and setting values
             polylineOptions = new PolylineOptions()
                     .color(Color.BLUE)
                     .width(6);
@@ -189,7 +191,8 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Iterate through the array and plot on the map via Directions requests
         for (int i = 0; i < arrayPoints.length(); i++) {
             // Extract the latitude and longitude values for each point in the array
-            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"),
+                    arrayPoints.optJSONObject(i).optDouble("longitude"));
 
             // Adding new latlng point to the array list
             markerPoints.add(latLngObject);

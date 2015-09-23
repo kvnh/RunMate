@@ -58,13 +58,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class to track the run of a user via GPS Location tracking
+ */
 public class MapsActivityTrackRun extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
-
+    // TAG to represent the MapsActivityTrackRun class
     public static final String TAG = MapsActivityTrackRun.class.getSimpleName();
 
     /**
@@ -105,39 +108,61 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     public static final int LOCATION_ACCURACY = 10;
 
     /**
-     * Provides the entry point to Google Play services.
+     * Key for storing activity state in the Bundle.
      */
-    private GoogleApiClient mGoogleApiClient;
+    public static final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
 
     /**
-     * Used to request a quality of service for location updates
-     * and store parameters for requests to the FusedLocationProviderApi.
+     * Key for storing activity state in the Bundle.
      */
-    private LocationRequest mLocationRequest;
+    public static final String LOCATION_KEY = "location-key";
 
     /**
-     * The current location of the device.
+     * Key for storing activity state in the Bundle.
      */
-    private Location mCurrentLocation;
+    public static final String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
 
-    /**
-     * Stores the types of location services the client is requesting.
-     * Used to check settings and determine if the device has the required location settings.
-     */
-    private LocationSettingsRequest mLocationSettingsRequest;
-
-    // Keys for storing activity state in the Bundle.
-    private static final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
-    private static final String LOCATION_KEY = "location-key";
-    private static final String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
+    // Declare member variables for route creation
+    private ArrayList<LatLng> latLngGPSTrackingPoints;
+    private Polyline line;
+    private List<Polyline> polylines;
+    // Member variable used to retrieve the sent route via the Directions API
+    private ArrayList<LatLng> markerPoints;
+    private Route mTrackedRun;
+    // Get the name of the passed intent
+    private String intentName;
     // Member variable to represent an array of ParseGeoPoint values to be stored in the backend
     // Values are those points clicked on the map
     private ArrayList<ParseGeoPoint> parseLatLngList;
+    // Member variable to represent an array of ParseGeoPoint values to be stored Parse
+    // Values are the southwest and northeast LatLng points at the bounds of the route
+    private ArrayList<ParseGeoPoint> parseLatLngBoundsList;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    // Create a DirectionsUtility object
+    private DirectionsUtility directionsUtility;
 
-    // Member variables for the UI buttons and text outputs
+    //Provides the entry point to Google Play services.
+    private GoogleApiClient mGoogleApiClient;
+
+    // Used to request a quality of service for location updates
+    // and store parameters for requests to the FusedLocationProviderApi.
+    private LocationRequest mLocationRequest;
+
+    // The current location of the device.
+    private Location mCurrentLocation;
+
+    // Stores the types of location services the client is requesting.
+    // Used to check settings and determine if the device has the required location settings.
+    private LocationSettingsRequest mLocationSettingsRequest;
+
+    // Boolean to to track whether the location updates have been turned on or off by the user.
+    // Value changes when the user presses the Start Run and Stop Run buttons.
+    private Boolean mCheckLocationUpdates;
+
+    // Time when the location was updated represented as a String.
+    private String mLastUpdateTime;
+
+    // Member variables for the UI components
     private Button mStartUpdatesButton;
     private Button mStopUpdatesButton;
     private Button mSaveRunButton;
@@ -146,38 +171,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     private TextView mRunTimeTextView;
     private long startTime = 0;
     private long totalTimeMillis;
-
-    /**
-     * Boolean to to track whether the location updates have been turned on or off by the user.
-     * Value changes when the user presses the Start Run and Stop Run buttons.
-     */
-    private Boolean mCheckLocationUpdates;
-
-    /**
-     * Time when the location was updated represented as a String.
-     */
-    private String mLastUpdateTime;
-
-    // Declare array list for location points
-    private ArrayList<LatLng> latLngGPSTrackingPoints;
-
-    private Polyline line;
-
-    private List<Polyline> polylines;
-
-    // member variable to represent an array of LatLng values, used to retrieve the sent route via the Directions API
-    private ArrayList<LatLng> markerPoints;
-
-    private Route mTrackedRun;
-
-    // Member variable to represent an array of ParseGeoPoint values to be stored in the parse.com cloud
-    // Values are the southwest and northeast LatLng points at the bounds of the route
-    private ArrayList<ParseGeoPoint> parseLatLngBoundsList;
-
-    private DirectionsUtility directionsUtility;
-
-    // Get the name of the passed intent
-    private String intentName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,11 +192,11 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         markerPoints = new ArrayList<LatLng>();
         mTrackedRun = new Route();
 
-        // set the location update request to false to start the activity
+        // Set the location update request to false to start the activity
         mCheckLocationUpdates = false;
         mLastUpdateTime = "";
 
-
+        // Initialize DirectionsUtility object
         directionsUtility = new DirectionsUtility();
 
         // Getting reference to SupportMapFragment of the activity_maps
@@ -244,7 +237,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         }
 
-        // set up member variables for each UI component
+        // Set up member variables for each UI component
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
         mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
         mSaveRunButton = (Button) findViewById(R.id.save_run_button);
@@ -264,28 +257,35 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         }
     }
 
+    /**
+     * Method to plot a route that was created manually
+     */
     public void plotManualRoute() {
-        // assign the JSON String value from the passed in intent to a new String variable
+        // Assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;
         PolylineOptions polylineOptions = null;
 
         try {
-            // convert String to a JSONArray
+            // Convert String to a JSONArray
             array = new JSONArray(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        // Create JSONArray to hold points
         JSONArray arrayPoints = array;
 
+        // Iterate through the array and plot on the map
         for (int i = 0; i < arrayPoints.length(); i++) {
-            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+            // Extract the latitude and longitude values for each point in the array
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"),
+                    arrayPoints.optJSONObject(i).optDouble("longitude"));
 
-            // Adding new latlng point to the array list
+            // Adding new LatLng point to the array list
             markerPoints.add(latLngObject);
 
-            // Initialising the polyline in the map and setting some values
+            // Initialising the polyline in the map and setting values
             polylineOptions = new PolylineOptions()
                     .color(Color.BLUE)
                     .width(6);
@@ -299,13 +299,16 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         mMap.addPolyline(polylineOptions);
     }
 
+    /**
+     * Method to plot a Route that was created via the Directions API
+     */
     public void plotDirectionsRoute() {
-        // assign the JSON String value from the passed in intent to a new String variable
+        // Assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngList");
         JSONArray array = null;
 
         try {
-            // convert String to a JSONArray
+            // Convert String to a JSONArray
             array = new JSONArray(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -313,8 +316,11 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         JSONArray arrayPoints = array;
 
+        // Iterate through the array and plot on the map via Directions requests
         for (int i = 0; i < arrayPoints.length(); i++) {
-            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"), arrayPoints.optJSONObject(i).optDouble("longitude"));
+            // Extract the latitude and longitude values for each point in the array
+            LatLng latLngObject = new LatLng(arrayPoints.optJSONObject(i).optDouble("latitude"),
+                    arrayPoints.optJSONObject(i).optDouble("longitude"));
 
             // Adding new latlng point to the array list
             markerPoints.add(latLngObject);
@@ -325,25 +331,24 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
         for (int i = 0; i < markerPoints.size() - 1; i++) {
 
-            /**
-             * For the start location, the colour of the marker is GREEN.
-             */
+            // For the start location, the colour of the marker is GREEN
             if (markerPoints.size() == 1) {
                 // Add a green marker for the start position.
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
 
+            // Once the second point is plotted, begin calls to the Directions API
             if (markerPoints.size() >= 2) {
 
+                // Assign values to LatLng objects
                 LatLng point1 = markerPoints.get(i);
                 LatLng point2 = markerPoints.get(i + 1);
 
                 marker.position(point1).visible(false);
 
-                // Getting URL to the Google Directions API
-                // send these values to the getDirectionsUrl() method and assign returned value to string variable url
+                // Creating URL to send to the Google Directions API.
                 String url = directionsUtility.getDirectionsUrl(point1, point2);
-                // create a DownloadTask object - see nested class below
+                // Create a DownloadURLTask object - see nested class below
                 DownloadURLTask downloadURLTask = new DownloadURLTask();
                 // Start downloading json data from Google Directions API
                 downloadURLTask.execute(url);
@@ -354,7 +359,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         addMarkersToMap(markerPoints);
     }
 
-    // Fetches data from url passed
+    /**
+     * Asynchronous task to fetch JSON data via the passed in URL
+     */
     private class DownloadURLTask extends AsyncTask<String, Void, String> {
 
         // Downloading data in non-ui thread
@@ -378,15 +385,15 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ParseLatLngValuesTask parserTask = new ParseLatLngValuesTask();
-
-            // Invokes the thread for parsing the JSON data
-            parserTask.execute(result);
+            // Create a ParseLatLngValuesTask object and invoke thread for parsing JSON data
+            ParseLatLngValuesTask parseLatLngValuesTask = new ParseLatLngValuesTask();
+            parseLatLngValuesTask.execute(result);
         }
     }
 
     /**
-     * A class to parse the Google Places in JSON format
+     * An AsyncTask class to parse the LatLng values from the Directions API JSON data.
+     * LatLng values will then be used to plot a line on the map.
      */
     private class ParseLatLngValuesTask extends AsyncTask<String, Integer, List<LatLng>> {
 
@@ -397,7 +404,6 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             List<LatLng> routePoints = null;
             try {
                 jsonObject = new JSONObject(jsonData[0]);
-
                 // Starts parsing data
                 routePoints = directionsUtility.parseJSONObjectOverviewPolyline(jsonObject);
             } catch (Exception e) {
@@ -423,6 +429,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         }
     }
 
+    /**
+     * Method to zoom to the boundary extremes of a plotted route.
+     */
     public void zoomToViewRoute() {
         // assign the JSON String value from the passed in intent to a new String variable
         String jsonArray = getIntent().getStringExtra("parseLatLngBoundsList");
@@ -502,7 +511,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     /**
-     * Updates fields based on data stored in the bundle.
+     * Method to update fields based on data stored in the bundle.
      */
     private void updateSettingsFromBundle(Bundle savedInstanceState) {
         Log.i(TAG, "Updating values from bundle");
@@ -547,7 +556,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
                 // Return dialog to user, and direct them to Play Store if Google Play services is out of date or missing
                 googleAPI.getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                // otherwise, display a message informing user that Google Play services is out of date
+                // Otherwise, display a message informing user that Google Play services is out of date
                 Toast.makeText(getApplicationContext(),
                         "Device is not supported - please install Google Play services", Toast.LENGTH_LONG)
                         .show();
@@ -559,17 +568,17 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     }
 
     /**
-     * Creates the Google API client used to access Google Play Services
+     * Method to create a Google API client used to access Google Play Services
      */
     protected synchronized void createGoogleApiClient() {
         // Create a new GoogleApiClient object using the builder pattern
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                // let the client know that this class will handle connection management
+                // Let the client know that this class will handle connection management
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                        // add the LocationServices API from Google Play Services
+                        // Add the LocationServices API from Google Play Services
                 .addApi(LocationServices.API)
-                        // build the client
+                        // Build the client
                 .build();
     }
 
@@ -577,14 +586,14 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * Creates the location request and sets the accuracy of the current location
      */
     protected void createLocationRequest() {
-        // initialise the mLocationRequest object with desired settings
+        // Initialise the mLocationRequest object with desired settings
         mLocationRequest = LocationRequest.create()
-                // request the most precise location possible
+                // Request the most precise location possible
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        // set update interval for active location updates
+                        // Set update interval for active location updates
                 .setInterval(UPDATE_INTERVAL)
-                        // set fastest rate for active location updates
-                        // app will never receive updates faster than this setting
+                        // Set fastest rate for active location updates
+                        // App will never receive updates faster than this setting
                 .setFastestInterval(FASTEST_UPDATE_INTERVAL);
         // .setSmallestDisplacement(DISPLACEMENT);
     }
@@ -596,7 +605,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
     protected void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
-        // ensure that dialog will always be displayed
+        // Ensure that dialog will always be displayed
         builder.setAlwaysShow(true);
         mLocationSettingsRequest = builder.build();
     }
@@ -663,7 +672,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
      * Handles the Start Run button and checks for location settings before proceeding.
      */
     public void startUpdatesButton(View view) {
-        // check location settings to ensure GPS is enabled, before running location updates
+        // Check location settings to ensure GPS is enabled, before running location updates
         checkLocationSettings();
     }
 
@@ -678,6 +687,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         timerHandler.removeCallbacks(timerRunnable);
     }
 
+    /**
+     * Method to save a route once a user has completed their run
+     * @param view
+     */
     public void saveRunButton(View view) {
         // Stop checking for location updates.
         stopLocationUpdates();
@@ -693,6 +706,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         finish();
     }
 
+    /**
+     * Method to send a route once a user has completed their run
+     * @param view
+     */
     public void sendRunButton(View view) {
         // Stop checking for location updates.
         stopLocationUpdates();
@@ -700,19 +717,23 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         // Remove callbacks to the Runnable object and stop timer.
         timerHandler.removeCallbacks(timerRunnable);
 
+        // Create the route to send
         createCompletedRouteToSend();
     }
 
+    /**
+     * Method to delet a run
+     * @param view
+     */
     public void deleteRunButton(View view) {
         String objectId = getIntent().getStringExtra("myRunsObjectId");
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_ROUTES);
         query.getInBackground(objectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
-                    // object.deleteInBackground();
                     deleteUserRoute(object);
                 } else {
-                    // there is an error - notify the user
+                    // There is an error - notify the user
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivityTrackRun.this);
                     builder.setMessage(R.string.error_delete_route_message)
                             .setTitle(R.string.error_deleting_route_title)
@@ -728,6 +749,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         finish();
     }
 
+    /**
+     * Method to delete a users route from the object
+     * @param object
+     */
     public void deleteUserRoute(ParseObject object) {
         ParseObject completedRuns = object;
         List<String> completedRunsAcceptedID = completedRuns.getList(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS);
@@ -749,6 +774,10 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         Toast.makeText(MapsActivityTrackRun.this, R.string.success_delete_route, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Method to create a route for saving to Parse
+     * @return
+     */
     public ParseObject createCompletedRouteToSave() {
         // Add all of the location points to the Route object.
         mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
@@ -772,6 +801,9 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         return completedRoute;
     }
 
+    /**
+     * Method for creating an intent containing route data
+     */
     public void createCompletedRouteToSend() {
         // Add all of the location points to the Route object.
         mTrackedRun.setMinMaxLatLngSectionArrayList(latLngGPSTrackingPoints);
@@ -807,6 +839,11 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         return parseLatLngList;
     }
 
+    /**
+     * Method to convert an array of LatLng elements to an array of ParseGeoPoint elements.
+     * @param latLngBounds
+     * @return
+     */
     protected ArrayList<ParseGeoPoint> convertLatLngBoundsToParseGeoPointArray(LatLngBounds latLngBounds) {
 
         parseLatLngBoundsList = new ArrayList<ParseGeoPoint>();
