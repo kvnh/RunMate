@@ -77,7 +77,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ui.EditFriendsActivity"
+            android:name=".ui.AddRemoveFriendsActivity"
             android:label="@string/title_activity_edit_friends"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"

@@ -6,10 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -27,23 +25,29 @@ import com.parse.SaveCallback;
 
 import java.util.List;
 
-public class EditFriendsActivity extends Activity {
+/**
+ * Class to and add and remove users from a friends list
+ */
+public class AddRemoveFriendsActivity extends Activity {
 
-    // TAG to represent the EditFriendsActivity class
-    public static final String TAG = EditFriendsActivity.class.getSimpleName();
-
-    // set up a reference to the current user
-    protected ParseUser mCurrentUser;
-    // set up a member variable to store a list of users returned from the parse user query
-    protected List<ParseUser> mUsers;
-    // set up a ParseRelation member to hold ParseUsers
-    protected ParseRelation<ParseUser> mFriendsRelation;
-    // Create a variable for the GridView
-    protected GridView mGridView;
-    // Declare the context of the activity.
-    protected Context mContext;
-
+    /**
+     * The maximum number of users returned from a ParseUser query
+     */
     private static final int PARSE_USER_QUERY_LIMIT = 500;
+
+    // TAG to represent the AddRemoveFriendsActivity class
+    public static final String TAG = AddRemoveFriendsActivity.class.getSimpleName();
+
+    // Set up a reference to the current user
+    private ParseUser mCurrentUser;
+    // Set up a member variable to store a list of users returned from the parse user query
+    private List<ParseUser> mUsers;
+    // Set up a ParseRelation member to hold ParseUsers
+    private ParseRelation<ParseUser> mFriendsRelation;
+    // Create a variable for the GridView
+    private GridView mGridView;
+    // Declare the context of the application.
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +56,11 @@ public class EditFriendsActivity extends Activity {
         // Set the GridView layout
         setContentView(R.layout.user_grid);
 
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
-
         // Set the GridView in the layout
         mGridView = (GridView) findViewById(R.id.friendsGrid);
-        // get the default grid view associated with this activity and set it to allow multiple items/friends to be checked
+        // mGridView keeps track of items that are selected (the check property on each item)
+        // Set it to the default grid view and allow items to be checked
         mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
-
         // Add a listener to detect when items on the grid view have been tapped
         mGridView.setOnItemClickListener(mOnItemClickListener);
 
@@ -67,8 +69,8 @@ public class EditFriendsActivity extends Activity {
         // Attach this as the empty text view for the GridView
         mGridView.setEmptyView(emptyFriendsList);
 
-        // Initialise the Context to the EditFriendsActivity.
-        mContext = EditFriendsActivity.this;
+        // Initialise the Context to AddRemoveFriendsActivity.
+        mContext = AddRemoveFriendsActivity.this;
     }
 
     @Override
@@ -77,48 +79,40 @@ public class EditFriendsActivity extends Activity {
 
         // Get the current logged in user
         mCurrentUser = ParseUser.getCurrentUser();
-        // For the relation, from this user, call the getRelation() method
+        // For the FriendsRelation for current user, call getRelation()
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         // Set up a dialog progress indicator box
-        final ProgressDialog progressDialog = new ProgressDialog(EditFriendsActivity.this);
+        final ProgressDialog progressDialog = new ProgressDialog(AddRemoveFriendsActivity.this);
         progressDialog.setTitle(R.string.edit_friends_progress_dialog_title);
         progressDialog.setMessage(mContext.getString(R.string.edit_friends_progress_dialog_message));
         progressDialog.show();
 
-        // ParseQuery class used to fetch ParseObjects.
-        // The query will return a list of ParseUser objects.
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        // Use ParseQuery to retrieve a list of the ParseUsers associated with this user.
+        ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
         // Sort the results of the query in ascending order by username.
-        query.orderByAscending(ParseConstants.KEY_USERNAME);
+        friendsQuery.orderByAscending(ParseConstants.KEY_USERNAME);
         // Set query limits to 500 users.
-        query.setLimit(PARSE_USER_QUERY_LIMIT);
+        friendsQuery.setLimit(PARSE_USER_QUERY_LIMIT);
         // Execute the query in the background thread.
-        query.findInBackground(new FindCallback<ParseUser>() {
+        friendsQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
 
                 // Dismiss progress dialog once result returned from backend
                 progressDialog.dismiss();
 
+                // If no exception returned
                 if (e == null) {
-                    // Successful query - display ParseUsers
+
+                    // Set the mUsers to the List of returned users
                     mUsers = users;
-                    // Create an array of strings to store the ParseUsers
-                    // and set the size equal to that of the list returned.
-                    String[] usernames = new String[mUsers.size()];
-                    // Enhanced for loop to go through the list of ParseUsers and extract usernames
-                    int i = 0;
-                    for (ParseUser user : mUsers) {
-                        usernames[i] = user.getUsername();
-                        i++;
-                    }
 
                     // Use the custom UserAdapter
                     // Get the adapter associated with the GridView and check to see if it is null
                     if (mGridView.getAdapter() == null) {
                         // Use the custom UserAdapter to display the users in the GridView.
-                        UserAdapter adapter = new UserAdapter(EditFriendsActivity.this, mUsers);
+                        UserAdapter adapter = new UserAdapter(AddRemoveFriendsActivity.this, mUsers);
                         // Call setAdapter for this activity to set the items in the GridView.
                         mGridView.setAdapter(adapter);
                     } else {
@@ -126,13 +120,14 @@ public class EditFriendsActivity extends Activity {
                         ((UserAdapter) mGridView.getAdapter()).refill(mUsers);
                     }
 
+                    // Add checkmarks to the users friends
                     addFriendCheckMarks();
 
                 } else {
                     // There was an error - log the message.
                     Log.e(TAG, e.getMessage());
                     // Display an alert to the user.
-                    AlertDialog.Builder builder = new AlertDialog.Builder(EditFriendsActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddRemoveFriendsActivity.this);
                     builder.setMessage(e.getMessage())
                             .setTitle(R.string.error_title)
                             .setPositiveButton(android.R.string.ok, null);
@@ -145,48 +140,42 @@ public class EditFriendsActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will automatically handle clicks on the Home/Up button,
-        // so long as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as a parent activity is specified in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Method to add a check mark a selected users picture.
+     */
     private void addFriendCheckMarks() {
-        // the first thing we need is a list of the users friends
-        // we have the friend relation, but this doesn't give us a list of users to work with
-        // the list itself is still on the back end, we need to use the ParseRelation to retrieve it
-        // use the build in query to retrieve it - this gets us the query associated with this ParseRelation
+        // Use mFriendsRelation to return a list of the users friends from Parse
         mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
-                // We are working with asynchronous tasks so we need to think about how our app will behave if the asynchronous
-                // task takes longer than anticipated...
-                // We start this activity by getting the list of all users in the onResume() method;
-                // then when that is complete, we come down here and kick off this second task which then runs asynchronously itself...
-                // When this comes back, the check marks get updated
-                if (e == null) {
-                    // query successful and list is returned - look for a match by looping through the entire list of users...
-                    // for each one we'll check it in our list of friends
-                    // (this shouldn't be too bad, because at most our list of users will be 1000
-                    for (int i = 0; i < mUsers.size(); i++) {
-                        // store the user in a ParseUser variable
-                        ParseUser user = mUsers.get(i);
 
-                        // write a separate for loop to loop through the list of friends that is returned in this done() method
+                if (e == null) {
+                    // If no exception - Query successful and list is returned.
+                    // Get each user who has been selected
+                    for (int i = 0; i < mUsers.size(); i++) {
+                        // Store the user in a ParseUser variable
+                        ParseUser user = mUsers.get(i);
+                        // Iterate through the returned list to set the check mark of each selected user
                         for (ParseUser friend : friends) {
-                            // compare the object id of each friend (the object id is the unique id created each time a new user signs up)
                             if (friend.getObjectId().equals(user.getObjectId())) {
-                                // set the check mark
+                                // Set the check mark
                                 mGridView.setItemChecked(i, true);
                             }
                         }
                     }
                 } else {
+                    // Log an exception
                     Log.e(TAG, e.getMessage());
                 }
             }
@@ -205,29 +194,25 @@ public class EditFriendsActivity extends Activity {
             if (mGridView.isItemChecked(position)) {
                 // Add a friend if checked
                 // Pass in the user that was tapped on as the parameter (the position of the item that is tapped on)
-                // Map this to our list of users stored in the variable mUsers
-                // For a list variable (mUsers), we use the get() method
-                // Now the user at the current position will be added to the friends relation
+                // Map this to the list of users stored in the variable mUsers - use get()
                 mFriendsRelation.add(mUsers.get(position));
 
                 // Manipulate the image view for the check mark - set to visible when selected
                 checkImageView.setVisibility(View.VISIBLE);
             } else {
-                // remove the friend by calling the remove() method of ParseRelation
+                // Remove the friend by calling the remove() method of ParseRelation
                 mFriendsRelation.remove(mUsers.get(position));
 
                 // Manipulate the image view for the check mark - set to invisible when selected
                 checkImageView.setVisibility(View.INVISIBLE);
             }
 
-            // the user is added/removed locally, but we also need to save this relation to the backend
-            // choose the asynchronous method saveInBackground() and for the callback, use new SaveCallback()
+            // Save this relation in Parse using the background thread
             mCurrentUser.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    // Don't do anything if successful
-                    // If it fails, let the user retry deleting them as friends again and log the exception
                     if (e != null) {
+                        // Alert the user of an exception
                         Log.e(TAG, e.getMessage());
                     }
                 }

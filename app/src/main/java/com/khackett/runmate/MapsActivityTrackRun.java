@@ -64,9 +64,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
-    /**
-     * Tag for current Activity
-     */
+
     public static final String TAG = MapsActivityTrackRun.class.getSimpleName();
 
     /**
@@ -832,6 +830,30 @@ public class MapsActivityTrackRun extends FragmentActivity implements
             @Override
             public void done(ParseException e) {
                 if (e == null) {
+
+//                    // Create a new ParseObject
+//                    ParseObject route = object;
+//                    // Add the current user to the accepted list and update the Route object
+//                    ArrayList<String> acceptedRecipientIds = new ArrayList<String>();
+//                    acceptedRecipientIds.add(ParseUser.getCurrentUser().getObjectId());
+//                    route.put(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, acceptedRecipientIds);
+//
+//                    // Get the list of recipients
+//                    List<String> recipientList = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
+//                    if (recipientList.size() == 1) {
+//                        // If it is the last recipient - delete the Route object
+//                        route.deleteInBackground();
+//                    } else {
+//                        // Remove the current user from the recipient list and save.
+//                        recipientList.remove(ParseUser.getCurrentUser().getObjectId());
+//
+//                        ArrayList<String> recipientsToRemove = new ArrayList<String>();
+//                        recipientsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+//
+//                        route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, recipientsToRemove);
+//                        route.saveInBackground();
+//                    }
+
                     // successful
                     Toast.makeText(MapsActivityTrackRun.this, R.string.success_save_run, Toast.LENGTH_LONG).show();
                 } else {

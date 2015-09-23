@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         switch (itemId) {
             case R.id.action_add_friends:
                 // Create and start a new intent to add/remove friends.
-                Intent intent = new Intent(this, EditFriendsActivity.class);
+                Intent intent = new Intent(this, AddRemoveFriendsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.action_plot_route:

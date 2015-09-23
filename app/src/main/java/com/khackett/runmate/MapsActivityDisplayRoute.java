@@ -466,13 +466,13 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         }
 
         // Create a new JSONArray
-        JSONArray arrayPoints = jsonArray;
+        JSONArray pointsArray = jsonArray;
 
         // Get LatLng values for the extreme southWest and northEast corners of the route
-        LatLng southWest = new LatLng(arrayPoints.optJSONObject(0).optDouble("latitude"),
-                arrayPoints.optJSONObject(0).optDouble("longitude"));
-        LatLng northEast = new LatLng(arrayPoints.optJSONObject(1).optDouble("latitude"),
-                arrayPoints.optJSONObject(1).optDouble("longitude"));
+        LatLng southWest = new LatLng(pointsArray.optJSONObject(0).optDouble("latitude"),
+                pointsArray.optJSONObject(0).optDouble("longitude"));
+        LatLng northEast = new LatLng(pointsArray.optJSONObject(1).optDouble("latitude"),
+                pointsArray.optJSONObject(1).optDouble("longitude"));
 
         // Set these values to LatLngBounds and animate camera to view
         LatLngBounds latLngBounds = new LatLngBounds(southWest, northEast);
@@ -551,18 +551,18 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
         // Keep the screen on while the user is animating the route
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Start the animation
-        mRunMateAnimator.startAnimation();
+        mRunnerAnimation.startAnimation();
     }
 
     // Create a RunMateAnimator object
-    private RunMateAnimator mRunMateAnimator = new RunMateAnimator();
+    private RunnerAnimation mRunnerAnimation = new RunnerAnimation();
     // Handler object to process the Runnable object
     private final Handler mHandler = new Handler();
 
     /**
      * Class to handle the animation feature of the MapsActivityDisplayRoute class
      */
-    public class RunMateAnimator implements Runnable {
+    public class RunnerAnimation implements Runnable {
 
         /**
          * The speed of the camera during animation
@@ -610,7 +610,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
          */
         public void startAnimation() {
             if (allNonDuplicateLatLng.size() > 2) {
-                mRunMateAnimator.initialize();
+                mRunnerAnimation.initialize();
             }
         }
 
@@ -673,11 +673,11 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                         public void onFinish() {
                             Log.i(TAG, "Camera animation finished");
                             // Reset the animation values
-                            mRunMateAnimator.reset();
+                            mRunnerAnimation.reset();
                             // The Handler’s post() method posts the Runnable object to the message queue
                             // which kicks off the run() method to begin the next stage of the animation sequence.
                             Handler handler = new Handler();
-                            handler.post(mRunMateAnimator);
+                            handler.post(mRunnerAnimation);
                         }
 
                         @Override
@@ -740,7 +740,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                             null);
 
                     // Begin the Runnable thread again
-                    mHandler.postDelayed(mRunMateAnimator, MARKER_FRAME_RATE_MILLISECONDS);
+                    mHandler.postDelayed(mRunnerAnimation, MARKER_FRAME_RATE_MILLISECONDS);
 
                 } else {
                     // Increment the current point on the route
@@ -750,7 +750,7 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
                     // Remove the runner icon
                     runnerMarker.remove();
                     // Remove any callbacks to the Handler object and stop the thread
-                    mHandler.removeCallbacks(mRunMateAnimator);
+                    mHandler.removeCallbacks(mRunnerAnimation);
                 }
             }
         }

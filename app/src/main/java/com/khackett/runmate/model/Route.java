@@ -221,22 +221,30 @@ public class Route {
         return mLongitudeMin;
     }
 
-    /**
-     * Gets the maximum and minimum latitude and longitude points of the route
-     *
-     * @return the LatLngBounds value of a route
-     */
-    public LatLngBounds getLatLngBounds() {
-        LatLngBounds latLngBounds;
-        mLatitudeMin = getLatitudeMin();
-        mLongitudeMin = getLongitudeMin();
-        mLatitudeMax = getLatitudeMax();
-        mLongitudeMax = getLongitudeMax();
-        LatLng southWest = new LatLng(mLatitudeMin, mLongitudeMin);
-        LatLng northEast = new LatLng(mLatitudeMax, mLongitudeMax);
-        latLngBounds = new LatLngBounds(southWest, northEast);
-        return latLngBounds;
-    }
+/**
+ * Gets the maximum and minimum latitude and longitude points of the route
+ *
+ * @return the LatLngBounds value of a route
+ */
+public LatLngBounds getLatLngBounds() {
+
+    // Declare a LatLngBounds object
+    LatLngBounds latLngBounds;
+
+    // Get min and max lat and lng values from the entire list of points
+    mLatitudeMin = getLatitudeMin();
+    mLongitudeMin = getLongitudeMin();
+    mLatitudeMax = getLatitudeMax();
+    mLongitudeMax = getLongitudeMax();
+
+    // Assign these to southWest and northEast LatLng values
+    LatLng southWest = new LatLng(mLatitudeMin, mLongitudeMin);
+    LatLng northEast = new LatLng(mLatitudeMax, mLongitudeMax);
+
+    // Assign to the LatLngBounds object and return value
+    latLngBounds = new LatLngBounds(southWest, northEast);
+    return latLngBounds;
+}
 
     /**
      * Calculates the straight line distance between two locations on a map

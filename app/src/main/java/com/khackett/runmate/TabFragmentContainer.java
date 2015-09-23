@@ -13,6 +13,7 @@ import com.khackett.runmate.adapters.MyFragmentPagerAdapter;
 
 /**
  * Created by KHackett on 31/08/15.
+ * Class to maintain the
  */
 public class TabFragmentContainer extends Fragment {
 

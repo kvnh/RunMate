@@ -3,6 +3,7 @@ package com.khackett.runmate.ui;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,16 +48,21 @@ public class FriendsFragment extends Fragment {
         // View is then attached to a parent - the ViewPager object from TabFragmentContainer.
         View rootView = inflater.inflate(R.layout.user_grid, container, false);
 
-        // Set the GridView fragment
-        mGridView = (GridView) rootView.findViewById(R.id.friendsGrid);
-
-        // Check that there are friends to display - if not, display a message
-        TextView emptyFriendsList = (TextView) rootView.findViewById(android.R.id.empty);
-        // Attach this as the empty text view for the GridView
-        mGridView.setEmptyView(emptyFriendsList);
-
         // Return the view of the fragment
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Set the GridView fragment
+        mGridView = (GridView) view.findViewById(R.id.friendsGrid);
+
+        // Check that there are friends to display - if not, display a message
+        TextView emptyFriendsList = (TextView) view.findViewById(android.R.id.empty);
+        // Attach this as the empty text view for the GridView
+        mGridView.setEmptyView(emptyFriendsList);
     }
 
 
@@ -83,7 +89,7 @@ public class FriendsFragment extends Fragment {
                 // If no exception returned
                 if (e == null) {
 
-                    // Set the mFriends variable based on the List of returned ParseUsers
+                    // Set the mFriends variable to the List of returned ParseUsers
                     mFriends = friends;
 
                     // Create an adapter and set it as the list adapter.
