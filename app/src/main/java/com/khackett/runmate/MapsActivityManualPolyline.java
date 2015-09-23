@@ -50,7 +50,7 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Set the layout file for this fragment activity
-        setContentView(R.layout.activity_maps_activity_directions_multiple);
+        setContentView(R.layout.maps_activity_manual_polyline);
         setUpMapIfNeeded();
 
         // Instantiate ArrayLists
@@ -85,8 +85,7 @@ public class MapsActivityManualPolyline extends FragmentActivity implements Goog
 
         // Register buttons with the listener
         mButtonSend.setOnClickListener(this);
-        mButtonUndo.setOnClickListener(this);
-        mButtonCompleteLoop.setOnClickListener(this);
+
     }
 
     /**

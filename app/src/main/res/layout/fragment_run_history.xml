@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity$PlaceholderFragment">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/background_fill"
+        android:contentDescription="@string/content_description_background"/>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -27,7 +34,10 @@
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/empty_inbox_label"
-        android:textSize="@dimen/default_text_size"/>
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:text="@string/empty_my_run_history"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
 </RelativeLayout>

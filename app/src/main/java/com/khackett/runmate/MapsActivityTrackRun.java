@@ -689,6 +689,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to save a route once a user has completed their run
+     *
      * @param view
      */
     public void saveRunButton(View view) {
@@ -708,6 +709,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to send a route once a user has completed their run
+     *
      * @param view
      */
     public void sendRunButton(View view) {
@@ -723,6 +725,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to delet a run
+     *
      * @param view
      */
     public void deleteRunButton(View view) {
@@ -751,6 +754,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to delete a users route from the object
+     *
      * @param object
      */
     public void deleteUserRoute(ParseObject object) {
@@ -776,6 +780,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to create a route for saving to Parse
+     *
      * @return
      */
     public ParseObject createCompletedRouteToSave() {
@@ -841,6 +846,7 @@ public class MapsActivityTrackRun extends FragmentActivity implements
 
     /**
      * Method to convert an array of LatLng elements to an array of ParseGeoPoint elements.
+     *
      * @param latLngBounds
      * @return
      */
@@ -862,35 +868,16 @@ public class MapsActivityTrackRun extends FragmentActivity implements
         return parseLatLngBoundsList;
     }
 
+    /**
+     * Saves a completed route to Parse
+     *
+     * @param completedRoute
+     */
     public void saveCompletedRoute(ParseObject completedRoute) {
         completedRoute.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-
-//                    // Create a new ParseObject
-//                    ParseObject route = object;
-//                    // Add the current user to the accepted list and update the Route object
-//                    ArrayList<String> acceptedRecipientIds = new ArrayList<String>();
-//                    acceptedRecipientIds.add(ParseUser.getCurrentUser().getObjectId());
-//                    route.put(ParseConstants.KEY_ACCEPTED_RECIPIENT_IDS, acceptedRecipientIds);
-//
-//                    // Get the list of recipients
-//                    List<String> recipientList = route.getList(ParseConstants.KEY_RECIPIENT_IDS);
-//                    if (recipientList.size() == 1) {
-//                        // If it is the last recipient - delete the Route object
-//                        route.deleteInBackground();
-//                    } else {
-//                        // Remove the current user from the recipient list and save.
-//                        recipientList.remove(ParseUser.getCurrentUser().getObjectId());
-//
-//                        ArrayList<String> recipientsToRemove = new ArrayList<String>();
-//                        recipientsToRemove.add(ParseUser.getCurrentUser().getObjectId());
-//
-//                        route.removeAll(ParseConstants.KEY_RECIPIENT_IDS, recipientsToRemove);
-//                        route.saveInBackground();
-//                    }
-
                     // successful
                     Toast.makeText(MapsActivityTrackRun.this, R.string.success_save_run, Toast.LENGTH_LONG).show();
                 } else {

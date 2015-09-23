@@ -69,7 +69,9 @@
 
     <string name="progress_bar">Progress Bar</string>
 
-    <string name="empty_inbox_label">No new messages</string>
+    <string name="empty_inbox_label">No new run messages</string>
+    <string name="empty_my_runs_label">No accepted runs yet</string>
+    <string name="empty_my_run_history">No runs completed yet... Get up and go!</string>
     <string name="empty_friends_label">No friends yet... Add some to begin</string>
     <string name="title_activity_edit_friends">Edit Friends</string>
     <string name="title_activity_maps_activity_manual_polyline">Manual Polyline</string>

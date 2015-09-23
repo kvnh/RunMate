@@ -1,0 +1,77 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.khackett.runmate.MapsActivityManualPolyline">
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/maps_activity_tool_bar"
+        android:layout_alignParentBottom="true"
+        android:background="@color/backgroundPurple"
+        android:orientation="horizontal">
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/btn_undo"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginStart="2dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="#07000000"-->
+            <!--android:gravity="center_vertical|center_horizontal"-->
+            <!--android:paddingTop="@dimen/maps_activity_tool_bar_icon_padding"-->
+            <!--android:src="@mipmap/ic_undo_white_24dp"/>-->
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/btn_complete_loop"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="#07000000"-->
+            <!--android:gravity="center_vertical|center_horizontal"-->
+            <!--android:paddingTop="@dimen/maps_activity_tool_bar_icon_padding"-->
+            <!--android:shadowRadius="5"-->
+            <!--android:src="@mipmap/ic_loop_white_24dp"/>-->
+
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#07000000"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingTop="@dimen/maps_activity_tool_bar_icon_padding"
+            android:shadowRadius="5"
+            android:src="@mipmap/ic_done_white_24dp"/>
+
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout"
+        tools:context="com.khackett.runmate.MapsActivityManualPolyline">
+
+        <TextView
+            android:id="@+id/distanceCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:layout_marginTop="15dp"
+            android:background="#07000000"
+            android:paddingStart="15dp"
+            android:text="@string/distance_count"
+            android:textColor="@color/ColorPrimaryRed"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+    </fragment>
+
+</RelativeLayout>

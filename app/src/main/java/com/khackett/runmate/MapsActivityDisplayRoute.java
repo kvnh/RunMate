@@ -564,6 +564,8 @@ public class MapsActivityDisplayRoute extends FragmentActivity implements View.O
 
     /**
      * Class to handle the animation feature of the MapsActivityDisplayRoute class
+     * Some code taken from:
+     * https://github.com/ddewaele/GoogleMapsV2WithActionBarSherlock/blob/master/GoogleMapsV2WithActionBarSherlock/docs/part3.md
      */
     public class RunnerAnimation implements Runnable {
 
