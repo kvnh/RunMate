@@ -155,6 +155,9 @@ public class RouteRecipientsActivity extends Activity {
                     // set the mFriends variable based on the list of friends that is returned
                     mFriends = friends;
 
+                    // Remove the current user from the list if they are there
+                    mFriends.remove(ParseUser.getCurrentUser());
+
                     // Create an adapter and set it as the list adapter.
                     // Get the adapter associated with the GridView and check to see if it is null.
                     if (mGridView.getAdapter() == null) {

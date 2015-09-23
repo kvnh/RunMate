@@ -108,6 +108,9 @@ public class AddRemoveFriendsActivity extends Activity {
                     // Set the mUsers to the List of returned users
                     mUsers = users;
 
+                    // Remove the current user from the list
+                    mUsers.remove(ParseUser.getCurrentUser());
+
                     // Use the custom UserAdapter
                     // Get the adapter associated with the GridView and check to see if it is null
                     if (mGridView.getAdapter() == null) {

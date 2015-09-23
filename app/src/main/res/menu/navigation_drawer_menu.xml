@@ -28,21 +28,8 @@
                 android:id="@+id/navItemHelp"
                 android:icon="@mipmap/ic_help_outline_black_24dp"
                 android:title="@string/nav_item_help"/>
-            <item
-                android:id="@+id/navItemSettings"
-                android:icon="@mipmap/ic_settings_black_24dp"
-                android:title="@string/nav_item_settings"/>
         </menu>
     </item>
-
-    <!--<item android:title="">-->
-    <!--<menu>-->
-    <!--<item-->
-    <!--android:id="@+id/navItemLogOut"-->
-    <!--android:icon="@mipmap/ic_action_play_over_video"-->
-    <!--android:title="@string/nav_item_log_out"/>-->
-    <!--</menu>-->
-    <!--</item>-->
 
     <group
         android:id="@+id/groupExtras">

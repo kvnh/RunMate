@@ -43,7 +43,7 @@
         android:id="@+id/chooseFriendsButton"
         style="@style/AuthenticationButton"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editTextLayout"
+        android:layout_below="@+id/routeNameText"
         android:layout_marginTop="40dp"
         android:text="@string/choose_friends_button_label"/>
 
