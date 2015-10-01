@@ -32,7 +32,7 @@
         android:layout_below="@id/instructionsTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
-        android:src="@drawable/ic_action_name"/>
+        android:src="@mipmap/ic_person_outline_white_24dp"/>
 
     <ImageView
         android:id="@+id/buttonDivider"
